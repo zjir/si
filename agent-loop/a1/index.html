@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A1 · Agent loop</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--fg:#1c2024;--muted:#6b7280;--line:#e3e6ea;--accent:#2b59c3;--ok:#1a7f37;--warn:#b42318;--run:#9a6700;--code:#f1f3f5;--add:#e6ffec;--del:#ffebe9}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1115;--card:#171a21;--fg:#e6e8eb;--muted:#9aa3ad;--line:#2a2f38;--accent:#7aa2ff;--ok:#56d364;--warn:#ff7b72;--run:#e3b341;--code:#1e222b;--add:#12261a;--del:#2d1517}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:2;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+header h1{font-size:16px;margin:0}
+header .meta{color:var(--muted);font-size:12px}
+header .sp{flex:1}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+button,.btn{font:inherit;padding:5px 10px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:6px;cursor:pointer}
+button:hover,.btn:hover{border-color:var(--accent);text-decoration:none}
+main{max-width:1200px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:16px}
+.card>h2{font-size:14px;margin:0;padding:10px 14px;border-bottom:1px solid var(--line)}
+.pad{padding:12px 14px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600}
+tbody tr.task{cursor:pointer}tbody tr.task:hover{background:var(--code)}
+tr.sel{background:var(--code)}
+.num{text-align:right;white-space:nowrap}
+.muted{color:var(--muted)}
+.badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:12px;border:1px solid currentColor;white-space:nowrap}
+.s-done{color:var(--ok)}.s-running,.s-queued{color:var(--run)}.s-failed,.s-blocked,.s-invalid,.s-max_rounds{color:var(--warn)}
+.warn{color:var(--warn)}
+.warnlist{margin:0;padding:0;list-style:none}.warnlist li{color:var(--warn);margin:2px 0}
+.warnlist b{font-family:ui-monospace,Consolas,monospace;font-size:12px}
+dl.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:0}
+dl.kv dt{color:var(--muted)}dl.kv dd{margin:0;word-break:break-word}
+pre{background:var(--code);padding:10px;border-radius:6px;overflow:auto;max-height:520px;font:12px/1.4 ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;margin:6px 0}
+pre.diff{white-space:pre}
+.diff .a{background:var(--add)}.diff .d{background:var(--del)}.diff .h{color:var(--accent)}
+details.round{border-top:1px solid var(--line)}
+details.round>summary{list-style:none;cursor:pointer;padding:9px 14px;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline}
+details.round>summary::-webkit-details-marker{display:none}
+details.round>summary::before{content:"▸";color:var(--muted)}
+details.round[open]>summary::before{content:"▾"}
+details.round>summary .sum{flex-basis:100%;color:var(--muted);padding-left:18px}
+details.round .body{padding:4px 14px 14px 32px}
+h3{font-size:13px;margin:12px 0 4px}
+.empty{color:var(--muted);padding:14px}
+code{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:var(--code);padding:1px 4px;border-radius:4px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+@media (max-width:760px){.hide-s{display:none}th,td{padding:6px}details.round .body{padding-left:14px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>A1 · Agent loop</h1>
+  <span class="meta" id="hdr"></span>
+  <span class="sp"></span>
+  <a class="btn" id="lnkNew" target="_blank" rel="noopener">Nový úkol (GitHub)</a>
+  <a class="btn" href="new-task.html">Nový úkol (offline)</a>
+  <button id="btnReload" title="Znovu načíst data.js">Obnovit</button>
+</header>
+<main>
+  <div class="card">
+    <h2>Úkoly <span class="tabs" style="float:right" id="filters"></span></h2>
+    <table>
+      <thead><tr><th>Úkol</th><th>Název</th><th class="hide-s">Režim</th><th>Stav</th><th class="num">Kola</th><th class="num hide-s">Tokeny in/out</th><th class="num hide-s">Cena</th><th class="num hide-s">Doba</th><th class="hide-s">Poslední verdikt</th><th>!</th></tr></thead>
+      <tbody id="list"></tbody>
+    </table>
+  </div>
+  <div id="detail"></div>
+</main>
+<script>
+(function(){
+"use strict";
+var D=null, filter="all", selected=null;
+var STATUS_CS={running:"běží",queued:"ve frontě",done:"hotovo",blocked:"zablokováno",failed:"selhalo",max_rounds:"strop kol",invalid:"neplatné",paused:"pozastaveno"};
+
+function el(tag,attrs,kids){var e=document.createElement(tag);if(attrs){for(var k in attrs){if(k==="text")e.textContent=attrs[k];else if(k==="cls")e.className=attrs[k];else if(k==="html")e.innerHTML=attrs[k];else e.setAttribute(k,attrs[k]);}}(kids||[]).forEach(function(c){if(c==null)return;e.appendChild(typeof c==="string"?document.createTextNode(c):c);});return e;}
+function fmtTok(n){if(n==null)return "?";n=+n;return n>=1e6?(n/1e6).toFixed(1)+"M":n>=1e3?(n/1e3).toFixed(1)+"k":String(Math.round(n));}
+function fmtDur(s){if(s==null)return "?";s=+s;var h=Math.floor(s/3600),m=Math.round((s%3600)/60);return h?h+" h "+m+" min":m+" min";}
+function fmtCost(t){if(!t)return "?";return (t.cost_known?"":"≥ ")+"$"+(+t.cost_usd).toFixed(2);}
+function fmtDate(s){if(!s)return "";var d=new Date(s);if(isNaN(d))return s;return d.toLocaleString("cs-CZ");}
+function statusOf(t){return (t.state&&t.state.status)||"queued";}
+function badge(st){return el("span",{cls:"badge s-"+st,text:STATUS_CS[st]||st});}
+function commitLink(c,label){if(!c||!c.hash)return null;var u=D.repo_url?D.repo_url.replace(/\/$/,"")+"/commit/"+c.hash:null;return u?el("a",{href:u,target:"_blank",rel:"noopener",text:label||c.hash.slice(0,7)}):el("code",{text:c.hash.slice(0,7)});}
+function pre(text,cls){return el("pre",{cls:cls||"",text:text});}
+function diffPre(text){var p=el("pre",{cls:"diff"});text.split("\n").forEach(function(l){var c="";if(/^\+(?!\+\+)/.test(l))c="a";else if(/^-(?!--)/.test(l))c="d";else if(/^@@/.test(l))c="h";p.appendChild(el("div",{cls:c,text:l||" "}));});return p;}
+function lastRound(t){return t.rounds&&t.rounds.length?t.rounds[t.rounds.length-1]:null;}
+
+function renderHeader(){
+  var r=D.runner||{};var hb=r.heartbeat?"runner: "+fmtDate(r.heartbeat):"runner: –";
+  document.getElementById("hdr").textContent="model "+D.model+" · effort "+D.effort+" · data "+fmtDate(D.generated_at)+" · "+hb+(r.stop_file?" · STOP":"");
+  var nl=document.getElementById("lnkNew");
+  if(D.repo_url){nl.href=D.repo_url.replace(/\/$/,"")+"/actions/workflows/new-task.yml";}else{nl.style.display="none";}
+}
+function renderFilters(){
+  var f=document.getElementById("filters");f.innerHTML="";
+  var counts={all:D.tasks.length};D.tasks.forEach(function(t){var s=statusOf(t);counts[s]=(counts[s]||0)+1;});
+  ["all","running","queued","done","max_rounds","blocked","failed"].forEach(function(k){if(k!=="all"&&!counts[k])return;
+    var b=el("button",{text:(k==="all"?"vše":STATUS_CS[k]||k)+" ("+(counts[k]||0)+")"});if(filter===k)b.style.borderColor="var(--accent)";
+    b.onclick=function(ev){ev.stopPropagation();filter=k;renderList();renderFilters();};f.appendChild(b);});
+}
+function renderList(){
+  var tb=document.getElementById("list");tb.innerHTML="";
+  var order={running:0,queued:1};
+  var tasks=D.tasks.slice().filter(function(t){return filter==="all"||statusOf(t)===filter;})
+    .sort(function(a,b){var oa=order[statusOf(a)]!=null?order[statusOf(a)]:2,ob=order[statusOf(b)]!=null?order[statusOf(b)]:2;if(oa!==ob)return oa-ob;return a.id<b.id?1:-1;});
+  if(!tasks.length){tb.appendChild(el("tr",{},[el("td",{colspan:"10",cls:"empty",text:"Žádné úkoly."})]));return;}
+  tasks.forEach(function(t){
+    var lr=lastRound(t),res=lr&&lr.result,st=statusOf(t),task=t.task||{};
+    var tr=el("tr",{cls:"task"+(selected===t.id?" sel":"")},[
+      el("td",{},[el("code",{text:t.id})]),
+      el("td",{text:task.title||""}),
+      el("td",{cls:"hide-s",text:task.mode||""}),
+      el("td",{},[badge(st)]),
+      el("td",{cls:"num",text:(t.totals.rounds)+" / "+(task.max_rounds||"?")}),
+      el("td",{cls:"num hide-s",text:fmtTok(t.totals.input_tokens)+" / "+fmtTok(t.totals.output_tokens)}),
+      el("td",{cls:"num hide-s",text:fmtCost(t.totals)}),
+      el("td",{cls:"num hide-s",text:fmtDur(t.totals.duration_s)}),
+      el("td",{cls:"hide-s muted",text:res?(res.status+": "+(res.summary||"")):""}),
+      el("td",{cls:"warn",text:t.warnings&&t.warnings.length?String(t.warnings.length):""})
+    ]);
+    tr.onclick=function(){selected=t.id;location.hash=t.id;renderList();renderDetail();document.getElementById("detail").scrollIntoView({behavior:"smooth"});};
+    tb.appendChild(tr);
+  });
+}
+function kv(pairs){var dl=el("dl",{cls:"kv"});pairs.forEach(function(p){if(p[1]==null||p[1]==="")return;dl.appendChild(el("dt",{text:p[0]}));var dd=el("dd");if(p[1] instanceof Node)dd.appendChild(p[1]);else dd.textContent=String(p[1]);dl.appendChild(dd);});return dl;}
+function list(arr){arr=arr||[];if(!arr.length)return null;return el("span",{},arr.map(function(x,i){return el("span",{},[i?", ":"",el("code",{text:x})]);}));}
+
+function renderRound(t,r){
+  var m=r.meta||{},res=r.result||{},f=res.findings||{};
+  var st=res.status||(m.scope_violation?"SCOPE_VIOLATION":m.timed_out?"TIMEOUT":m.exit_code?"FAILED":"NO_RESULT");
+  var d=el("details",{cls:"round"});
+  var models=(m.actual_models&&m.actual_models.length)?m.actual_models.join(", "):(m.requested_model||"?");
+  var s=el("summary",{},[
+    el("b",{text:"Kolo "+r.round}),
+    el("span",{cls:"badge "+(st==="DONE"?"s-done":st==="CONTINUE"?"s-running":"s-failed"),text:st}),
+    el("span",{cls:"muted",text:models+" · "+(m.requested_effort||"?")}),
+    el("span",{cls:"muted",text:fmtDur(m.duration_s)}),
+    el("span",{cls:"muted",text:"tok "+fmtTok(m.input_tokens)+"/"+fmtTok(m.output_tokens)}),
+    el("span",{cls:"muted",text:m.cost_usd!=null?"$"+(+m.cost_usd).toFixed(2):"cena ?"}),
+    el("span",{cls:"muted",text:"B/S/D "+(f.blocking!=null?f.blocking:"-")+"/"+(f.medium!=null?f.medium:"-")+"/"+(f.minor!=null?f.minor:"-")}),
+    r.commit?commitLink(r.commit):null,
+    el("span",{cls:"sum",text:res.summary||""})
+  ]);
+  d.appendChild(s);
+  var body=el("div",{cls:"body"});
+  d.appendChild(body);
+  d.addEventListener("toggle",function(){
+    if(!d.open||body.childNodes.length)return;
+    body.appendChild(kv([
+      ["Shrnutí",res.summary],["Další kolo",res.next],
+      ["Požadavky",res.requests&&res.requests.length?res.requests.join(" | "):null],
+      ["Změněné soubory",list(m.changed_files)],
+      ["Porušení rozsahu",m.scope_violation?list(m.scope_violations):null],
+      ["Začátek / konec",fmtDate(m.started_at)+" → "+fmtDate(m.ended_at)],
+      ["Model (požadovaný / skutečný)",(m.requested_model||"?")+" / "+models],
+      ["Effort",(m.requested_effort||"?")+(m.effort_verified?"":" (neověřeno)")],
+      ["Tokeny in / out / cache",fmtTok(m.input_tokens)+" / "+fmtTok(m.output_tokens)+" / "+fmtTok(m.cache_read_tokens)],
+      ["Tahů, pokusů, exit",(m.num_turns!=null?m.num_turns:"?")+", "+(m.attempts||"?")+", "+m.exit_code+(m.timed_out?" (timeout)":"")],
+      ["CLI",m.claude_version],
+      ["Commit",r.commit?commitLink(r.commit,r.commit.hash):null]
+    ]));
+    if(r.notes){body.appendChild(el("h3",{text:"Poznámky agenta"}));body.appendChild(pre(r.notes));}
+    if(r.output){body.appendChild(el("h3",{text:"Výstup agenta"}));body.appendChild(pre(r.output));}
+    if(r.diff){body.appendChild(el("h3",{text:"Diff kola"}));body.appendChild(diffPre(r.diff));}
+  });
+  return d;
+}
+function renderDetail(){
+  var box=document.getElementById("detail");box.innerHTML="";
+  var t=D.tasks.filter(function(x){return x.id===selected;})[0];if(!t)return;
+  var task=t.task||{},st=t.state||{};
+  var c=el("div",{cls:"card"});
+  c.appendChild(el("h2",{},[el("code",{text:t.id})," ",task.title||""," ",badge(statusOf(t))]));
+  var p=el("div",{cls:"pad"});c.appendChild(p);
+  if(t.warnings&&t.warnings.length){var ul=el("ul",{cls:"warnlist"});t.warnings.forEach(function(w){ul.appendChild(el("li",{},[el("b",{text:w.code}),"  "+(w.detail||"")]));});p.appendChild(ul);}
+  p.appendChild(kv([
+    ["Režim",task.mode],["Cíl",task.goal],["Hotovo, když",task.done_when],
+    ["Vstupy",list(task.inputs)],["Smí měnit",list(task.scope_allow)],["Nesmí měnit",list(task.scope_deny)],
+    ["Strop",(task.max_rounds||"?")+" kol · "+(task.max_minutes||"?")+" min/kolo"],
+    ["Poznámky",task.notes],["Vytvořeno",fmtDate(task.created_at)],
+    ["Stav",(STATUS_CS[st.status]||st.status||"")+(st.phase?" · "+st.phase:"")+(st.round!=null?" · kolo "+st.round:"")],
+    ["Začátek / konec",fmtDate(st.started_at)+(st.ended_at?" → "+fmtDate(st.ended_at):"")],
+    ["Heartbeat",fmtDate(st.heartbeat)],
+    ["Soubor úkolu",el("code",{text:t.file})],
+    ["Commity",el("span",{},[t.commits&&t.commits.start?commitLink(t.commits.start,"start"):null," ",t.commits&&t.commits.end?commitLink(t.commits.end,"konec"):null])]
+  ]));
+  var rs=el("div",{},[el("h3",{text:"Znovu spustit"})]);
+  if(D.repo_url){rs.appendChild(el("a",{cls:"btn",href:D.repo_url.replace(/\/$/,"")+"/actions/workflows/restart-task.yml",target:"_blank",rel:"noopener",text:"Restart přes GitHub (task_id "+t.id+")"}));}
+  rs.appendChild(pre("agent-loop\\start-loop.cmd restart -Id "+t.id+"\nagent-loop\\start-loop.cmd restart -Id "+t.id+" -FromScratch"));
+  p.appendChild(rs);
+  if(t.state_md){var sd=el("details",{},[el("summary",{text:"state.md (aktuální stav pro příští kolo)"}),pre(t.state_md)]);p.appendChild(sd);}
+  var rc=el("div",{cls:"card"},[el("h2",{text:"Kroky ("+(t.rounds||[]).length+")"})]);
+  if(!t.rounds||!t.rounds.length)rc.appendChild(el("div",{cls:"empty",text:"Zatím žádné kolo."}));
+  (t.rounds||[]).forEach(function(r){rc.appendChild(renderRound(t,r));});
+  box.appendChild(c);box.appendChild(rc);
+}
+function render(){
+  D=window.LOOP_DATA||{tasks:[],model:"?",effort:"?"};D.tasks=D.tasks||[];
+  if(!selected&&location.hash)selected=decodeURIComponent(location.hash.slice(1));
+  renderHeader();renderFilters();renderList();renderDetail();
+}
+function reload(){
+  var s=document.createElement("script");s.src="data.js?t="+Date.now();
+  s.onload=function(){render();s.remove();};
+  s.onerror=function(){alert("data.js se nepodařilo načíst");};
+  document.body.appendChild(s);
+}
+document.getElementById("btnReload").onclick=reload;
+window.addEventListener("hashchange",function(){selected=decodeURIComponent(location.hash.slice(1));renderList();renderDetail();});
+var s=document.createElement("script");s.src="data.js?t="+Date.now();s.onload=render;s.onerror=render;document.body.appendChild(s);
+setInterval(reload,120000);
+})();
+</script>
+</body>
+</html>

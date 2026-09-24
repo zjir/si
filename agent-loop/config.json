@@ -1,0 +1,29 @@
+{
+  "model": "fable",
+  "model_expect": "fable",
+  "effort": "max",
+  "claude_command": "claude",
+  "use_bare": false,
+  "extra_args": [],
+  "poll_seconds": 300,
+  "retries": 3,
+  "retry_sleep_seconds": 3600,
+  "heartbeat_seconds": 30,
+  "default_max_rounds": 5,
+  "default_max_minutes": 60,
+  "push": true,
+  "remote": "origin",
+  "repo_url": "https://github.com/zjir/si",
+  "diff_max_kb": 200,
+  "report_diff_max_kb": 60,
+  "report_text_max_kb": 20,
+  "prompts": {
+    "common": "agent-loop/prompts/common.md",
+    "spec": "agent-loop/review-loop/review.md",
+    "code": "agent-loop/prompts/code.md"
+  },
+  "tools": {
+    "spec": "Read,Edit,Write,Glob,Grep",
+    "code": "Read,Edit,Write,Glob,Grep,Bash"
+  }
+}

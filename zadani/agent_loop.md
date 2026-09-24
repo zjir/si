@@ -353,6 +353,8 @@ Druhý formulář pro restart bez psaní souboru: vstupy `task_id` a `from_scrat
 2. Agent si odpovídá na otázky sám, nikdy nechce nic od uživatele.
 3. Když v A1 kliknu na úkol, uvidím základní detaily a jednotlivé kroky a jejich výstupy. Kroky jsou sbalené a můžu je rozbalit po jednom.
 4. Loop má jen možnost zastavení po N krocích, pokud agent dříve sám nerozhodne o ukončení.
+5. Všechny běhy agentů používají vždy model Fable 5.1 s effortem max.
+6. Cílová platforma smyčky je Windows (PowerShell).
 
 ### 15.3 Role recenzenta
 

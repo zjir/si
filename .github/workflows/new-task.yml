@@ -1,0 +1,89 @@
+name: new-task
+run-name: "Nový úkol: ${{ inputs.title }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: "Název (jedna věta)"
+        required: true
+        type: string
+      mode:
+        description: "Režim: spec = recenze/doplnění zadání, code = implementace"
+        required: true
+        type: choice
+        options: [spec, code]
+        default: spec
+      goal:
+        description: "Cíl pro agenta"
+        required: true
+        type: string
+      done_when:
+        description: "Hotovo, když (ověřitelná podmínka)"
+        required: true
+        type: string
+      scope_allow:
+        description: "Smí měnit: cesty/globy oddělené čárkou (např. zadani/komponenta-sr.md)"
+        required: true
+        type: string
+      inputs_paths:
+        description: "Vstupy ke čtení, čárkou (volitelné)"
+        required: false
+        type: string
+        default: "PAT/Popis OS P.A.T.pdf"
+      max_rounds:
+        description: "Max. počet kol N"
+        required: true
+        type: string
+        default: "5"
+      max_minutes:
+        description: "Max. minut na kolo"
+        required: true
+        type: string
+        default: "60"
+      advanced:
+        description: 'JSON s dalšími poli: {"scope_deny":[],"priority":100,"notes":""}'
+        required: false
+        type: string
+        default: "{}"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: agent-loop-tasks
+  cancel-in-progress: false
+
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create task file
+        id: task
+        env:
+          IN_TITLE: ${{ inputs.title }}
+          IN_MODE: ${{ inputs.mode }}
+          IN_GOAL: ${{ inputs.goal }}
+          IN_DONE_WHEN: ${{ inputs.done_when }}
+          IN_SCOPE_ALLOW: ${{ inputs.scope_allow }}
+          IN_INPUTS: ${{ inputs.inputs_paths }}
+          IN_MAX_ROUNDS: ${{ inputs.max_rounds }}
+          IN_MAX_MINUTES: ${{ inputs.max_minutes }}
+          IN_ADVANCED: ${{ inputs.advanced }}
+        run: python3 .github/scripts/task_tool.py new
+      - name: Commit and push
+        env:
+          MSG: ${{ steps.task.outputs.message }}
+          FILE: ${{ steps.task.outputs.path }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$FILE"
+          git commit -q -m "$MSG"
+          for i in 1 2 3 4 5; do
+            git push -q origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 5))
+            git pull -q --rebase origin "${GITHUB_REF_NAME}"
+          done
+          exit 1

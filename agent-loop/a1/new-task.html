@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A1 · Nový úkol</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--fg:#1c2024;--muted:#6b7280;--line:#e3e6ea;--accent:#2b59c3;--code:#f1f3f5;--warn:#b42318}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1115;--card:#171a21;--fg:#e6e8eb;--muted:#9aa3ad;--line:#2a2f38;--accent:#7aa2ff;--code:#1e222b;--warn:#ff7b72}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-bottom:16px}
+h1{font-size:18px;margin:0 0 4px}p{margin:4px 0 12px;color:var(--muted)}
+label{display:block;font-weight:600;margin:12px 0 4px}label small{font-weight:400;color:var(--muted)}
+input,textarea,select{width:100%;font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)}
+textarea{min-height:90px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+button,.btn{font:inherit;padding:7px 12px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:6px;cursor:pointer;display:inline-block;margin:10px 8px 0 0}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+a{color:var(--accent)}
+pre{background:var(--code);padding:10px;border-radius:6px;overflow:auto;font:12px/1.4 ui-monospace,Consolas,monospace;white-space:pre-wrap}
+.err{color:var(--warn)}
+@media (max-width:640px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <h1>Nový úkol (záložní formulář)</h1>
+    <p>Hlavní cesta je GitHub Action „new-task“. Tento formulář jen sestaví soubor úkolu; id je dočasné a runner ho přečísluje. Model a effort jsou pevné (config.json).</p>
+    <form id="f">
+      <label>Název <small>jedna věta</small></label><input name="title" required>
+      <label>Režim</label><select name="mode"><option value="spec">spec — recenze / doplnění zadání</option><option value="code">code — implementace proti testům</option></select>
+      <label>Cíl <small>pro agenta</small></label><textarea name="goal" required></textarea>
+      <label>Hotovo, když <small>ověřitelná podmínka</small></label><textarea name="done_when" required></textarea>
+      <label>Smí měnit <small>cesty / globy oddělené čárkou, např. zadani/komponenta-sr.md</small></label><input name="scope_allow" required>
+      <label>Nesmí měnit <small>volitelné</small></label><input name="scope_deny">
+      <label>Vstupy ke čtení <small>volitelné, čárkou</small></label><input name="inputs" value="PAT/Popis OS P.A.T.pdf">
+      <div class="row">
+        <div><label>Max. kol (N)</label><input name="max_rounds" type="number" min="1" value="5"></div>
+        <div><label>Max. minut / kolo</label><input name="max_minutes" type="number" min="1" value="60"></div>
+        <div><label>Priorita <small>nižší dřív</small></label><input name="priority" type="number" value="100"></div>
+      </div>
+      <label>Poznámky pro agenta <small>volitelné</small></label><textarea name="notes"></textarea>
+      <label>Repozitář <small>pro odkaz na založení souboru</small></label><input name="repo" value="https://github.com/zjir/si">
+      <label>Větev</label><input name="branch" value="master">
+      <button class="primary" type="submit">Sestavit</button>
+    </form>
+  </div>
+  <div class="card" id="out" hidden>
+    <b id="fname"></b>
+    <pre id="json"></pre>
+    <button id="copy">Kopírovat JSON</button>
+    <button id="dl">Stáhnout soubor</button>
+    <a class="btn" id="gh" target="_blank" rel="noopener">Založit soubor na GitHubu</a>
+    <p>Lokálně: ulož soubor do <code>tasks/inbox/</code>; runner ho sám commitne a zpracuje.</p>
+    <p class="err" id="err"></p>
+  </div>
+  <p><a href="index.html">← zpět na A1</a></p>
+</main>
+<script>
+(function(){
+"use strict";
+function list(v){return (v||"").split(",").map(function(s){return s.trim();}).filter(Boolean);}
+var f=document.getElementById("f"),json="",name="";
+f.onsubmit=function(ev){
+  ev.preventDefault();
+  var d=new FormData(f),now=new Date();
+  var pad=function(n){return (n<10?"0":"")+n;};
+  var off=-now.getTimezoneOffset(),sign=off>=0?"+":"-";off=Math.abs(off);
+  var iso=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate())+"T"+pad(now.getHours())+":"+pad(now.getMinutes())+":"+pad(now.getSeconds())+sign+pad(Math.floor(off/60))+":"+pad(off%60);
+  var id="TASK-"+Math.floor(now.getTime()/1000);
+  var t={id:id,title:d.get("title").trim(),mode:d.get("mode"),goal:d.get("goal").trim(),done_when:d.get("done_when").trim(),
+    inputs:list(d.get("inputs")),scope_allow:list(d.get("scope_allow")),scope_deny:list(d.get("scope_deny")),
+    max_rounds:+d.get("max_rounds")||5,max_minutes:+d.get("max_minutes")||60,priority:+d.get("priority")||100,
+    notes:d.get("notes").trim(),created_at:iso};
+  document.getElementById("err").textContent=t.scope_allow.length?"":"„Smí měnit“ nesmí být prázdné.";
+  json=JSON.stringify(t,null,2)+"\n";name=id+".json";
+  document.getElementById("fname").textContent="tasks/inbox/"+name;
+  document.getElementById("json").textContent=json;
+  var repo=d.get("repo").trim().replace(/\/$/,""),br=d.get("branch").trim()||"master";
+  document.getElementById("gh").href=repo+"/new/"+encodeURIComponent(br)+"/tasks/inbox?filename="+encodeURIComponent(name)+"&value="+encodeURIComponent(json);
+  document.getElementById("out").hidden=false;
+};
+document.getElementById("copy").onclick=function(){navigator.clipboard.writeText(json).then(function(){},function(){alert("Kopírování selhalo; označ text ručně.");});};
+document.getElementById("dl").onclick=function(){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([json],{type:"application/json"}));a.download=name;a.click();};
+})();
+</script>
+</body>
+</html>

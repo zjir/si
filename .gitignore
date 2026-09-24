@@ -1,3 +1,7 @@
 # data
 *.csv
 PAT/
+# agent loop (local only)
+.loop.lock
+.loop-logs/
+STOP
