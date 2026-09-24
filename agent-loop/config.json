@@ -1,6 +1,6 @@
 {
-  "model": "fable",
-  "model_expect": "fable",
+  "model": "claude-fable-5-1",
+  "model_expect": "fable-5-1",
   "effort": "max",
   "claude_command": "claude",
   "use_bare": false,
