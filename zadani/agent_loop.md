@@ -2,6 +2,16 @@
 
 Verze 0.1 · návrh před implementací · dokument je psaný pro AI implementátora, ne pro čtení člověkem
 
+## 0. Kontext: obchodní systém P.A.T.
+
+Vše v tomto zadání se dělá v kontextu obchodního systému P.A.T. a pro něj. Výsledek (agent loop a zadání, která zpracovává) bude použit výhradně v systému P.A.T., který se ve finále implementuje; jiné použití není a nenavrhuje se pro něj. Každé rozhodnutí se posuzuje podle toho, co potřebuje P.A.T.; rozpor se systémem P.A.T. je chyba zadání.
+
+Podklady systému ve složce `PAT/` (závazné):
+
+- `PAT/Popis OS P.A.T.pdf` — popis obchodního systému P.A.T.,
+- `PAT/Obchodní deník.xls` — reálný obchodní deník s reálnými obchody,
+- `PAT/obrazky-obchodu/` — obrázky jednotlivých obchodů.
+
 ## 1. Účel
 
 Lokální smyčka, která bez dohledu zpracovává úkoly zadané zvenčí přes git. Jeden úkol = jedna větev = série kol jednoho agenta. Výstupy jdou do souborů a do gitu; člověk je čte přes statickou HTML stránku, která shrnuje stav úkolu, použitý model, spotřebu a výstupy jednotlivých kol.

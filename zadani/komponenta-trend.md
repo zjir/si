@@ -1,5 +1,15 @@
 # Zadání: Komponenta detekce trendu a pullbacku (pro obchodní systém P.A.T.)
 
+## 0. Kontext: obchodní systém P.A.T.
+
+Vše v tomto zadání se dělá v kontextu obchodního systému P.A.T. a pro něj. Výsledek (komponenta detekce trendu a pullbacku) bude použit výhradně v systému P.A.T., který se ve finále implementuje; jiné použití není a nenavrhuje se pro něj. Každé rozhodnutí se posuzuje podle toho, co potřebuje P.A.T.; rozpor se systémem P.A.T. je chyba zadání.
+
+Podklady systému ve složce `PAT/` (závazné):
+
+- `PAT/Popis OS P.A.T.pdf` — popis obchodního systému P.A.T.,
+- `PAT/Obchodní deník.xls` — reálný obchodní deník s reálnými obchody,
+- `PAT/obrazky-obchodu/` — obrázky jednotlivých obchodů.
+
 ## 1. Účel a rozsah
 
 Komponenta (knihovna) zpracovává proud minutových barů a v každém okamžiku, bez pohledu do budoucnosti, určuje:
