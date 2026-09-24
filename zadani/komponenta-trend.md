@@ -353,3 +353,24 @@ P.A.T. je vizuální systém; číselná kontrola nezachytí vše.
 - Profit target, stop-loss, vstup, výstup, position sizing.
 - Vzdálenosti ceny ke swingům a geometrie obchodu.
 - Hodnocení obchodního výsledku (vstup, cíl, stop), prediktivní modely, zprávy. Test správnosti detekce (13) do rozsahu patří.
+
+## 15. Dodatky k zapracování
+
+> **Úkol pro recenzenta:** body níže jsou dodatky zadavatele. Zapracuj každý do příslušných sekcí dokumentu jako konkrétní řešení. Po zapracování tuto sekci odstraň; zapracování zaznamenej v rozhodovacím logu.
+
+1. Pokud se zjistí, že jsou třeba další vstupy, musí se o ně požádat.
+2. K dispozici budou 1s a 1min data. 1s data je možné použít pro jemnou detekci v citlivých místech.
+3. Pokud se zjistí, že by pro detekci byla vhodnější jiná než 1min data, je třeba to uvést a zdůvodnit.
+4. Komponenta musí mít testovatelné rozhraní. Testy komponenty jsou samostatné zadání `zadani/testy.md`.
+5. Komponenta musí především umět odpovědět na otázku Ø1:
+   - Jsem v trendu (jak silném atd.)?
+   - Začíná pullback?
+   - Bude trend pokračovat?
+   - \+ detaily pro P.A.T.
+6. Nesmí overfittovat. Měla by mít podobné výsledky na syntetických datech jako na různých trzích.
+7. Metoda detekce se nemusí omezovat na metody P.A.T. Recenzent může k zodpovězení Ø1 použít naprosto jakékoliv prostředky a techniky. Pokud jimi nedisponuje (např. GPU), může o ně požádat.
+8. Komponenta může implementovat více druhů detekce. Každý, který bude výhodné implementovat, bude popsán.
+9. Dodatečným podkladem je reálný obchodní deník s reálnými obchody. Nesmí ale kontaminovat algoritmus do té míry, že bude poplatný těmto datům.
+10. Vše by mělo fungovat na obecném trhu, primární je teď trh NQ. Doladění na ostatních trzích může přijít později.
+11. Jakýkoliv indikátor je na aktuální svíčce počítán z hodnot, které nejsou dopředu známé (OPEN/CLOSE/HIGH/LOW). Zvážit, zda vycházet z hodnoty předchozí svíčky.
+12. Výstup SR komponenty (`zadani/komponenta-sr.md`) slouží jako vstup této komponenty.

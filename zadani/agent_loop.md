@@ -328,3 +328,23 @@ Druhý formulář pro restart bez psaní souboru: vstupy `task_id` a `from_scrat
 - Vlastní obsah úkolů (zadání komponenty, kód, testy); loop je jen nosič.
 - Server, fronta, uživatelské účty, notifikace.
 - Automatické slučování větví a nasazení.
+
+## 15. Dodatky k zapracování
+
+> **Úkol pro recenzenta:** body níže jsou dodatky zadavatele. Zapracuj každý do příslušných sekcí dokumentu jako konkrétní řešení. Po zapracování tuto sekci odstraň; zapracování zaznamenej v rozhodovacím logu.
+
+### 15.1 Struktura
+
+1. Zadání jsou oddělená ve složce `zadani/` (jeden soubor = jedno zadání). Instrukce pro recenzenta jsou ve složce `agent-loop/review-loop/`. Smyčka recenzentů pracuje nad soubory v `zadani/`.
+
+### 15.2 Definice loopu
+
+1. Žádné větvení gitu, všechno budou jen přídavky (commity do jedné linie), aby se dalo jednoduše malou aplikací A1 prohlížet historii zpracování úkolu.
+2. Agent si odpovídá na otázky sám, nikdy nechce nic od uživatele.
+3. Když v A1 kliknu na úkol, uvidím základní detaily a jednotlivé kroky a jejich výstupy. Kroky jsou sbalené a můžu je rozbalit po jednom.
+4. Loop má jen možnost zastavení po N krocích, pokud agent dříve sám nerozhodne o ukončení.
+
+### 15.3 Role recenzenta
+
+1. Vychází ze skillu, který už máme (review zadání komponenty trend, viz `agent-loop/review-loop/prompts/review.md`).
+2. Končí ve chvíli, kterou stanoví sám a která by měla znamenat, že k úkolu již není co dodat.
