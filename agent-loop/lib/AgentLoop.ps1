@@ -647,6 +647,9 @@ function Invoke-AgentRound {
         Update-LoopLock
         Write-Text (Get-RepoPath ($roundDir + '/stdout.log')) ($r.Out + $(if ($r.Err) { "`n--- stderr ---`n" + $r.Err } else { '' }))
         if ($r.Code -eq 0 -or $r.TimedOut) { break }
+        $jj = ConvertFrom-ClaudeOutput $r.Out
+        $api = [int](Get-Prop $jj 'api_error_status' 0)
+        if ($api -eq 401 -or $api -eq 403) { Write-Log ("$id r$Round authentication error ($api); no retry. Run 'claude' and /login."); break }
         if ($attempt -ge $retries) { break }
         $sleep = [int](Get-Cfg 'retry_sleep_seconds' 3600)
         Write-Log ("$id r$Round failed (exit $($r.Code)); retry in $sleep s")
