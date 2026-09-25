@@ -1037,6 +1037,17 @@ function Repair-Interrupted {
     }
 }
 
+$script:ReportSig = $null
+
+function Update-ReportIfTasksChanged {
+    # New or moved task files (skill, web form, GitHub action) appear in A1 without waiting for a round.
+    $sig = (@(Get-AllTasks) | ForEach-Object { $_.Folder + '/' + $_.Name }) -join '|'
+    if ($sig -eq $script:ReportSig) { return }
+    $script:ReportSig = $sig
+    Update-Report
+    if (Invoke-Commit 'agent loop: report (tasks changed)' '' @('agent-loop/a1/data.js')) { Sync-Push | Out-Null }
+}
+
 # ---------------------------------------------------------------- main loop
 
 function Start-Loop([switch]$Once) {
@@ -1052,7 +1063,7 @@ function Start-Loop([switch]$Once) {
             if (Test-StopFile) { Write-Log ('STOP file present, loop ends. ' + (Read-Text (Get-RepoPath 'STOP')).Trim()); break }
             Add-InboxFiles
             $clean = Test-TreeClean
-            if ($clean) { Sync-Pull | Out-Null }
+            if ($clean) { Sync-Pull | Out-Null; Update-ReportIfTasksChanged }
             $entry = Select-NextTask
             $progressed = $false
             if ($entry -and -not $clean) {
