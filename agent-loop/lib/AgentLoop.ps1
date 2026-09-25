@@ -746,7 +746,7 @@ function Invoke-AgentRound {
     while ($true) {
         $attempt++
         Write-Log ("$id r$Round attempt $attempt ($model, effort $effort)")
-        $r = Invoke-Native -File $script:Claude -Arguments $cargs -StdIn $prompt -TimeoutSec ($F.max_minutes * 60) -OnTick $tick -TickSec ([int](Get-Cfg 'heartbeat_seconds' 30)) -Env $envVars -OnLine $onLine -OnStart { param($pr) $script:ChildPid = $pr.Id; Update-LoopLock }
+        $r = Invoke-Native -File $script:Claude -Arguments $cargs -StdIn $prompt -TimeoutSec ($F.max_minutes * 60) -OnTick $tick -TickSec ([int](Get-Cfg 'heartbeat_seconds' 30)) -Env $envVars -OnLine $onLine -OnStart { param($pr) $script:ChildPid = $pr.Id; $State['agent_pid'] = $pr.Id; Save-TaskState $id $State; Update-LoopLock }
         $script:ChildPid = 0
         Update-LoopLock
         Write-Text (Get-RepoPath ($roundDir + '/stdout.log')) ($r.Out + $(if ($r.Err) { "`n--- stderr ---`n" + $r.Err } else { '' }))
@@ -1008,6 +1008,23 @@ function Add-InboxFiles {
     Sync-Push | Out-Null
 }
 
+function Stop-TaskAgents {
+    # Agents of active tasks whose loop died (window closed, crash) keep running in their own console:
+    # stop them before anything else touches the working tree.
+    foreach ($e in @(Get-AllTasks | Where-Object { $_.Folder -eq 'active' })) {
+        $F = Resolve-TaskFields $e.Task
+        $s = Read-TaskState $F.id
+        $ap = [int](Get-Prop $s 'agent_pid' 0)
+        if ($ap -le 0) { continue }
+        $proc = Get-Process -Id $ap -ErrorAction SilentlyContinue
+        if ($proc -and $proc.ProcessName -match '(?i)claude|node') {
+            Write-Log ($F.id + ': stopping orphaned agent process ' + $ap)
+            Stop-ProcessTree $proc
+            Start-Sleep -Seconds 2
+        }
+    }
+}
+
 function Repair-Interrupted {
     # A round interrupted by a crash or reboot leaves uncommitted files. Keep the in-scope work,
     # discard the rest and commit it as an interrupted round.
@@ -1060,6 +1077,7 @@ function Start-Loop([switch]$Once) {
         $caps = Get-ClaudeCaps
         Write-Log ("claude: " + $caps.path + ' | ' + $caps.version + ' | --effort supported: ' + $caps.effort + ' | --bare supported: ' + $caps.bare)
         if (-not $caps.effort) { Write-Log 'WARNING: this claude CLI has no --effort flag; effort is only requested via CLAUDE_CODE_EFFORT_LEVEL and marked unverified.' }
+        Stop-TaskAgents
         Repair-Interrupted
         while ($true) {
             Update-LoopLock
