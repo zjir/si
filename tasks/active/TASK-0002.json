@@ -1,0 +1,24 @@
+{
+    "id":  "TASK-0002",
+    "title":  "Review: zadani/komponenta-trend.md",
+    "mode":  "spec",
+    "goal":  "Zreviduj zadani/komponenta-trend.md v roli recenzenta (agent-loop/review-loop/review.md): zapracuj sekci Dodatky k zapracování, vyplň všechna prázdná místa, vše v kontextu systému P.A.T.",
+    "done_when":  "Dodatky jsou zapracované a sekce odstraněná; průchod celým dokumentem nenajde žádný blokující ani střední nález.",
+    "inputs":  [
+                   "PAT/Popis OS P.A.T.pdf",
+                   "PAT/Obchodní deník.xls",
+                   "PAT/PAT_obchody_z_obrazku.csv",
+                   "PAT/PAT_obchody_z_obrazku_POPIS.md"
+               ],
+    "scope_allow":  [
+                        "zadani/komponenta-trend.md"
+                    ],
+    "scope_deny":  [
+
+                   ],
+    "max_rounds":  1,
+    "max_minutes":  90,
+    "priority":  100,
+    "notes":  "",
+    "created_at":  "2026-09-25T17:15:47+02:00"
+}
