@@ -17,5 +17,6 @@
     "max_minutes":  30,
     "priority":  100,
     "notes":  "",
-    "created_at":  "2026-09-25T16:40:51+02:00"
+    "created_at":  "2026-09-25T16:40:51+02:00",
+    "restart":  true
 }
