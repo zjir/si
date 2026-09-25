@@ -1,0 +1,6 @@
+Kolo 1 je uzavřené. Výstupy:
+
+- `zadani/komponenta-trend.md` přepsáno celé (1154 řádků): všech 14 dodatků zapracováno včetně dodatku 14 (kalendář zpráv), který zadavatel doplnil na konec souboru během kola; sekce „Dodatky k zapracování“ odstraněna; založen rozhodovací log D-1 až D-46 a historie revizí; poslední řádek `KONEC DOKUMENTU`.
+- Hlavní změny: Ø1 jako primární výstup (`answer`), detektory A/B/C/D s katalogem metod, stupně swingů přes korekce, pseudokotvy pro ε, porovnávání v ticích, `atr_ref = atr1(t−1)`, konvence timestampu s kontrolou, úplný stavový automat s událostmi a payloady, rozhraní a parametry, brány 13.2 se syntetickými scénáři S1–S10, robustnostní brána 13.11, porovnání TF, kontrola shody s deníkem.
+- `runs/TASK-0002/round-01/result.json`: `CONTINUE`, nálezy 6 / 58 / 11, čtyři požadavky (bid/ask objem, data ES/YM, rozsah 1s dat, konvence timestampu exportu).
+- `runs/TASK-0002/state.md` a `round-01/notes.md`: stav, rozpis nálezů a seznam bodů pro třetí průchod v kole 2.

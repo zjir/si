@@ -1,0 +1,15 @@
+{
+  "task": "TASK-0002",
+  "round": 1,
+  "status": "CONTINUE",
+  "summary": "Kolo 1: všech 14 dodatků zapracováno (včetně kalendáře zpráv doplněného během kola) a sekce Dodatky odstraněna; zadání přepsáno na 1154 řádků se stavovým automatem, rozhraním, testy a logem D-1…D-46; druhý průchod opravil 11 nepřesností, třetí průchod zbývá.",
+  "findings": {"blocking": 6, "medium": 58, "minor": 11},
+  "changed": ["zadani/komponenta-trend.md"],
+  "next": "Třetí průchod celým dokumentem v rolích implementátor/tester se zaměřením na nová rozhodnutí kola 1: 3.9 (typy ScheduledEvent/Release, aliasy názvů zpráv, warmup), 15.2 (zarovnání při direction NONE), 13.2 brána 6 jako tabulka pass/fail, 12.2 formát anotace, 7.4 pb_low u restartu, soulad komponenta-sr.md s 3.5; seznam v runs/TASK-0002/round-01/notes.md.",
+  "requests": [
+    "R1: potvrdit, zda export 1min barů z NinjaTraderu obsahuje bid/ask objem (modul delta 9); bez něj modul zůstane neaktivní",
+    "R2: 1min data ES a YM ve stejném formátu jako NQ pro robustnostní bránu 13.11; do té doby jen NQ + syntetika",
+    "R3: rozsah a formát 1s dat (od kdy, časové pásmo, konvence timestampu) pro 3.4 a test 13.2.7",
+    "R4: potvrdit konvenci timestampu 1min exportu (čas uzavření vs. otevření baru); zatím kontrola objemem při startu"
+  ]
+}
