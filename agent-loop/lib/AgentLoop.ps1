@@ -513,6 +513,7 @@ function Test-InScope([string]$Path, $F, [string]$TaskDir) {
     $p = $Path -replace '\\', '/'
     if ($p.StartsWith($TaskDir + '/')) { return $true }
     if ($p -eq 'agent-loop/a1/data.js') { return $true }   # written by the runner during the round (live view)
+    if ($p -match '^tasks/inbox/[^/]+\.json$') { return $true }   # new tasks dropped in while a round runs (A1 form, skill)
     if (Test-PathMatch $p $F.scope_deny) { return $false }
     return (Test-PathMatch $p $F.scope_allow)
 }
@@ -523,6 +524,7 @@ function Undo-RoundChanges($Changes, [string]$KeepPrefix, [string]$DiscardDir, [
         $p = $c.Path -replace '\\', '/'
         if ($p.StartsWith($KeepPrefix + '/')) { continue }
         if ($KeepFiles -contains $p) { continue }
+        if ($c.Code -eq '??' -and $p -match '^tasks/inbox/[^/]+\.json$') { continue }
         $abs = Get-RepoPath $p
         if (Test-Path -LiteralPath $abs -PathType Leaf) {
             $copy = Get-RepoPath ($DiscardDir + '/' + $p)
