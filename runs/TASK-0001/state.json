@@ -1,15 +1,15 @@
 {
     "task":  "TASK-0001",
-    "status":  "running",
-    "phase":  "between_rounds",
+    "status":  "max_rounds",
+    "phase":  "ended",
     "round":  1,
     "run_start_round":  0,
     "started_at":  "2026-09-25T16:46:15+02:00",
-    "ended_at":  null,
+    "ended_at":  "2026-09-25T16:51:46+02:00",
     "heartbeat":  "2026-09-25T16:46:49+02:00",
     "last_status":  "INTERRUPTED",
     "last_summary":  null,
     "push_failed":  false,
-    "updated_at":  "2026-09-25T16:51:43+02:00",
+    "updated_at":  "2026-09-25T16:51:46+02:00",
     "current_round":  1
 }
