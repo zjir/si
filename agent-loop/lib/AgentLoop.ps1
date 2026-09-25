@@ -970,6 +970,7 @@ function New-LoopTask {
     $errs = @(Test-TaskValid (Resolve-TaskFields $t))
     if ($errs.Count -gt 0) { throw ('Invalid task: ' + ($errs -join '; ')) }
     Write-Json (Get-RepoPath ('tasks/inbox/' + $id + '.json')) $t
+    Update-Report
     Invoke-Commit ('task: ' + $id + ' ' + $Title) '' @() | Out-Null
     Sync-Push | Out-Null
     Write-Log ('created ' + $id)
@@ -987,6 +988,7 @@ function Restart-LoopTask([string]$Id, [switch]$FromScratch) {
     Move-TaskFile $e[0] 'inbox' | Out-Null
     $s = Read-TaskState $Id
     if ($s) { $s['status'] = 'queued'; $s['phase'] = 'queued'; Save-TaskState $Id $s }
+    Update-Report
     Invoke-Commit ('task: restart ' + $Id + $(if ($FromScratch) { ' from scratch' } else { '' })) '' @() | Out-Null
     Sync-Push | Out-Null
     Write-Log ('requeued ' + $Id)
