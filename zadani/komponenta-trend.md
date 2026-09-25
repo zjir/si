@@ -384,3 +384,4 @@ P.A.T. je vizuální systém; číselná kontrola nezachytí vše.
 10. Vše by mělo fungovat na obecném trhu, primární je teď trh NQ. Doladění na ostatních trzích může přijít později.
 11. Jakýkoliv indikátor je na aktuální svíčce počítán z hodnot, které nejsou dopředu známé (OPEN/CLOSE/HIGH/LOW). Zvážit, zda vycházet z hodnoty předchozí svíčky.
 12. Výstup SR komponenty (`zadani/komponenta-sr.md`) slouží jako vstup této komponenty.
+13. Mají se vyčerpat a navrhnout všechny použitelné metody detekce (klasické, statistické, strojové učení i jiné). Prioritou ale není úplnost výčtu, nýbrž dosažení cíle: co nejspolehlivější odpověď na otázku Ø1.
