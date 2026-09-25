@@ -25,11 +25,11 @@ Initialize-Loop $repo
 switch ($Command) {
     'run'     { Start-Loop }
     'once'    { Start-Loop -Once }
-    'report'  { Update-Report; Write-Log 'agent-loop/a1/data.js updated' }
+    'report'  { Update-Report; Invoke-Commit 'agent loop: report' '' @('agent-loop/a1/data.js') | Out-Null; Sync-Push | Out-Null; Write-Log 'agent-loop/a1/data.js updated' }
     'new'     { New-LoopTask -Title $Title -Goal $Goal -DoneWhen $DoneWhen -ScopeAllow $Scope -Mode $Mode -Inputs $Inputs -ScopeDeny $Deny -MaxRounds $MaxRounds -MaxMinutes $MaxMinutes -Priority $Priority -Notes $Notes | Out-Null }
     'restart' { Restart-LoopTask -Id $Id -FromScratch:$FromScratch }
     'stop'    { Write-Text (Get-RepoPath 'STOP') ((Get-Now) + "`n"); Write-Log 'STOP created' }
-    'resume'  { Remove-Item -LiteralPath (Get-RepoPath 'STOP') -Force -ErrorAction SilentlyContinue; Write-Log 'STOP removed' }
+    'resume'  { Remove-Item -LiteralPath (Get-RepoPath 'STOP') -Force -ErrorAction SilentlyContinue; Update-Report; Invoke-Commit 'agent loop: resume' '' @('agent-loop/a1/data.js') | Out-Null; Sync-Push | Out-Null; Write-Log 'STOP removed' }
     'selftest' {
         Write-Log ('repo: ' + $repo + ' | branch: ' + (Get-GitBranch) + ' | remote: ' + (Test-Remote) + ' | clean: ' + (Test-TreeClean))
         Resolve-Claude | Out-Null

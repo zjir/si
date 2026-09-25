@@ -28,8 +28,9 @@ tr.sel{background:var(--code)}
 .num{text-align:right;white-space:nowrap}
 .muted{color:var(--muted)}
 .badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:12px;border:1px solid currentColor;white-space:nowrap}
-.s-done{color:var(--ok)}.s-running,.s-queued{color:var(--run)}.s-failed,.s-blocked,.s-invalid,.s-max_rounds{color:var(--warn)}
+.s-done{color:var(--ok)}.s-running,.s-queued{color:var(--run)}.s-failed,.s-blocked,.s-invalid,.s-max_rounds,.s-model_mismatch{color:var(--warn)}
 .warn{color:var(--warn)}
+.banner{background:var(--warn);color:#fff;font-weight:600;padding:10px 14px;border-radius:8px;margin-bottom:16px;white-space:pre-wrap}
 .warnlist{margin:0;padding:0;list-style:none}.warnlist li{color:var(--warn);margin:2px 0}
 .warnlist b{font-family:ui-monospace,Consolas,monospace;font-size:12px}
 dl.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:0}
@@ -61,6 +62,7 @@ code{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:var(-
   <button id="btnReload" title="Znovu načíst data.js">Obnovit</button>
 </header>
 <main>
+  <div id="banner" class="banner" hidden></div>
   <div class="card">
     <h2>Úkoly <span class="tabs" style="float:right" id="filters"></span></h2>
     <table>
@@ -74,7 +76,7 @@ code{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:var(-
 (function(){
 "use strict";
 var D=null, filter="all", selected=null;
-var STATUS_CS={running:"běží",queued:"ve frontě",done:"hotovo",blocked:"zablokováno",failed:"selhalo",max_rounds:"strop kol",invalid:"neplatné",paused:"pozastaveno"};
+var STATUS_CS={model_mismatch:"jiný model – stop",running:"běží",queued:"ve frontě",done:"hotovo",blocked:"zablokováno",failed:"selhalo",max_rounds:"strop kol",invalid:"neplatné",paused:"pozastaveno"};
 
 function el(tag,attrs,kids){var e=document.createElement(tag);if(attrs){for(var k in attrs){if(k==="text")e.textContent=attrs[k];else if(k==="cls")e.className=attrs[k];else if(k==="html")e.innerHTML=attrs[k];else e.setAttribute(k,attrs[k]);}}(kids||[]).forEach(function(c){if(c==null)return;e.appendChild(typeof c==="string"?document.createTextNode(c):c);});return e;}
 function fmtTok(n){if(n==null)return "?";n=+n;return n>=1e6?(n/1e6).toFixed(1)+"M":n>=1e3?(n/1e3).toFixed(1)+"k":String(Math.round(n));}
@@ -91,13 +93,14 @@ function lastRound(t){return t.rounds&&t.rounds.length?t.rounds[t.rounds.length-
 function renderHeader(){
   var r=D.runner||{};var hb=r.heartbeat?"runner: "+fmtDate(r.heartbeat):"runner: –";
   document.getElementById("hdr").textContent="model "+D.model+" · effort "+D.effort+" · data "+fmtDate(D.generated_at)+" · "+hb+(r.stop_file?" · STOP":"");
+  var bn=document.getElementById("banner");bn.hidden=!r.stop_file;bn.textContent=r.stop_file?("SMYČKA ZASTAVENA: "+(r.stop_reason||"soubor STOP")+"  →  po opravě spusť: agent-loop\\start-loop.cmd resume"):"";
   var nl=document.getElementById("lnkNew");
   if(D.repo_url){nl.href=D.repo_url.replace(/\/$/,"")+"/actions/workflows/new-task.yml";}else{nl.style.display="none";}
 }
 function renderFilters(){
   var f=document.getElementById("filters");f.innerHTML="";
   var counts={all:D.tasks.length};D.tasks.forEach(function(t){var s=statusOf(t);counts[s]=(counts[s]||0)+1;});
-  ["all","running","queued","done","max_rounds","blocked","failed"].forEach(function(k){if(k!=="all"&&!counts[k])return;
+  ["all","running","queued","model_mismatch","done","max_rounds","blocked","failed"].forEach(function(k){if(k!=="all"&&!counts[k])return;
     var b=el("button",{text:(k==="all"?"vše":STATUS_CS[k]||k)+" ("+(counts[k]||0)+")"});if(filter===k)b.style.borderColor="var(--accent)";
     b.onclick=function(ev){ev.stopPropagation();filter=k;renderList();renderFilters();};f.appendChild(b);});
 }

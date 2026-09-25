@@ -677,11 +677,24 @@ function Invoke-AgentRound {
     $status = [string](Get-Prop $result 'status' '')
     $noResult = ($status -notin @('DONE', 'CONTINUE', 'BLOCKED'))
 
+    # model check: every model reported by the CLI must match model_expect, otherwise the round is discarded
+    $expect = [string](Get-Cfg 'model_expect' '')
+    $badModels = @($actual | Where-Object { $expect -and ($_ -notmatch [regex]::Escape($expect)) })
+    $mismatch = [bool]($expect -and (($badModels.Count -gt 0) -or ($r.Code -eq 0 -and -not $r.TimedOut -and $actual.Count -eq 0)))
+    $mismatchDetail = ''
+    if ($mismatch) {
+        $seen = ($actual -join ', '); if (-not $seen) { $seen = 'unknown (CLI reported no model)' }
+        $mismatchDetail = 'expected "' + $expect + '", CLI used: ' + $seen
+        Write-Log ("$id r$Round MODEL MISMATCH, round discarded: " + $mismatchDetail)
+    }
+
     # scope check
     $changes = @(Get-GitChanges)
     $violations = @($changes | Where-Object { -not (Test-InScope $_.Path $F $taskDir) } | ForEach-Object { $_.Path })
-    if ($violations.Count -gt 0) {
+    if ($violations.Count -gt 0 -and -not $mismatch) {
         Write-Log ("$id r$Round scope violation, round discarded: " + ($violations -join ', '))
+    }
+    if ($violations.Count -gt 0 -or $mismatch) {
         Undo-RoundChanges $changes $roundDir ($roundDir + '/discarded') @($taskDir + '/state.json')
     }
 
@@ -704,6 +717,7 @@ function Invoke-AgentRound {
         exit_code = $r.Code; attempts = $attempt; timed_out = $r.TimedOut
         no_result = $noResult
         scope_violation = ($violations.Count -gt 0); scope_violations = $violations
+        model_mismatch = $mismatch; model_mismatch_detail = $mismatchDetail
         changed_files = @()
     }
 
@@ -815,6 +829,7 @@ function Invoke-Task($Entry) {
         $state['last_status'] = $res.Status
         $state['last_summary'] = [string](Get-Prop $res.Result 'summary' '')
         if ($res.Failed) { $final = 'failed' }
+        elseif ($m.model_mismatch) { $state['status'] = 'model_mismatch'; $state['phase'] = 'paused'; $state['model_mismatch'] = $m.model_mismatch_detail }
         elseif ($m.scope_violation) { }
         elseif ($res.Status -eq 'DONE') { $final = 'done' }
         elseif ($res.Status -eq 'BLOCKED') { $final = 'blocked' }
@@ -825,6 +840,12 @@ function Invoke-Task($Entry) {
 
         $st = $res.Status; if (-not $st) { $st = 'NO_RESULT' }
         if ($m.scope_violation) { $st = 'SCOPE_VIOLATION' }
+        if ($m.model_mismatch) {
+            $st = 'MODEL_MISMATCH'
+            # stop the whole loop; STOP carries the reason and is shown in A1
+            Write-Text (Get-RepoPath 'STOP') ('MODEL_MISMATCH ' + $id + ' r' + $round + ': ' + $m.model_mismatch_detail + "`n")
+            Update-Report
+        }
         if ($res.Failed) { $st = 'FAILED' }
         $fnd = Get-Prop $res.Result 'findings' $null
         $mdl = ($m.actual_models -join '+')
@@ -834,6 +855,10 @@ function Invoke-Task($Entry) {
         $ok = Sync-Push
         if (-not $ok -and -not $state['push_failed']) { $state['push_failed'] = $true; Save-TaskState $id $state; Invoke-Commit ($id + ' push failed flag') '' @() | Out-Null }
         Write-Log ("$id r$round -> $st")
+        if ($m.model_mismatch) {
+            Write-Log ('LOOP STOPPED: ' + $m.model_mismatch_detail + '. Fix agent-loop/config.json or the CLI, then run: start-loop.cmd resume')
+            return $false
+        }
     }
 
     $state['status'] = $final; $state['phase'] = 'ended'
@@ -904,7 +929,7 @@ function Start-Loop([switch]$Once) {
         Repair-Interrupted
         while ($true) {
             Update-LoopLock
-            if (Test-StopFile) { Write-Log 'STOP file present, loop ends.'; break }
+            if (Test-StopFile) { Write-Log ('STOP file present, loop ends. ' + (Read-Text (Get-RepoPath 'STOP')).Trim()); break }
             Add-InboxFiles
             $clean = Test-TreeClean
             if ($clean) { Sync-Pull | Out-Null }
@@ -1005,8 +1030,8 @@ function Get-TaskWarnings($Task, $State, $Rounds) {
         if ($null -eq $m) { continue }
         $n = $r.round
         $am = @(Get-Prop $m 'actual_models' @())
-        if ($am.Count -gt 0 -and $expect -and -not (@($am | Where-Object { $_ -match [regex]::Escape($expect) }).Count -gt 0)) {
-            [void]$w.Add([ordered]@{ code = 'MODEL_MISMATCH'; detail = "r$n ran on " + ($am -join ', ') + " (expected $expect)" })
+        if ((Get-Prop $m 'model_mismatch' $false) -or ($am.Count -gt 0 -and $expect -and @($am | Where-Object { $_ -notmatch [regex]::Escape($expect) }).Count -gt 0)) {
+            [void]$w.Add([ordered]@{ code = 'MODEL_MISMATCH'; detail = "r${n}: " + [string](Get-Prop $m 'model_mismatch_detail' (($am -join ', ') + " (expected $expect)")) + ' - round discarded, loop stopped' })
         }
         if (-not (Get-Prop $m 'effort_verified' $false)) { [void]$w.Add([ordered]@{ code = 'EFFORT_UNVERIFIED'; detail = "r${n}: CLI without --effort" }) }
         if (Get-Prop $m 'scope_violation' $false) { [void]$w.Add([ordered]@{ code = 'SCOPE_VIOLATION'; detail = "r$n discarded: " + (@(Get-Prop $m 'scope_violations' @()) -join ', ') }) }
@@ -1101,7 +1126,7 @@ function Update-Report {
         branch       = (Get-GitBranch)
         model        = [string](Get-Cfg 'model' '')
         effort       = [string](Get-Cfg 'effort' '')
-        runner       = [ordered]@{ heartbeat = (Get-Prop $lock 'heartbeat' $null); host = (Get-Prop $lock 'host' $null); stop_file = (Test-StopFile) }
+        runner       = [ordered]@{ heartbeat = (Get-Prop $lock 'heartbeat' $null); host = (Get-Prop $lock 'host' $null); stop_file = (Test-StopFile); stop_reason = $(if (Test-StopFile) { (Read-Text (Get-RepoPath 'STOP')).Trim() } else { $null }) }
         tasks        = $tasks.ToArray()
     }
     $json = ConvertTo-Json -InputObject $data -Depth 30 -Compress
