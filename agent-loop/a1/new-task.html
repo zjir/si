@@ -50,10 +50,12 @@ pre{background:var(--code);padding:10px;border-radius:6px;overflow:auto;font:12p
   <div class="card" id="out" hidden>
     <b id="fname"></b>
     <pre id="json"></pre>
+    <button class="primary" id="save" hidden>Uložit do tasks/inbox</button>
     <button id="copy">Kopírovat JSON</button>
     <button id="dl">Stáhnout soubor</button>
     <a class="btn" id="gh" target="_blank" rel="noopener">Založit soubor na GitHubu</a>
-    <p>Lokálně: ulož soubor do <code>tasks/inbox/</code>; runner ho sám commitne a zpracuje.</p>
+    <p id="saveinfo"></p>
+    <p>Lokálně: soubor musí skončit v <code>tasks/inbox/</code>; runner ho sám commitne, přečísluje a zpracuje.</p>
     <p class="err" id="err"></p>
   </div>
   <p><a href="index.html">← zpět na A1</a></p>
@@ -81,6 +83,41 @@ f.onsubmit=function(ev){
   var repo=d.get("repo").trim().replace(/\/$/,""),br=d.get("branch").trim()||"master";
   document.getElementById("gh").href=repo+"/new/"+encodeURIComponent(br)+"/tasks/inbox?filename="+encodeURIComponent(name)+"&value="+encodeURIComponent(json);
   document.getElementById("out").hidden=false;
+};
+// --- přímý zápis do tasks/inbox (File System Access API: Chrome, Edge) ---
+var fsOk=typeof window.showDirectoryPicker==="function";
+var info=document.getElementById("saveinfo");
+if(fsOk){document.getElementById("save").hidden=false;}
+else{info.textContent="Tento prohlížeč neumí zapisovat do složek (funguje v Chrome a Edge). Použij Stáhnout soubor.";}
+function idb(){return new Promise(function(res,rej){var r=indexedDB.open("a1-new-task",1);r.onupgradeneeded=function(){r.result.createObjectStore("h");};r.onsuccess=function(){res(r.result);};r.onerror=function(){rej(r.error);};});}
+function idbGet(){return idb().then(function(db){return new Promise(function(res){var q=db.transaction("h").objectStore("h").get("inbox");q.onsuccess=function(){res(q.result||null);};q.onerror=function(){res(null);};});}).catch(function(){return null;});}
+function idbSet(h){return idb().then(function(db){return new Promise(function(res){var tx=db.transaction("h","readwrite");tx.objectStore("h").put(h,"inbox");tx.oncomplete=res;tx.onerror=res;});}).catch(function(){});}
+function resolveInbox(dir){
+  // accepted choices: the tasks/inbox folder itself, the tasks folder, or the repository root
+  if(dir.name==="inbox")return Promise.resolve(dir);
+  if(dir.name==="tasks")return dir.getDirectoryHandle("inbox");
+  return dir.getDirectoryHandle("tasks").then(function(t){return t.getDirectoryHandle("inbox");});
+}
+function ensurePerm(h){return h.queryPermission({mode:"readwrite"}).then(function(p){return p==="granted"?p:h.requestPermission({mode:"readwrite"});});}
+function pickInbox(){
+  return window.showDirectoryPicker({id:"a1-inbox",mode:"readwrite"}).then(function(d){
+    return resolveInbox(d).catch(function(){throw new Error("Ve vybrané složce není tasks/inbox. Vyber kořen repozitáře, složku tasks nebo tasks/inbox.");});
+  }).then(function(inbox){return idbSet(inbox).then(function(){return inbox;});});
+}
+function getInbox(){
+  return idbGet().then(function(h){
+    if(!h)return pickInbox();
+    return ensurePerm(h).then(function(p){return p==="granted"?h:pickInbox();});
+  });
+}
+document.getElementById("save").onclick=function(){
+  if(!json){return;}
+  if(document.getElementById("err").textContent){alert("Oprav nejdřív chyby ve formuláři.");return;}
+  getInbox().then(function(inbox){
+    return inbox.getFileHandle(name,{create:true}).then(function(fh){return fh.createWritable();})
+      .then(function(w){return w.write(json).then(function(){return w.close();});})
+      .then(function(){info.textContent="Uloženo: tasks/inbox/"+name+" — runner úkol při dalším cyklu commitne a zpracuje.";});
+  }).catch(function(e){if(e&&e.name==="AbortError")return;info.textContent="Uložení selhalo: "+(e&&e.message?e.message:e);});
 };
 document.getElementById("copy").onclick=function(){navigator.clipboard.writeText(json).then(function(){},function(){alert("Kopírování selhalo; označ text ručně.");});};
 document.getElementById("dl").onclick=function(){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([json],{type:"application/json"}));a.download=name;a.click();};
