@@ -801,11 +801,15 @@ function Invoke-AgentRound {
     # scope check
     $changes = @(Get-GitChanges)
     $violations = @($changes | Where-Object { -not (Test-InScope $_.Path $F $taskDir) } | ForEach-Object { $_.Path })
-    if ($violations.Count -gt 0 -and -not $mismatch) {
-        Write-Log ("$id r$Round scope violation, round discarded: " + ($violations -join ', '))
-    }
-    if ($violations.Count -gt 0 -or $mismatch) {
+    if ($mismatch) {
+        # wrong model: the whole round is thrown away
         Undo-RoundChanges $changes $roundDir ($roundDir + '/discarded') @(($taskDir + '/state.json'), 'agent-loop/a1/data.js')
+    } elseif ($violations.Count -gt 0) {
+        # only the out-of-scope files are reverted (copies in discarded/); in-scope work is kept.
+        # The runner cannot tell who made a change, so another process may be the author.
+        Write-Log ("$id r$Round out-of-scope changes reverted (copies in " + $roundDir + "/discarded): " + ($violations -join ', '))
+        $outOfScope = @($changes | Where-Object { -not (Test-InScope $_.Path $F $taskDir) })
+        Undo-RoundChanges $outOfScope $roundDir ($roundDir + '/discarded') @(($taskDir + '/state.json'), 'agent-loop/a1/data.js')
     }
 
     $meta = [ordered]@{
@@ -941,7 +945,6 @@ function Invoke-Task($Entry) {
         if ($res.Fatal) { $state['status'] = 'stopped'; $state['phase'] = 'paused'; $state['stop_reason'] = $res.Fatal }
         elseif ($res.Failed) { $final = 'failed' }
         elseif ($m.model_mismatch) { $state['status'] = 'model_mismatch'; $state['phase'] = 'paused'; $state['model_mismatch'] = $m.model_mismatch_detail }
-        elseif ($m.scope_violation) { }
         elseif ($res.Status -eq 'DONE') { $final = 'done' }
         elseif ($res.Status -eq 'BLOCKED') { $final = 'blocked' }
         if ($null -eq $final -and $round -ge $lastRound) { $final = 'max_rounds' }
@@ -950,7 +953,7 @@ function Invoke-Task($Entry) {
         Update-Report
 
         $st = $res.Status; if (-not $st) { $st = 'NO_RESULT' }
-        if ($m.scope_violation) { $st = 'SCOPE_VIOLATION' }
+        if ($m.scope_violation) { $st = $st + '+SCOPE(reverted ' + @($m.scope_violations).Count + ')' }
         if ($res.Fatal) {
             $st = 'API_ERROR'
             Write-Text (Get-RepoPath 'STOP') ('API_ERROR ' + $id + ' r' + $round + ': ' + $res.Fatal + "`n")
@@ -1080,6 +1083,11 @@ function Start-Loop([switch]$Once) {
             while ((Get-Date) -lt $until -and -not (Test-StopFile)) { Start-Sleep -Seconds 5 }
         }
     } finally {
+        # Ctrl+C: do not leave the agent running on its own (it has its own console and keeps working)
+        if ($script:ChildPid -gt 0) {
+            $cp = Get-Process -Id $script:ChildPid -ErrorAction SilentlyContinue
+            if ($cp) { Write-Log ('Stopping agent process ' + $script:ChildPid); Stop-ProcessTree $cp }
+        }
         Exit-LoopLock
     }
 }
@@ -1180,7 +1188,7 @@ function Get-TaskWarnings($Task, $State, $Rounds) {
             [void]$w.Add([ordered]@{ code = 'MODEL_MISMATCH'; detail = "r${n}: " + [string](Get-Prop $m 'model_mismatch_detail' (($am -join ', ') + " (expected $expect)")) + ' - round discarded, loop stopped' })
         }
         if (-not (Get-Prop $m 'effort_verified' $false)) { [void]$w.Add([ordered]@{ code = 'EFFORT_UNVERIFIED'; detail = "r${n}: CLI without --effort" }) }
-        if (Get-Prop $m 'scope_violation' $false) { [void]$w.Add([ordered]@{ code = 'SCOPE_VIOLATION'; detail = "r$n discarded: " + (@(Get-Prop $m 'scope_violations' @()) -join ', ') }) }
+        if (Get-Prop $m 'scope_violation' $false) { [void]$w.Add([ordered]@{ code = 'SCOPE_VIOLATION'; detail = "r${n}: changes outside scope were reverted, copies in round-" + ('{0:D2}' -f $n) + "/discarded (the author may be another process): " + (@(Get-Prop $m 'scope_violations' @()) -join ', ') }) }
         if (Get-Prop $m 'fatal_error' $null) { [void]$w.Add([ordered]@{ code = 'API_ERROR'; detail = "r${n}: " + [string](Get-Prop $m 'fatal_error' '') + ' - loop stopped' }) }
         if (Get-Prop $m 'timed_out' $false) { [void]$w.Add([ordered]@{ code = 'TIMEOUT'; detail = "r$n exceeded max_minutes" }) }
         elseif (Get-Prop $m 'no_result' $false) { [void]$w.Add([ordered]@{ code = 'NO_RESULT'; detail = "r$n wrote no valid result.json" }) }
