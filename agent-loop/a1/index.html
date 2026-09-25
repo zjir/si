@@ -37,6 +37,7 @@ dl.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:0}
 dl.kv dt{color:var(--muted)}dl.kv dd{margin:0;word-break:break-word}
 pre{background:var(--code);padding:10px;border-radius:6px;overflow:auto;max-height:520px;font:12px/1.4 ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;margin:6px 0}
 pre.diff{white-space:pre}
+pre.live{max-height:420px}
 .diff .a{background:var(--add)}.diff .d{background:var(--del)}.diff .h{color:var(--accent)}
 details.round{border-top:1px solid var(--line)}
 details.round>summary{list-style:none;cursor:pointer;padding:9px 14px;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline}
@@ -75,7 +76,7 @@ code{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:var(-
 <script>
 (function(){
 "use strict";
-var D=null, filter="all", selected=null;
+var D=null, filter="all", selected=null, openRounds={}, timer=null;
 var STATUS_CS={stopped:"zastaveno",model_mismatch:"jiný model – stop",running:"běží",queued:"ve frontě",done:"hotovo",blocked:"zablokováno",failed:"selhalo",max_rounds:"strop kol",invalid:"neplatné",paused:"pozastaveno"};
 
 function el(tag,attrs,kids){var e=document.createElement(tag);if(attrs){for(var k in attrs){if(k==="text")e.textContent=attrs[k];else if(k==="cls")e.className=attrs[k];else if(k==="html")e.innerHTML=attrs[k];else e.setAttribute(k,attrs[k]);}}(kids||[]).forEach(function(c){if(c==null)return;e.appendChild(typeof c==="string"?document.createTextNode(c):c);});return e;}
@@ -131,14 +132,16 @@ function renderList(){
 function kv(pairs){var dl=el("dl",{cls:"kv"});pairs.forEach(function(p){if(p[1]==null||p[1]==="")return;dl.appendChild(el("dt",{text:p[0]}));var dd=el("dd");if(p[1] instanceof Node)dd.appendChild(p[1]);else dd.textContent=String(p[1]);dl.appendChild(dd);});return dl;}
 function list(arr){arr=arr||[];if(!arr.length)return null;return el("span",{},arr.map(function(x,i){return el("span",{},[i?", ":"",el("code",{text:x})]);}));}
 
-function renderRound(t,r){
+function renderRound(t,r,isLast){
   var m=r.meta||{},res=r.result||{},f=res.findings||{};
-  var st=res.status||(m.scope_violation?"SCOPE_VIOLATION":m.timed_out?"TIMEOUT":m.exit_code?"FAILED":"NO_RESULT");
+  var running=!r.meta&&isLast&&statusOf(t)==="running";
+  var st=running?"BĚŽÍ":m.model_mismatch?"MODEL_MISMATCH":m.fatal_error?"API_ERROR":(res.status||(m.scope_violation?"SCOPE_VIOLATION":m.timed_out?"TIMEOUT":m.exit_code?"FAILED":"NO_RESULT"));
+  var key=t.id+"|"+r.round;
   var d=el("details",{cls:"round"});
   var models=(m.actual_models&&m.actual_models.length)?m.actual_models.join(", "):(m.requested_model||"?");
   var s=el("summary",{},[
     el("b",{text:"Kolo "+r.round}),
-    el("span",{cls:"badge "+(st==="DONE"?"s-done":st==="CONTINUE"?"s-running":"s-failed"),text:st}),
+    el("span",{cls:"badge "+(st==="DONE"?"s-done":(st==="CONTINUE"||running)?"s-running":"s-failed"),text:st}),
     el("span",{cls:"muted",text:models+" · "+(m.requested_effort||"?")}),
     el("span",{cls:"muted",text:fmtDur(m.duration_s)}),
     el("span",{cls:"muted",text:"tok "+fmtTok(m.input_tokens)+"/"+fmtTok(m.output_tokens)}),
@@ -150,8 +153,11 @@ function renderRound(t,r){
   d.appendChild(s);
   var body=el("div",{cls:"body"});
   d.appendChild(body);
-  d.addEventListener("toggle",function(){
-    if(!d.open||body.childNodes.length)return;
+  function build(){
+    if(body.childNodes.length)return;
+    if(r.live){body.appendChild(el("h3",{text:running?"Průběh (živě, obnovuje se)":"Průběh kola"}));var lp=pre(r.live,"live");body.appendChild(lp);setTimeout(function(){lp.scrollTop=lp.scrollHeight;},0);}
+    else if(running){body.appendChild(el("div",{cls:"muted",text:"Kolo běží, průběh zatím není k dispozici."}));}
+    if(running){body.appendChild(kv([["Průběžné shrnutí",res.summary],["Další krok",res.next],["Požadavky",res.requests&&res.requests.length?res.requests.join(" | "):null]]));return;}
     body.appendChild(kv([
       ["Shrnutí",res.summary],["Další kolo",res.next],
       ["Požadavky",res.requests&&res.requests.length?res.requests.join(" | "):null],
@@ -168,7 +174,9 @@ function renderRound(t,r){
     if(r.notes){body.appendChild(el("h3",{text:"Poznámky agenta"}));body.appendChild(pre(r.notes));}
     if(r.output){body.appendChild(el("h3",{text:"Výstup agenta"}));body.appendChild(pre(r.output));}
     if(r.diff){body.appendChild(el("h3",{text:"Diff kola"}));body.appendChild(diffPre(r.diff));}
-  });
+  }
+  d.addEventListener("toggle",function(){openRounds[key]=d.open;if(d.open)build();});
+  if(openRounds[key]===true||(openRounds[key]===undefined&&running)){d.open=true;build();}
   return d;
 }
 function renderDetail(){
@@ -197,24 +205,28 @@ function renderDetail(){
   if(t.state_md){var sd=el("details",{},[el("summary",{text:"state.md (aktuální stav pro příští kolo)"}),pre(t.state_md)]);p.appendChild(sd);}
   var rc=el("div",{cls:"card"},[el("h2",{text:"Kroky ("+(t.rounds||[]).length+")"})]);
   if(!t.rounds||!t.rounds.length)rc.appendChild(el("div",{cls:"empty",text:"Zatím žádné kolo."}));
-  (t.rounds||[]).forEach(function(r){rc.appendChild(renderRound(t,r));});
+  (t.rounds||[]).forEach(function(r,i,a){rc.appendChild(renderRound(t,r,i===a.length-1));});
   box.appendChild(c);box.appendChild(rc);
 }
 function render(){
   D=window.LOOP_DATA||{tasks:[],model:"?",effort:"?"};D.tasks=D.tasks||[];
   if(!selected&&location.hash)selected=decodeURIComponent(location.hash.slice(1));
+  var y=window.scrollY;
   renderHeader();renderFilters();renderList();renderDetail();
+  window.scrollTo(0,y);
+  var anyRunning=D.tasks.some(function(t){return statusOf(t)==="running";});
+  if(timer)clearTimeout(timer);timer=setTimeout(reload,anyRunning?30000:120000);
 }
 function reload(){
   var s=document.createElement("script");s.src="data.js?t="+Date.now();
   s.onload=function(){render();s.remove();};
-  s.onerror=function(){alert("data.js se nepodařilo načíst");};
+  s.onerror=function(){s.remove();if(timer)clearTimeout(timer);timer=setTimeout(reload,30000);};
   document.body.appendChild(s);
 }
 document.getElementById("btnReload").onclick=reload;
 window.addEventListener("hashchange",function(){selected=decodeURIComponent(location.hash.slice(1));renderList();renderDetail();});
 var s=document.createElement("script");s.src="data.js?t="+Date.now();s.onload=render;s.onerror=render;document.body.appendChild(s);
-setInterval(reload,120000);
+
 })();
 </script>
 </body>

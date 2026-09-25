@@ -139,7 +139,8 @@ function Invoke-Native {
         [scriptblock]$OnTick = $null,
         [int]$TickSec = 30,
         [hashtable]$Env = $null,
-        [scriptblock]$OnStart = $null
+        [scriptblock]$OnStart = $null,
+        [scriptblock]$OnLine = $null
     )
     $argStr = (@($Arguments) | ForEach-Object { Format-Arg ([string]$_) }) -join ' '
     $psi = New-Object System.Diagnostics.ProcessStartInfo
@@ -163,7 +164,8 @@ function Invoke-Native {
 
     $p = [System.Diagnostics.Process]::Start($psi)
     if ($OnStart) { try { & $OnStart $p } catch { } }
-    $outTask = $p.StandardOutput.ReadToEndAsync()
+    $outTask = $null
+    if ($null -eq $OnLine) { $outTask = $p.StandardOutput.ReadToEndAsync() }
     $errTask = $p.StandardError.ReadToEndAsync()
     try {
         if ($StdIn) {
@@ -176,6 +178,30 @@ function Invoke-Native {
 
     $timedOut = $false
     $sw = [System.Diagnostics.Stopwatch]::StartNew()
+    if ($OnLine) {
+        # streaming mode: hand every stdout line to $OnLine as it arrives
+        $sb = New-Object System.Text.StringBuilder
+        $lastTick = 0.0
+        $lineTask = $p.StandardOutput.ReadLineAsync()
+        while ($true) {
+            if ($lineTask.Wait(500)) {
+                $line = $lineTask.Result
+                if ($null -eq $line) { break }
+                [void]$sb.AppendLine($line)
+                try { & $OnLine $line } catch { }
+                $lineTask = $p.StandardOutput.ReadLineAsync()
+            }
+            $el = $sw.Elapsed.TotalSeconds
+            if ($OnTick -and ($el - $lastTick) -ge $TickSec) { $lastTick = $el; try { & $OnTick } catch { } }
+            if (-not $timedOut -and $TimeoutSec -gt 0 -and $el -ge $TimeoutSec) { $timedOut = $true; Stop-ProcessTree $p }
+        }
+        $p.WaitForExit()
+        $out = $sb.ToString()
+        $err = $errTask.Result
+        return [pscustomobject]@{
+            Code = $p.ExitCode; Out = $out; Err = $err; TimedOut = $timedOut; Seconds = [int]$sw.Elapsed.TotalSeconds
+        }
+    }
     if ($TimeoutSec -le 0 -and $null -eq $OnTick) {
         $p.WaitForExit()
     } else {
@@ -486,6 +512,7 @@ function Test-PathMatch([string]$Path, [string[]]$Globs) {
 function Test-InScope([string]$Path, $F, [string]$TaskDir) {
     $p = $Path -replace '\\', '/'
     if ($p.StartsWith($TaskDir + '/')) { return $true }
+    if ($p -eq 'agent-loop/a1/data.js') { return $true }   # written by the runner during the round (live view)
     if (Test-PathMatch $p $F.scope_deny) { return $false }
     return (Test-PathMatch $p $F.scope_allow)
 }
@@ -554,16 +581,88 @@ function Get-ClaudeArgs([string]$Mode) {
     if ($caps.effort) { $a += @('--effort', [string](Get-Cfg 'effort' 'max')) }
     if ((Get-Cfg 'use_bare' $false) -and $caps.bare) { $a += '--bare' }
     $tools = [string](Get-Prop (Get-Cfg 'tools') $Mode 'Read,Edit,Write,Glob,Grep')
-    $a += @('--allowedTools', $tools, '--permission-mode', 'acceptEdits', '--output-format', 'json')
+    $a += @('--allowedTools', $tools, '--permission-mode', 'acceptEdits', '--output-format', 'stream-json', '--verbose')
     foreach ($x in @(Get-Cfg 'extra_args' @())) { if ($x) { $a += [string]$x } }
     return ,$a
 }
 
 function ConvertFrom-ClaudeOutput([string]$Out) {
     if (-not $Out) { return $null }
+    # stream-json: take the last line that is the final result event
+    $lines = @($Out -split "`n" | Where-Object { $_.TrimStart().StartsWith('{') })
+    for ($i = $lines.Count - 1; $i -ge 0; $i--) {
+        if ($lines[$i] -match '"type"\s*:\s*"result"') {
+            try { return ($lines[$i] | ConvertFrom-Json) } catch { }
+        }
+    }
     $s = $Out.IndexOf('{'); $e = $Out.LastIndexOf('}')
     if ($s -lt 0 -or $e -le $s) { return $null }
     try { return ($Out.Substring($s, $e - $s + 1) | ConvertFrom-Json) } catch { return $null }
+}
+
+# ---------------------------------------------------------------- live log (stream-json -> readable lines)
+
+function Compress-Line($Text, [int]$Max) {
+    if ($null -eq $Text) { return '' }
+    $s = ([string]$Text -replace '\s+', ' ').Trim()
+    if ($s.Length -gt $Max) { $s = $s.Substring(0, $Max) + ' ...' }
+    return $s
+}
+
+function Format-ToolInput($In) {
+    if ($null -eq $In) { return '' }
+    $parts = @()
+    foreach ($k in @('file_path', 'path', 'pattern', 'glob', 'pages', 'offset', 'limit', 'command', 'description', 'url', 'query')) {
+        $v = Get-Prop $In $k $null
+        if ($null -ne $v -and [string]$v -ne '') { $parts += ($k + '=' + (Compress-Line $v 160)) }
+    }
+    if ($parts.Count -eq 0) { try { return (Compress-Line (ConvertTo-Json -InputObject $In -Depth 5 -Compress) 160) } catch { return '' } }
+    return ($parts -join '  ')
+}
+
+function Get-ToolResultText($C) {
+    $c2 = Get-Prop $C 'content' ''
+    if ($c2 -is [string]) { return $c2 }
+    $txt = @()
+    foreach ($x in @($c2)) { $v = Get-Prop $x 'text' $null; if ($v) { $txt += [string]$v } }
+    return ($txt -join ' ')
+}
+
+function Format-StreamEvent([string]$Line) {
+    if (-not $Line -or -not $Line.TrimStart().StartsWith('{')) { return $null }
+    $e = $null
+    try { $e = $Line | ConvertFrom-Json } catch { return $null }
+    $ts = (Get-Date).ToString('HH:mm:ss')
+    $out = New-Object System.Collections.ArrayList
+    $type = [string](Get-Prop $e 'type' '')
+    if ($type -eq 'system' -and [string](Get-Prop $e 'subtype' '') -eq 'init') {
+        [void]$out.Add($ts + '  == start, model ' + [string](Get-Prop $e 'model' '?'))
+    } elseif ($type -eq 'assistant') {
+        foreach ($c in @(Get-Prop (Get-Prop $e 'message' $null) 'content' @())) {
+            $ct = [string](Get-Prop $c 'type' '')
+            if ($ct -eq 'text') {
+                $tx = Compress-Line (Get-Prop $c 'text' '') 600
+                if ($tx) { [void]$out.Add($ts + '  ' + $tx) }
+            } elseif ($ct -eq 'tool_use') {
+                [void]$out.Add($ts + '  > ' + [string](Get-Prop $c 'name' '?') + '  ' + (Format-ToolInput (Get-Prop $c 'input' $null)))
+            } elseif ($ct -eq 'thinking') {
+                $tx = Compress-Line (Get-Prop $c 'thinking' '') 300
+                if ($tx) { [void]$out.Add($ts + '  ~ ' + $tx) }
+            }
+        }
+    } elseif ($type -eq 'user') {
+        foreach ($c in @(Get-Prop (Get-Prop $e 'message' $null) 'content' @())) {
+            if ([string](Get-Prop $c 'type' '') -eq 'tool_result' -and (Get-Prop $c 'is_error' $false)) {
+                [void]$out.Add($ts + '  x ' + (Compress-Line (Get-ToolResultText $c) 300))
+            }
+        }
+    } elseif ($type -eq 'result') {
+        $s = $ts + '  == end: ' + [string](Get-Prop $e 'subtype' '') + ', turns ' + [string](Get-Prop $e 'num_turns' '?') + ', cost $' + [string](Get-Prop $e 'total_cost_usd' '?')
+        if (Get-Prop $e 'is_error' $false) { $s += ', ERROR: ' + (Compress-Line (Get-Prop $e 'result' '') 300) }
+        [void]$out.Add($s)
+    }
+    if ($out.Count -eq 0) { return $null }
+    return ($out.ToArray() -join "`n")
 }
 
 # ---------------------------------------------------------------- one round
@@ -639,11 +738,13 @@ function Invoke-AgentRound {
     $r = $null
     $fatal = $null
     # invoked from Invoke-Native; $State and $id resolve through dynamic scope
-    $tick = { $State['heartbeat'] = Get-Now; Save-TaskState $id $State; Update-LoopLock }
+    $tick = { $State['heartbeat'] = Get-Now; Save-TaskState $id $State; Update-LoopLock; try { Update-Report } catch { } }
+    $liveAbs = Get-RepoPath ($roundDir + '/live.log')
+    $onLine = { param($l) $s = Format-StreamEvent $l; if ($s) { [IO.File]::AppendAllText($liveAbs, $s + "`n", $script:Utf8) } }
     while ($true) {
         $attempt++
         Write-Log ("$id r$Round attempt $attempt ($model, effort $effort)")
-        $r = Invoke-Native -File $script:Claude -Arguments $cargs -StdIn $prompt -TimeoutSec ($F.max_minutes * 60) -OnTick $tick -TickSec ([int](Get-Cfg 'heartbeat_seconds' 30)) -Env $envVars -OnStart { param($pr) $script:ChildPid = $pr.Id; Update-LoopLock }
+        $r = Invoke-Native -File $script:Claude -Arguments $cargs -StdIn $prompt -TimeoutSec ($F.max_minutes * 60) -OnTick $tick -TickSec ([int](Get-Cfg 'heartbeat_seconds' 30)) -Env $envVars -OnLine $onLine -OnStart { param($pr) $script:ChildPid = $pr.Id; Update-LoopLock }
         $script:ChildPid = 0
         Update-LoopLock
         Write-Text (Get-RepoPath ($roundDir + '/stdout.log')) ($r.Out + $(if ($r.Err) { "`n--- stderr ---`n" + $r.Err } else { '' }))
@@ -702,7 +803,7 @@ function Invoke-AgentRound {
         Write-Log ("$id r$Round scope violation, round discarded: " + ($violations -join ', '))
     }
     if ($violations.Count -gt 0 -or $mismatch) {
-        Undo-RoundChanges $changes $roundDir ($roundDir + '/discarded') @($taskDir + '/state.json')
+        Undo-RoundChanges $changes $roundDir ($roundDir + '/discarded') @(($taskDir + '/state.json'), 'agent-loop/a1/data.js')
     }
 
     $meta = [ordered]@{
@@ -730,9 +831,9 @@ function Invoke-AgentRound {
 
     # stage everything, save the diff of work files (without runner files of this round)
     Invoke-Git @('add', '-A') | Out-Null
-    $work = Invoke-Git @('diff', '--cached', '--name-only', '--', '.', (':(exclude)' + $taskDir + '/**')) -AllowFail
+    $work = Invoke-Git @('diff', '--cached', '--name-only', '--', '.', (':(exclude)' + $taskDir + '/**'), ':(exclude)agent-loop/a1/data.js') -AllowFail
     $meta['changed_files'] = @($work.Out -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ })
-    $diff = Invoke-Git @('diff', '--cached', '--stat', '-p', '--', '.', (':(exclude)' + $roundDir + '/**'), (':(exclude)' + $taskDir + '/state.json')) -AllowFail
+    $diff = Invoke-Git @('diff', '--cached', '--stat', '-p', '--', '.', (':(exclude)' + $roundDir + '/**'), (':(exclude)' + $taskDir + '/state.json'), ':(exclude)agent-loop/a1/data.js') -AllowFail
     if ($diff.Out) { Write-Text (Get-RepoPath ($roundDir + '/diff.patch')) (Limit-Text $diff.Out ([int](Get-Cfg 'diff_max_kb' 200))) }
     Write-Json (Get-RepoPath ($roundDir + '/meta.json')) $meta
 
@@ -916,7 +1017,7 @@ function Repair-Interrupted {
         $roundDir = $taskDir + '/round-' + ('{0:D2}' -f $cur)
         $ch = @(Get-GitChanges)
         $viol = @($ch | Where-Object { -not (Test-InScope $_.Path $F $taskDir) })
-        if ($viol.Count -gt 0) { Undo-RoundChanges $ch $roundDir ($roundDir + '/discarded') @($taskDir + '/state.json') }
+        if ($viol.Count -gt 0) { Undo-RoundChanges $ch $roundDir ($roundDir + '/discarded') @(($taskDir + '/state.json'), 'agent-loop/a1/data.js') }
         $res = Read-Json (Get-RepoPath ($roundDir + '/result.json'))
         $rst = [string](Get-Prop $res 'status' '')
         $s['round'] = $cur
@@ -1019,6 +1120,19 @@ function Read-TextOrNull([string]$Rel, [int]$MaxKb) {
     return (Limit-Text (Read-Text $abs) $MaxKb)
 }
 
+function Get-LiveTail([string]$Rel, [int]$MaxKb) {
+    # the end of the live log is the interesting part
+    $abs = Get-RepoPath $Rel
+    if (-not (Test-Path -LiteralPath $abs -PathType Leaf)) { return $null }
+    $t = Read-Text $abs
+    $max = $MaxKb * 1024
+    if ($t.Length -le $max) { return $t }
+    $cut = $t.Substring($t.Length - $max)
+    $nl = $cut.IndexOf("`n")
+    if ($nl -ge 0) { $cut = $cut.Substring($nl + 1) }
+    return ('... [' + ($t.Length - $cut.Length) + " chars earlier]`n" + $cut)
+}
+
 function Get-CommitMap {
     $map = @{}
     $r = Invoke-Git @('log', '-n', '5000', '--format=%H%x09%cI%x09%s') -AllowFail
@@ -1109,6 +1223,7 @@ function Update-Report {
                     notes   = (Read-TextOrNull ($rd + '/notes.md') $textKb)
                     output  = (Read-TextOrNull ($rd + '/output.md') $textKb)
                     diff    = (Read-TextOrNull ($rd + '/diff.patch') $diffKb)
+                    live    = (Get-LiveTail ($rd + '/live.log') $textKb)
                     commit  = $c
                 })
             }

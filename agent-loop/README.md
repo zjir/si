@@ -82,6 +82,10 @@ Otevři `agent-loop/a1/index.html` (funguje z disku i z GitHub Pages). Seznam ú
 
 Varování: `MODEL_MISMATCH`, `EFFORT_UNVERIFIED`, `SCOPE_VIOLATION`, `NO_RESULT`, `TIMEOUT`, `STUCK`, `NO_CHANGE`, `COST_UNKNOWN`, `MAX_ROUNDS`, `FAILED`, `BLOCKED`, `INVALID`, `PUSH_FAILED`, `REQUESTS`.
 
+## Živý průběh
+
+CLI běží v režimu `stream-json`; runner průběžně zapisuje čitelný průběh kola do `runs/<id>/round-NN/live.log` (čtení souborů, hledání, zápisy, poznámky agenta, chyby nástrojů) a každých `heartbeat_seconds` přegeneruje A1. V A1 je běžící kolo automaticky rozbalené s oddílem „Průběh (živě)“ a stránka se při běžícím úkolu obnovuje každých 30 s.
+
 ## Konfigurace (`config.json`)
 
 | Klíč | Výchozí | Popis |
