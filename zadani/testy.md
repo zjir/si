@@ -99,7 +99,7 @@ evs = engine.pop_events()             # události vzniklé od minulého volání
 records, events = engine.run(df)      # dávkově; DataFrame podle 3.2 a 3.3
 engine.version                        # str: semver + krátký git hash, např. "0.3.0+a1b2c3d"
 engine.params                         # dict: efektivní parametry včetně doplněných výchozích
-engine.warmup_bars                    # int: počet úvodních barů bez výstupu, výchozí = atr_n
+engine.warmup_bars                    # int: počet úvodních barů bez výstupu, výchozí = atr_n − 1 (5.2)
 ```
 
 Kanonická jména parametrů (`params`); hodnoty a rozsahy podle K 12:
@@ -392,5 +392,270 @@ Na reálných datech nikdo neoznačil „správný“ trend ani pullback. Test t
 | 6. Obchodní deník a obrázky obchodů | kladné příklady situací, které autor systému obchodoval | 16 | informativní, vypnuto (K 3.6, K 13.9) |
 
 Zdroje 3–5 nemají pevné cílové hodnoty (K 13.10); první běh stanoví referenci, další verze se porovnávají s ní (11.6).
+
+## 5. Orákulum (referenční implementace definic)
+
+Orákulum je samostatná, jednoduchá implementace definic K 4–8 v testovacím balíku (`tests/oracle/`). Smí být pomalá (O(n) s velkými konstantami, vektorizace není nutná), nesmí sdílet kód s komponentou a musí být čitelná řádek po řádku proti tomuto dokumentu. Použití: přesná pravda na syntetických datech (G7), shoda na reálných datech (G8), referenční swingy a úseky trendu pro kontroly pohledem do budoucnosti (9).
+
+### 5.1 Tabulka výkladů
+
+Kde zadání komponenty mlčí nebo připouští dvě čtení, platí tento výklad (stav v logu 21: Předpoklad, s kontrolou při implementaci komponenty). Změna vyžaduje záznam v logu a stejnou změnu v zadání komponenty.
+
+| # | Věc | Výklad | Důvod |
+|---|---|---|---|
+| P-01 | zahřívání | `atr1` je null pro `t < atr_n − 1`; zigzag i struktura začínají až od `t = atr_n − 1`; dřívější bary se nepoužijí ani jako historie | K 13.2.6 jen říká „málo dat pro ATR“; nejjednodušší deterministické chování |
+| P-02 | cenová řada zigzagu | extrém i návrat se měří na `hi_t`, `lo_t` podle `anchor_mode` (2) | K 5 mluví o „ceně“; kotvy TL musí být na téže řadě jako swingy |
+| P-03 | první swing | před prvním swingem se sledují oba běžící extrémy; potvrdí se ten, jehož návrat nastal dřív; nastanou-li oba v témže baru, dřív je ten s dřívějším extrémem; při stejném baru extrému rozhodne pořadí uvnitř baru (2) | K 5 začátek neřeší |
+| P-04 | strukturní vs. vnitřní swingy | strukturní swing low = nejnižší zigzag swing low uvnitř jednoho pullbacku (od `H_k` do nového maxima); strukturní swing high = `H_k`; ostatní zigzag swingy uvnitř pullbacku jsou vnitřní. Sekvence HH + HL (K 6.1), kotvy TL (K 6.2), „poslední swing low“ (K 6.5, K 7) se týkají jen strukturních swingů; PW1 (K 8.2) a `pb_inner_swings` (K 7) pracují se všemi zigzag swingy | doslovné čtení K 6.1 (každý zigzag swing) je v rozporu s K 8.2 (PW1 předpokládá vnitřní nižší swing high uvnitř trvajícího pullbacku) a s P.A.T. VIII.1, kde vnitřní swingy korekce jsou varování, ne konec trendu |
+| P-05 | tolerance ε mezi kotvami (K 6.2, 6.3) | nemění konstrukci TL; počet barů s tělem pod TL − ε mezi kotvami se jen hlásí (`tl_tolerance_violations`) | K neříká, co se stane při porušení; prolomení řeší K 6.5 přes close |
+| P-06 | „poslední swing low“ pro prolomení struktury | poslední **dokončený** strukturní swing low: během pullbacku k je to `L_{k−1}` (u prvního pullbacku `L0`), v impulsu po pullbacku k je to `L_k` | provizorní low běžícího pullbacku se ještě může posunout; P.A.T. IV SL:A a VI OUT:B pracují s low minulého swingu |
+| P-07 | strukturní low, které není nad předchozím | zigzag swing low potvrzený uvnitř pullbacku s cenou ≤ cena posledního dokončeného strukturního low (v ticích) končí trend: `TREND_END` s `reason = SEQUENCE_VIOLATION` | uptrend podle P.A.T. I.3 vyžaduje vyšší low; bez close pod low by K 6.5 trend neukončila a struktura by obsahovala LL |
+| P-08 | pullback, který začal v CANDIDATE nebo TL_BROKEN | `PULLBACK_START` se vydá v baru, kdy se trend stane (nebo znovu stane) platným, s `ref_idx = H_k`, pokud pullback ještě běží; pullback skončený před platností trendu události nemá, jeho low je přesto strukturní | K 7 vede fáze PULLBACK jen pro platný trend |
+| P-09 | strukturní potvrzení low | přesáhne-li `hi_t` cenu `H_k` (konec pullbacku) a swing high `H_k` je zigzagem potvrzen, potvrdí se běžící kandidát low zigzagu v tomto baru i bez návratu θ × `atr1` (event `SWING_CONFIRMED`, `detail.structural = true`) | návrat nad `H_k` je návrat ≥ θ × `atr1(t_H)`; jinak by pullback skončil bez strukturního low, když `atr1` během pullbacku vzrostlo |
+| P-10 | fáze ENDED | trvá jen bar události `TREND_END`; od dalšího baru NONE; nový `L0` = první zigzag swing low potvrzený po baru konce | K 7 dobu trvání neuvádí |
+| P-11 | CANDIDATE a close pod `L0` | kandidát se ruší (fáze NONE) bez události | trend nikdy nebyl platný, `TREND_END` by neměl protějšek |
+| P-12 | null ve filtrech | je-li kterýkoli z `pw1_trend_side`, `pw1_counter_side`, `pw2`, `pw3` null, je `reversal_hint` null | nedefinovaný vstup nesmí vypadat jako splněný filtr |
+| P-13 | PW1 protitrendová strana | vnitřní swing high `h_1, h_2, …` pullbacku se porovnávají v řadě `h_0 = H_k, h_1, h_2, …`; `pw1_counter_side = false`, existuje-li `i ≥ 1` s `h_i < h_{i−1}` a `h_{i+1} < h_i` (obecně `pw1_counter` po sobě jdoucích nižších kroků) | první vnitřní high je vždy pod `H_k`; P.A.T. VIII.1 varuje před opakovaně nižšími high v korekci |
+| P-14 | PW1 trendová strana | posledních `pw1_n` **zigzag** swing low (včetně vnitřních) potvrzených do `t` je ostře rostoucích (v ticích); méně než `pw1_n` → null | K 8.2 říká „swing low“ bez upřesnění; P.A.T. VIII.1 ukazuje vnitřní low korekce |
+| P-15 | `direction` při dvou platných trendech | strana s novějším `L0_idx`; při shodě strana s pozdějším `TREND_START`; při shodě UP | K 7 řeší jen první krok |
+| P-16 | `dist_to_level_atr` | vzdálenost close k nejbližší aktivní úrovni **pod** close (uptrend), v `atr1(t)`; žádná taková → null | „proti směru pullbacku“ (K 7) = kam pullback míří |
+| P-17 | `levels_crossed` | počet různých úrovní (klíč `kind, price, valid_from`) s cenou > `L0_price`, pro něž existuje bar `u ∈ [L0_idx, t]`, kde úroveň byla aktivní a `close_u > price` (v ticích) | K 8.1 neříká, zda se počítá aktivita v čase proražení |
+| P-18 | `dist_to_next_level_atr` | nejbližší aktivní úroveň **nad** close v `atr1(t)`; žádná → null | K 8.1 |
+| P-19 | `anchors_on_level`, `L0_on_level` | podíl strukturních low (všech od `L0`), jejichž cena je do `level_tol × atr1(idx kotvy)` od úrovně aktivní v baru kotvy; `L0_on_level` totéž pro `L0` | K 8.1 |
+| P-20 | `session_cross`, `roll_in_structure`, `gap_in_structure` | `session_id(L0_idx) ≠ session_id(t)`; existuje den rollu v `[L0_idx, t]`; existuje bar `u ∈ (L0_idx, t]` s `gap_before_bars ≥ 5` a stejným `session_id` jako bar `u − 1` | K 8.1, K 11 |
+| P-21 | `er` | čitatel `\|close_t − close_{L0_idx}\|`, jmenovatel `Σ_{i=L0_idx+1..t} \|close_i − close_{i−1}\|`; jmenovatel 0 → null | K 8.1 |
+| P-22 | `r2` | R² OLS regrese ceny strukturních low na jejich index (≥ 3 kotvy); rozptyl cen 0 → null | K 8.1 |
+| P-23 | `tl_max_dev_atr` | `max_{u ∈ [L0_idx, t]} (max(open_u, close_u) − main_tl(u)) / atr1(u)` vůči **aktuálně platné** hlavní TL | trader měří odklon od čáry, kterou má právě nakreslenou |
+| P-24 | `chop_bars` | `ER_u = \|close_u − close_{u−n}\| / Σ_{i=u−n+1..u} \|close_i − close_{i−1}\|` s `n = pw3_er_n`; bar `u` je chop, pokud `ER_u < pw3_er_thr` a (bez úrovní: vždy; s úrovněmi: vzdálenost `close_u` k nejbližší aktivní úrovni > `level_tol × atr1(u)`); `chop_bars = Σ` přes `u ∈ [t − pw3_w + 1, t]`; jmenovatel 0 → `ER_u = 0` (plochý trh je chop); null, dokud okno není celé | K 8.2 |
+| P-25 | `pw2` | `tl_max_dev_atr ≤ pw2_delta` | K 8.2 |
+| P-26 | `slope_norm` | sklon TL v bodech/bar dělený `atr1(t)` | K 6.6 |
+| P-27 | aktuální TL při posunu provizorního low | kandidát = přímka posledními dvěma strukturními low včetně provizorního; každé přijetí nového kandidáta vydá `CURR_TL_NEW` | K 6.3 |
+| P-28 | `TL_UPDATE` | vydá se, když se změní přímka hlavní TL (x0, y0 nebo slope) jindy než v baru `TREND_START`; kotva nad přímkou TL nemění a událost nevydá | K 6.2 |
+| P-29 | prolomení hlavní TL a aktuální TL | close < hlavní TL − ε → `TL_BREAK(MAIN)`, fáze TL_BROKEN, aktuální TL := hlavní (`curr_tl_broken = true`); jinak close < aktuální TL − ε (jen když aktuální ≠ hlavní) → `TL_BREAK(CURR)`, aktuální := hlavní bez další události | K 6.3, K 6.5 |
+| P-30 | návrat z TL_BROKEN | nový strukturní low nad posledním dokončeným → obálka se přepočítá (`TL_UPDATE`); je-li close ≥ nová hlavní TL − ε, trend je platný (fáze PULLBACK, pokud `hi ≤ H_k`, jinak IMPULSE); jinak zůstává TL_BROKEN | K 6.5 |
+| P-31 | pullback bez potvrzeného `H_k` (`theta_pb < theta`) | pullback skončený novým maximem dřív, než zigzag potvrdil `H_k`, nevytváří strukturní low ani high; `PULLBACK_END_UP` se vydá s `ref_idx = t` | mělká korekce není swing |
+| P-32 | reference pullbacku | `H_k` = běžící maximum `hi` od `L0_idx` v okamžiku začátku pullbacku, `t_H` = bar prvního dosažení této hodnoty; podmínka začátku `H_k − lo_t ≥ theta_pb × atr1(t_H)` | K 7 |
+| P-33 | pořadí uvnitř baru | 5.4 kroky 1–9; `seq` událostí roste v tomto pořadí | K neuvádí |
+| P-34 | `H` v CANDIDATE | běžící maximum `hi` od `L0_idx` včetně | K 7 |
+| P-35 | ceny vs. metriky u downtrendu | metriky (`dist_*`, `slope_norm_*`, `tl_max_dev_atr`, `er`, `slope_ratio`) jsou směrově zarovnané (kladné = ve prospěch trendu); ceny a parametry přímek (`L0_price`, `H_price`, `*_tl_y0`, `*_tl_slope`, `value_at`) jsou v původních jednotkách ceny (downtrend má záporný `main_tl_slope`) | spotřebitel (SL:B, vstupní zóny) potřebuje skutečné ceny; K 4 mluví o metrikách |
+| P-36 | `n_swings` | počet strukturních high + strukturních low po `L0` (bez `L0`) | K 8.1 „HH + HL od L0“ |
+| P-37 | `duration_min` | `(ts_t − ts_{L0_idx})` v minutách, celé číslo | K 8.1 |
+| P-38 | sdílený zigzag | jeden zigzag pro obě strany; strukturní potvrzení (P-09) vyvolané kteroukoli stranou platí pro zigzag jako celek | swingy jsou vlastnost ceny, ne směru |
+| P-39 | `pb_len` | `t − H_idx` | K 7 „délka v barech“ od začátku (`H`) |
+| P-40 | extrém a protilehlý extrém v témže baru | po swingu s extrémem v baru `i` se kandidát opačného typu hledá na barech `(i, t]` a navíc na baru `i`, pokud pořadí uvnitř baru (2) klade opačný extrém až za swing: po LOW v rostoucím nebo plochém baru (`close ≥ open`) se bar `i` započítá do hledání HIGH; po HIGH v klesajícím baru se bar `i` započítá do hledání LOW. Zápis `after(i, kind)` | bez pravidla by velký bar s oběma extrémy dával jiný výsledek než 1s data |
+| P-41 | `trend_valid` | `phase ∈ {IMPULSE, PULLBACK}` | K 10 „TL existuje a není prolomená“ |
+| P-42 | `curr_tl_broken` | true od `TL_BREAK(CURR)` nebo `TL_BREAK(MAIN)` do nejbližšího `CURR_TL_NEW`, `TREND_START` nebo návratu z TL_BROKEN | K 10 „stav prolomení“ |
+
+### 5.2 Základní řady
+
+```
+TR_0 = high_0 − low_0
+TR_t = max(high_t − low_t, |high_t − close_{t−1}|, |low_t − close_{t−1}|)      t ≥ 1
+atr1_t = mean(TR_{t−atr_n+1} … TR_t)                                          t ≥ atr_n − 1, jinak null
+hi_t, lo_t podle anchor_mode (2)
+GE(a, b, k, atr) := (ticks(a) − ticks(b)) × tick ≥ k × atr − 1e-9              „a − b ≥ k × atr“
+LT(a, b) := ticks(a) < ticks(b)                                                „a < b“
+```
+
+Zrcadlení pro stranu DOWN: `open' = −open, high' = −low, low' = −high, close' = −close`; `tick` beze změny; `hi'`, `lo'` z pře-mapovaných hodnot. Úrovně se zrcadlí `price' = −price`. Výstupy strany DOWN se převedou zpět podle P-35 (ceny × −1, metriky beze změny).
+
+### 5.3 Zigzag
+
+Stav: `dir ∈ {0, +1, −1}` (0 = před prvním swingem; +1 = poslední potvrzený je LOW, hledá se HIGH; −1 zrcadlově), kandidáti `cand_hi = (idx, price, atr)`, `cand_lo = (idx, price, atr)`, seznam `swings`. Vstup pro bar `t` navíc: příznaky `force_lo`, `force_hi` (P-09) spočítané ze stavu stran na konci baru `t − 1` a z `hi_t`, `lo_t`:
+
+```
+force_lo = strana UP má pb.active a pb.h_confirmed a LT(pb.H_ref.price, hi_t)
+force_hi = strana DOWN (v zrcadle) má totéž, tj. v původních cenách LT(lo_t, pb_down.H_ref.price)
+```
+
+Krok pro bar `t ≥ atr_n − 1`:
+
+```
+1. if dir == 0:
+     if cand_hi is None or LT(cand_hi.price, hi_t): cand_hi = (t, hi_t, atr1_t)   # při rovnosti zůstává dřívější
+     if cand_lo is None or LT(lo_t, cand_lo.price): cand_lo = (t, lo_t, atr1_t)
+     hi_ok = GE(cand_hi.price, lo_t, theta, cand_hi.atr) and (cand_hi.idx < t or LT(close_t, open_t))
+     lo_ok = GE(hi_t, cand_lo.price, theta, cand_lo.atr) and (cand_lo.idx < t or not LT(close_t, open_t))
+     if hi_ok and lo_ok:
+        first = HIGH if cand_hi.idx < cand_lo.idx else LOW if cand_lo.idx < cand_hi.idx
+                else (LOW if close_t ≥ open_t else HIGH)          # stejný bar extrému: pořadí uvnitř baru (2)
+     elif hi_ok: first = HIGH
+     elif lo_ok: first = LOW
+     else: return
+     if first == HIGH: confirm(cand_hi, HIGH, t); dir = −1; cand_lo = argmin lo over (cand_hi.idx, t]
+     else:             confirm(cand_lo, LOW, t);  dir = +1; cand_hi = argmax hi over (cand_lo.idx, t]
+     goto 2   # v témže baru může následovat další potvrzení
+2. loop:
+     if dir == +1:
+        if LT(cand_hi.price, hi_t): cand_hi = (t, hi_t, atr1_t)
+        if (cand_hi.idx < t or LT(close_t, open_t)) and (GE(cand_hi.price, lo_t, theta, cand_hi.atr) or force_hi):
+           confirm(cand_hi, HIGH, t, structural = force_hi and not GE(...))
+           dir = −1; cand_lo = argmin lo over (cand_hi.idx, t]   # první výskyt při rovnosti; prázdný interval → (t, lo_t, atr1_t)
+           continue
+     else (dir == −1):
+        if LT(lo_t, cand_lo.price): cand_lo = (t, lo_t, atr1_t)
+        if (cand_lo.idx < t or not LT(close_t, open_t)) and (GE(hi_t, cand_lo.price, theta, cand_lo.atr) or force_lo):
+           confirm(cand_lo, LOW, t, structural = force_lo and not GE(...))
+           dir = +1; cand_hi = argmax hi over (cand_lo.idx, t]   # prázdný interval → (t, hi_t, atr1_t)
+           continue
+     break
+```
+
+`confirm(c, kind, t, structural)` přidá swing `(kind, idx = c.idx, price = c.price, atr_at_extreme = c.atr, confirm_idx = t)` a vydá `SWING_CONFIRMED` (`known_idx = t`, `ref_idx = c.idx`, `price`, `detail = {kind, structural}`). Swing s extrémem v baru `t` lze potvrdit v témže baru jen tehdy, když návrat uvnitř baru odpovídá předpokladu pořadí (2): HIGH v klesajícím baru (`close < open`), LOW v rostoucím nebo plochém baru. Potvrzené swingy se nikdy nemění (K 5). `force_hi`, `force_lo` se počítají jednou před krokem 1 a v témže baru se nemění. Intervaly `(cand_hi.idx, t]` a `(cand_lo.idx, t]` se čtou jako `after(idx, kind)` podle P-40.
+
+### 5.4 Stavový automat strany (UP; DOWN zrcadlově podle 5.2)
+
+Stav strany: `phase`, `L0`, `struct_lows` (od `L0`; poslední prvek může být provizorní), `struct_highs`, `H = (idx, price)`, `pb = {active, H_ref, h_confirmed, low, inner, inner_highs, start_idx, start_emitted}`, `last_completed_low`, `main_tl`, `curr_tl`, `curr_is_main`, `main_broken`, `curr_broken`. `reset()` vrátí vše do NONE / prázdné. `new_swings` = swingy potvrzené zigzagem v baru `t` v pořadí potvrzení.
+
+```
+0. if t < atr_n − 1: záznam zahřívání (3.1 bod 7); return
+1. if phase == ENDED: reset(); phase = NONE                                        # P-10
+2. if phase == NONE:
+     lows = [s for s in new_swings if s.kind == LOW]
+     if not lows: záznam; return
+     L0 = lows[−1]; struct_lows = [L0]; struct_highs = []; last_completed_low = L0
+     H = argmax hi over after(L0.idx, HIGH) ∪ … až t  (první výskyt při rovnosti; prázdné → (L0.idx, hi_L0))
+     pb = neaktivní; phase = CANDIDATE
+     new_swings = swingy potvrzené po L0 v témže baru (L0 se znovu nezpracovává)
+3. if LT(H.price, hi_t): H = (t, hi_t)                                            # běžící maximum, P-34
+4. if not pb.active and phase ∈ {CANDIDATE, IMPULSE, TL_BROKEN}
+      and GE(H.price, lo_t, theta_pb, atr1[H.idx]):                               # P-32
+     pb = {active = True, H_ref = H, h_confirmed = False, low = None, inner = 0,
+           inner_highs = [], start_idx = t, start_emitted = False}
+     if phase == IMPULSE:
+        emit PULLBACK_START(known = t, ref = H.idx, price = H.price); phase = PULLBACK; pb.start_emitted = True
+5. for s in new_swings (v pořadí potvrzení):
+   5a. if s.kind == HIGH:
+         assert pb.active                                    # theta_pb ≤ theta: krok 4 proběhl dřív
+         if s.idx == pb.H_ref.idx: pb.h_confirmed = True; struct_highs.append(s)
+         else: pb.inner += 1; pb.inner_highs.append(s)       # vnitřní high pullbacku
+   5b. if s.kind == LOW:
+         assert pb.active
+         pb.inner += 1
+         if not pb.h_confirmed: continue                     # P-31: mělký pullback, low není strukturní
+         if pb.low is not None and not LT(s.price, pb.low.price): continue   # vyšší vnitřní low
+         if not LT(last_completed_low.price, s.price):       # s.price ≤ poslední dokončené low
+            if phase == CANDIDATE:                           # restart kandidáta níže
+               L0 = s; struct_lows = [L0]; struct_highs = []; last_completed_low = L0
+               H = argmax hi over after(L0.idx, HIGH) … t; pb = neaktivní; continue
+            emit TREND_END(known = t, ref = s.idx, price = s.price, reason = SEQUENCE_VIOLATION)   # P-07
+            phase = ENDED; záznam; return
+         pb.low = s                                           # nové provizorní low pullbacku
+         if phase == CANDIDATE:
+            struct_lows = [L0, s]; compute_tls() (5.5); phase = PULLBACK
+            emit TREND_START(known = t, ref = L0.idx, price = L0.price, detail = {anchors, slope})
+            emit PULLBACK_START(known = t, ref = pb.H_ref.idx, price = pb.H_ref.price); pb.start_emitted = True   # P-08
+         else:                                                # PULLBACK nebo TL_BROKEN
+            if struct_lows[−1] je provizorní low tohoto pullbacku: struct_lows[−1] = s
+            else: struct_lows.append(s)
+            old_main, old_curr = main_tl, curr_tl; compute_tls()
+            if main_tl ≠ old_main: emit TL_UPDATE(MAIN, known = t, ref = s.idx, detail = {anchors, slope})   # P-28
+            if not curr_is_main and curr_tl ≠ old_curr:
+               emit CURR_TL_NEW(known = t, ref = s.idx, detail = {anchors, slope}); curr_broken = False    # P-27
+            if phase == TL_BROKEN and not LT(close_t, main_tl(t) − eps × atr1_t):                          # P-30
+               phase = PULLBACK; main_broken = False; curr_broken = False
+               if not pb.start_emitted:
+                  emit PULLBACK_START(known = t, ref = pb.H_ref.idx, price = pb.H_ref.price); pb.start_emitted = True
+6. if pb.active and LT(pb.H_ref.price, hi_t):                                     # konec pullbacku
+     if pb.h_confirmed and pb.low is not None: last_completed_low = pb.low      # provizorní → dokončené
+     if phase == PULLBACK:
+        emit PULLBACK_END_UP(known = t, ref = (pb.low.idx if pb.low else t), price = hi_t); phase = IMPULSE
+     pb = neaktivní; H = (t, hi_t)
+7. if phase ∈ {IMPULSE, PULLBACK}:                                                # P-29
+     if LT(close_t, main_tl(t) − eps × atr1_t):
+        emit TL_BREAK(MAIN, known = t, ref = t, price = main_tl(t))
+        phase = TL_BROKEN; main_broken = True; curr_tl = main_tl; curr_is_main = True; curr_broken = True
+     elif not curr_is_main and LT(close_t, curr_tl(t) − eps × atr1_t):
+        emit TL_BREAK(CURR, known = t, ref = t, price = curr_tl(t)); curr_tl = main_tl; curr_is_main = True; curr_broken = True
+8. if phase ∈ {CANDIDATE, IMPULSE, PULLBACK, TL_BROKEN} and LT(close_t, last_completed_low.price):   # P-06
+     if phase == CANDIDATE: reset(); phase = NONE                                   # P-11
+     else: emit TREND_END(known = t, ref = t, price = close_t, reason = STRUCTURE_BREAK); phase = ENDED
+9. záznam (5.9)
+```
+
+Porovnání `LT(close_t, X − eps × atr1_t)` s reálným `X` se čte jako `ticks(close_t) × tick < X − eps × atr1_t − 1e-9`. `main_tl(u) = y0 + slope × (u − x0)`. Po `TREND_END` v kroku 5b nebo 8 zůstávají v záznamu baru hodnoty stavu před resetem (fáze ENDED, `L0`, TL), reset proběhne až v kroku 1 dalšího baru.
+
+### 5.5 Trendline
+
+```
+compute_tls():
+  A = struct_lows                                   # A[0] = L0, len(A) ≥ 2, ceny ostře rostoucí (P-07)
+  slope_j = (A[j].price − L0.price) / (A[j].idx − L0.idx)    pro j = 1 … len(A) − 1
+  j* = argmin_j slope_j; při rovnosti (rozdíl ≤ 1e-12) největší j
+  main_tl = (x0 = L0.idx, y0 = L0.price, slope = slope_j*, anchors = [L0.idx, A[j*].idx])
+  if len(A) ≥ 3:
+     P, Q = A[−2], A[−1]
+     slope_c = (Q.price − P.price) / (Q.idx − P.idx)
+     ratio = slope_c / main_tl.slope
+     if ratio ≥ curr_ratio_hi or ratio ≤ curr_ratio_lo:
+        curr_tl = (x0 = P.idx, y0 = P.price, slope = slope_c, anchors = [P.idx, Q.idx]); curr_is_main = False
+     else: curr_tl = main_tl; curr_is_main = True
+  else: curr_tl = main_tl; curr_is_main = True
+  tl_tolerance_violations = |{u ∈ (L0.idx, A[j*].idx) : min(open_u, close_u) < main_tl(u) − eps × atr1_u − 1e-9}|   # P-05
+```
+
+- Všechny kotvy leží na hlavní TL nebo nad ní z konstrukce (minimální sklon z `L0`).
+- `value_at(x) = y0 + slope × (x − x0)` pro libovolné celé `x` včetně budoucích; `x` je index baru, ne čas (K 4: osa x bez doplňování minut).
+- Rovnost přímek (`≠` v 5.4) = rovnost trojice `(x0, y0, slope)` s přesnou rovností float (stejné kotvy dávají stejný výpočet).
+
+### 5.6 Metriky kvality (K 8.1)
+
+Počítají se jen při `trend_valid = true`, jinak null (3.2); úsek = `[L0_idx, t]`.
+
+| Metrika | Výpočet |
+|---|---|
+| `slope_norm_main`, `slope_norm_curr` | `slope / atr1_t` (P-26); u strany DOWN se sklon před dělením zrcadlí, takže hodnota je kladná ve prospěch trendu |
+| `slope_ratio` | `slope_norm_curr / slope_norm_main` |
+| `er` | P-21 |
+| `r2` | P-22: `x` = indexy strukturních low, `y` = jejich ceny; `r2 = 1 − SS_res / SS_tot`; `SS_tot = 0` → null; méně než 3 kotvy → null |
+| `n_swings` | P-36 |
+| `duration_bars`, `duration_min` | `t − L0_idx`; P-37 |
+| `tl_max_dev_atr` | P-23 |
+| `levels_crossed` | P-17 |
+| `dist_to_next_level_atr` | P-18 |
+| `anchors_on_level`, `L0_on_level` | P-19 |
+| `session_cross`, `roll_in_structure`, `gap_in_structure` | P-20 |
+
+### 5.7 Filtry PW-SW (K 8.2)
+
+```
+pw1_trend_side:
+   lows = zigzag swingy LOW s idx ≥ L0.idx a confirm_idx ≤ t, seřazené podle idx, posledních pw1_n
+   if len(lows) < pw1_n: null
+   else: all(LT(lows[i−1].price, lows[i].price)) pro i = 1 … pw1_n − 1                      # P-14
+pw1_counter_side:
+   if phase ≠ PULLBACK: null
+   h = [pb.H_ref.price] + [s.price for s in pb.inner_highs]                                  # P-13
+   lower[i] = LT(h[i], h[i−1]) pro i ≥ 1
+   false, pokud existuje i ≥ 1, že lower[i], lower[i+1], …, lower[i + pw1_counter − 1] jsou všechny true; jinak true
+pw2 = (tl_max_dev_atr ≤ pw2_delta)                                                           # P-25; null při null
+pw3 = (chop_bars < pw3_max_chop)                                                             # P-24; null při null
+reversal_hint = null, je-li kterýkoli z předchozích null; jinak not (pw1_trend_side and pw1_counter_side and pw2 and pw3)   # P-12
+```
+
+Mimo `trend_valid = true` jsou všechny hodnoty null (3.2); `chop_bars` se počítá vždy (nezávisí na trendu).
+
+### 5.8 Směr
+
+```
+direction:
+   valid_up, valid_down = trend_valid obou stran
+   if valid_up and valid_down: strana s větším L0_idx; při rovnosti strana s pozdějším known_idx TREND_START; při rovnosti UP   # P-15
+   elif valid_up: UP;  elif valid_down: DOWN;  else NONE
+```
+
+### 5.9 Sestavení záznamu
+
+- Společná pole podle 3.2 z dat, kalendáře a úrovní; `n_levels_active` = počet úrovní s `valid_from ≤ t ≤ valid_to` (prázdné `valid_to` = bez konce).
+- Pole strany z jejího stavu; pravidla null podle 3.2. `struct_low_idxs` = indexy `struct_lows`; `struct_high_idxs` = indexy `struct_highs`.
+- `H_idx`, `H_price`: v PULLBACK `pb.H_ref`, jinak `H`.
+- `pb_*` jen v PULLBACK: `pb_start_idx = pb.start_idx`, `pb_len = t − pb.H_ref.idx`, `pb_inner_swings = pb.inner`, `pb_low_* = pb.low`.
+- `dist_to_tl_main_atr = (close_t − main_tl(t)) / atr1_t`, totéž pro aktuální; u strany DOWN v zrcadle (kladné = nad TL ve směru trendu).
+- `stopped_at_level`: `pb.low` existuje, úrovně nechybí, a existuje úroveň aktivní v `pb.low.idx` s `|pb.low.price − price| ≤ level_tol × atr1[pb.low.idx]`.
+- Metriky 5.6, filtry 5.7, `direction` 5.8, `delta_*` podle K 9 (5.10).
+
+### 5.10 Modul delta (K 9)
+
+Orákulum modul delta implementuje jen v rozsahu nutném pro S19 a R-7: nad řadou `delta` (kumulativní delta na bar, vstup) běží týž zigzag a automat 5.3–5.5 s `atr1` počítaným z řady delta (TR z jejích „OHLC“ = `open = delta_{t−1}`, `close = delta_t`, `high = max`, `low = min`). `delta_tl_agrees` = strana DOWN/UP delty má `trend_valid` a stejný směr jako `direction` ceny. `delta_divergence` (uptrend) = poslední strukturní low ceny je HL, zatímco poslední strukturní low delty (s extrémem do 5 barů od extrému ceny) je ≤ předchozí strukturní low delty + ε × atr1_delta. Den rollu → obě null. Bez `delta_enabled` se pole nevyplňují (null) a S19 se přeskočí (SKIP).
 
 KONEC DOKUMENTU
