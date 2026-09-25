@@ -11,7 +11,11 @@ Běžíš bez dohledu v lokální smyčce. Toto je jedno kolo úkolu. Kontext ú
 5. **Šetři tokeny.** Čti cíleně (Grep, rozsahy řádků). Starší kola nečti; stačí `state.md`, výsledek a diff minulého kola. Neopakuj obsah souborů v odpovědi.
 6. **Kontext P.A.T.:** vše se dělá pro obchodní systém P.A.T. a jen pro něj (sekce 0 zadání, podklady v `PAT/`). Text popisu systému nikam nekopíruj.
 7. **Používej jen povolené nástroje.** V režimu `spec` nemáš Bash ani PowerShell; nezkoušej je, každý zamítnutý pokus stojí tah. PDF čti přímo nástrojem Read (parametr `pages`, nejvýš 20 stran na volání), CSV a text přes Read a Grep.
-8. Chybí-li ti prostředky (data, výpočetní výkon, jiný vstup), zapiš požadavek do `requests` a pokračuj s nejlepším dostupným řešením.
+8. **Zapisuj průběžně, ne až na konci.** Kolo může kdykoli skončit (limit kreditů, timeout, pád). Co je uzavřené, musí už být v souborech:
+   - každé uzavřené prázdné místo nebo hotovou změnu zapiš do cílového souboru hned, ne v jedné dávce na konci,
+   - `result.json` zapiš hned na začátku kola se `status: "CONTINUE"` a průběžně ho aktualizuj (počty nálezů, `summary`, `next`); na konci nastav konečný stav,
+   - `state.md` aktualizuj po každém větším kroku (co je hotovo, co rozpracováno), aby příští kolo navázalo bez opakování práce.
+9. Chybí-li ti prostředky (data, výpočetní výkon, jiný vstup), zapiš požadavek do `requests` a pokračuj s nejlepším dostupným řešením.
 
 ## Soubory, které v každém kole zapíšeš
 

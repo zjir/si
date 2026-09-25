@@ -32,7 +32,7 @@ Zadání může obsahovat sekci s dodatky zadavatele. Každý bod zapracuj do p�
    - **AI implementátor**, který má podle dokumentu napsat kód bez možnosti se doptat,
    - **AI tester**, který má napsat testy a rozhodnout, zda implementace odpovídá.
    Každá otázka bez jednoznačné odpovědi v dokumentu je prázdné místo.
-4. Každé prázdné místo uzavři zápisem do textu specifikace (ne jen do logu).
+4. Každé prázdné místo uzavři zápisem do textu specifikace (ne jen do logu), **ihned po rozhodnutí**, včetně řádku v rozhodovacím logu. Nesbírej rozhodnutí na konec kola; po každých několika uzavřených místech aktualizuj `result.json` a `state.md`.
 5. Po zapracování projdi dokument znovu; nová rozhodnutí vytvářejí nové otázky. Průchody opakuj, dokud průchod nenajde nic nového nebo nedojde čas kola.
 6. Aktualizuj závěrečné sekce dokumentu, `state.md` a zapiš `result.json`.
 
