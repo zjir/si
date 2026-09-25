@@ -1,0 +1,21 @@
+{
+    "id":  "TASK-0001",
+    "title":  "Test: review testy.md",
+    "mode":  "spec",
+    "goal":  "Zreviduj zadani/testy.md podle role recenzenta a zapracuj dodatky.",
+    "done_when":  "Dodatky zapracovány, žádné prázdné místo.",
+    "inputs":  [
+                   "zadani/komponenta-trend.md"
+               ],
+    "scope_allow":  [
+                        "zadani/testy.md"
+                    ],
+    "scope_deny":  [
+
+                   ],
+    "max_rounds":  1,
+    "max_minutes":  30,
+    "priority":  100,
+    "notes":  "",
+    "created_at":  "2026-09-25T16:40:51+02:00"
+}
