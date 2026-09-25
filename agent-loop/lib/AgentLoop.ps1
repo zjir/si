@@ -637,6 +637,7 @@ function Invoke-AgentRound {
     $retries = [int](Get-Cfg 'retries' 3)
     $attempt = 0
     $r = $null
+    $fatal = $null
     # invoked from Invoke-Native; $State and $id resolve through dynamic scope
     $tick = { $State['heartbeat'] = Get-Now; Save-TaskState $id $State; Update-LoopLock }
     while ($true) {
@@ -649,7 +650,13 @@ function Invoke-AgentRound {
         if ($r.Code -eq 0 -or $r.TimedOut) { break }
         $jj = ConvertFrom-ClaudeOutput $r.Out
         $api = [int](Get-Prop $jj 'api_error_status' 0)
-        if ($api -eq 401 -or $api -eq 403) { Write-Log ("$id r$Round authentication error ($api); no retry. Run 'claude' and /login."); break }
+        $apiCode = [string](Get-Prop $jj 'api_error_code' '')
+        if ($api -eq 401 -or $api -eq 403 -or $apiCode -eq 'credits_required') {
+            # waiting does not help: login expired or spend limit / credits exhausted
+            $fatal = ('API ' + $api + ' ' + $apiCode + ': ' + [string](Get-Prop $jj 'result' '')).Trim()
+            Write-Log ("$id r$Round fatal API error, no retry: " + $fatal)
+            break
+        }
         if ($attempt -ge $retries) { break }
         $sleep = [int](Get-Cfg 'retry_sleep_seconds' 3600)
         Write-Log ("$id r$Round failed (exit $($r.Code)); retry in $sleep s")
@@ -714,7 +721,7 @@ function Invoke-AgentRound {
         is_error = (Get-Prop $j 'is_error' $null)
         session_id = (Get-Prop $j 'session_id' $null)
         started_at = $started; ended_at = $ended; duration_s = $r.Seconds
-        exit_code = $r.Code; attempts = $attempt; timed_out = $r.TimedOut
+        exit_code = $r.Code; attempts = $attempt; timed_out = $r.TimedOut; fatal_error = $fatal
         no_result = $noResult
         scope_violation = ($violations.Count -gt 0); scope_violations = $violations
         model_mismatch = $mismatch; model_mismatch_detail = $mismatchDetail
@@ -729,7 +736,7 @@ function Invoke-AgentRound {
     if ($diff.Out) { Write-Text (Get-RepoPath ($roundDir + '/diff.patch')) (Limit-Text $diff.Out ([int](Get-Cfg 'diff_max_kb' 200))) }
     Write-Json (Get-RepoPath ($roundDir + '/meta.json')) $meta
 
-    return [pscustomobject]@{ Meta = $meta; Result = $result; Status = $status; NoResult = $noResult; Failed = ($r.Code -ne 0 -and -not $r.TimedOut) }
+    return [pscustomobject]@{ Meta = $meta; Result = $result; Status = $status; NoResult = $noResult; Failed = ($r.Code -ne 0 -and -not $r.TimedOut -and -not $fatal); Fatal = $fatal }
 }
 
 function Format-Tokens($n) {
@@ -828,7 +835,8 @@ function Invoke-Task($Entry) {
         $state['heartbeat'] = Get-Now
         $state['last_status'] = $res.Status
         $state['last_summary'] = [string](Get-Prop $res.Result 'summary' '')
-        if ($res.Failed) { $final = 'failed' }
+        if ($res.Fatal) { $state['status'] = 'stopped'; $state['phase'] = 'paused'; $state['stop_reason'] = $res.Fatal }
+        elseif ($res.Failed) { $final = 'failed' }
         elseif ($m.model_mismatch) { $state['status'] = 'model_mismatch'; $state['phase'] = 'paused'; $state['model_mismatch'] = $m.model_mismatch_detail }
         elseif ($m.scope_violation) { }
         elseif ($res.Status -eq 'DONE') { $final = 'done' }
@@ -840,6 +848,11 @@ function Invoke-Task($Entry) {
 
         $st = $res.Status; if (-not $st) { $st = 'NO_RESULT' }
         if ($m.scope_violation) { $st = 'SCOPE_VIOLATION' }
+        if ($res.Fatal) {
+            $st = 'API_ERROR'
+            Write-Text (Get-RepoPath 'STOP') ('API_ERROR ' + $id + ' r' + $round + ': ' + $res.Fatal + "`n")
+            Update-Report
+        }
         if ($m.model_mismatch) {
             $st = 'MODEL_MISMATCH'
             # stop the whole loop; STOP carries the reason and is shown in A1
@@ -855,6 +868,10 @@ function Invoke-Task($Entry) {
         $ok = Sync-Push
         if (-not $ok -and -not $state['push_failed']) { $state['push_failed'] = $true; Save-TaskState $id $state; Invoke-Commit ($id + ' push failed flag') '' @() | Out-Null }
         Write-Log ("$id r$round -> $st")
+        if ($res.Fatal) {
+            Write-Log ('LOOP STOPPED: ' + $res.Fatal + ' -- fix it (login / usage credits), then run: start-loop.cmd resume')
+            return $false
+        }
         if ($m.model_mismatch) {
             Write-Log ('LOOP STOPPED: ' + $m.model_mismatch_detail + '. Fix agent-loop/config.json or the CLI, then run: start-loop.cmd resume')
             return $false
@@ -1037,6 +1054,7 @@ function Get-TaskWarnings($Task, $State, $Rounds) {
         }
         if (-not (Get-Prop $m 'effort_verified' $false)) { [void]$w.Add([ordered]@{ code = 'EFFORT_UNVERIFIED'; detail = "r${n}: CLI without --effort" }) }
         if (Get-Prop $m 'scope_violation' $false) { [void]$w.Add([ordered]@{ code = 'SCOPE_VIOLATION'; detail = "r$n discarded: " + (@(Get-Prop $m 'scope_violations' @()) -join ', ') }) }
+        if (Get-Prop $m 'fatal_error' $null) { [void]$w.Add([ordered]@{ code = 'API_ERROR'; detail = "r${n}: " + [string](Get-Prop $m 'fatal_error' '') + ' - loop stopped' }) }
         if (Get-Prop $m 'timed_out' $false) { [void]$w.Add([ordered]@{ code = 'TIMEOUT'; detail = "r$n exceeded max_minutes" }) }
         elseif (Get-Prop $m 'no_result' $false) { [void]$w.Add([ordered]@{ code = 'NO_RESULT'; detail = "r$n wrote no valid result.json" }) }
         if ($null -eq (Get-Prop $m 'cost_usd' $null) -and $null -eq (Get-Prop $m 'input_tokens' $null)) { [void]$w.Add([ordered]@{ code = 'COST_UNKNOWN'; detail = "r${n}: no usage data" }) }
