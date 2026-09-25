@@ -147,6 +147,7 @@ function renderRound(t,r,isLast){
     el("span",{cls:"muted",text:"tok "+fmtTok(m.input_tokens)+"/"+fmtTok(m.output_tokens)}),
     el("span",{cls:"muted",text:m.cost_usd!=null?"$"+(+m.cost_usd).toFixed(2):"cena ?"}),
     el("span",{cls:"muted",text:"B/S/D "+(f.blocking!=null?f.blocking:"-")+"/"+(f.medium!=null?f.medium:"-")+"/"+(f.minor!=null?f.minor:"-")}),
+    m.scope_violation?el("span",{cls:"warn",text:"⚠ mimo rozsah vráceno: "+(m.scope_violations||[]).length}):null,
     r.commit?commitLink(r.commit):null,
     el("span",{cls:"sum",text:res.summary||""})
   ]);
