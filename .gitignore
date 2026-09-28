@@ -5,3 +5,4 @@ PAT/
 .loop.lock
 .loop-logs/
 STOP
+data/
