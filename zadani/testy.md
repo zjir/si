@@ -12,6 +12,8 @@ Podklady systému ve složce `PAT/` (závazné):
 - `PAT/Obchodní deník.xls` — reálný obchodní deník s reálnými obchody,
 - `PAT/obrazky-obchodu/` — obrázky jednotlivých obchodů.
 
+**Tržní data:** jediný zdroj tržních dat je adresář `data/`. Původ dat (soubory Sierra Chart `.scid`), jejich export, formát, obchodní den, rollover, díry a ověření popisuje [`data/README.md`](../data/README.md); fakta o jednotlivých trzích jsou v `data/<SYMBOL>/README.md`. Jiná tržní data se nepoužívají.
+
 ## 1. Účel a rozsah
 
 ### 1.1 Předmět testu
@@ -657,5 +659,14 @@ direction:
 ### 5.10 Modul delta (K 9)
 
 Orákulum modul delta implementuje jen v rozsahu nutném pro S19 a R-7: nad řadou `delta` (kumulativní delta na bar, vstup) běží týž zigzag a automat 5.3–5.5 s `atr1` počítaným z řady delta (TR z jejích „OHLC“ = `open = delta_{t−1}`, `close = delta_t`, `high = max`, `low = min`). `delta_tl_agrees` = strana DOWN/UP delty má `trend_valid` a stejný směr jako `direction` ceny. `delta_divergence` (uptrend) = poslední strukturní low ceny je HL, zatímco poslední strukturní low delty (s extrémem do 5 barů od extrému ceny) je ≤ předchozí strukturní low delty + ε × atr1_delta. Den rollu → obě null. Bez `delta_enabled` se pole nevyplňují (null) a S19 se přeskočí (SKIP).
+
+## 6. Dodatky k zapracování
+
+> **Úkol pro recenzenta:** body níže jsou dodatky zadavatele. Zapracuj každý do příslušných sekcí dokumentu jako konkrétní řešení. Po zapracování tuto sekci odstraň; zapracování zaznamenej v rozhodovacím logu.
+
+1. **Testovací data** jsou v `data/<SYMBOL>/` podle [`data/README.md`](../data/README.md). Nahrazují sady v 4.2.1: NQ 1min → `data/NQ/NQ-1-min.csv`, NQ 1s → `data/NQ/NQ-1-sec.csv`, obdobně FDAX (`data/FDAX/`); ES a YM zatím nejsou. Soubory jsou CSV (sloupce v `data/README.md` 5), ne parquet; hash SHA-256 se počítá z CSV.
+2. **Konvence času je ověřená:** čas `Europe/Prague`, bar = začátek intervalu. Loader textového exportu NinjaTraderu ani parametr `ts_convention` nejsou potřeba; kontrola 4.2.2 bod 6 zůstává jako test.
+3. **Rollover a kalendář:** spojitou řadu sestaví datová vrstva zpětným aditivním posunem (`data/README.md` 7.3); místo `data/roll_dates.csv` se použije sloupec `roll_day` z `data/<SYMBOL>/<SYMBOL>-rolls.csv`. Obchodní den a session určuje burza (`data/README.md` 6); náhradní postup 3.6 bod 1 (`ts + 6 h` v ET) platí jen pro CME, pro Eurex je obchodní den kalendářní den v Praze.
+4. **Díry a vyřazené dny** jsou v reportu exportu (`gaps`, `missing_weekdays`, `excluded_days`) a v `data/<SYMBOL>/README.md`. Validace 4.2.2 je převezme a nehlásí je jako `DATA_ERROR`; bary mimo obchodní hodiny burzy (např. FDAX po 22:00) vynechá datová vrstva.
 
 KONEC DOKUMENTU

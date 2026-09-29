@@ -5,4 +5,10 @@ PAT/
 .loop.lock
 .loop-logs/
 STOP
-data/
+# data: only the .md documentation is versioned
+data/**
+!data/**/
+!data/**/*.md
+
+# files the Claude desktop app drops into the folder
+Claude outputs/

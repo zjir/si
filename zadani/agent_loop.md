@@ -12,6 +12,8 @@ Podklady systému ve složce `PAT/` (závazné):
 - `PAT/Obchodní deník.xls` — reálný obchodní deník s reálnými obchody,
 - `PAT/obrazky-obchodu/` — obrázky jednotlivých obchodů.
 
+**Tržní data:** úkoly, které pracují s tržními daty, se řídí [`data/README.md`](../data/README.md) (původ dat ze souborů Sierra Chart `.scid`, export, formát, obchodní den, rollover, ověření) a `data/<SYMBOL>/README.md`. Z adresáře `data/` jsou v gitu jen soubory `.md`; data samotná se necommitují.
+
 ## 1. Účel
 
 Lokální smyčka, která bez dohledu zpracovává úkoly zadané zvenčí přes git. Jeden úkol = jedna větev = série kol jednoho agenta. Výstupy jdou do souborů a do gitu; člověk je čte přes statickou HTML stránku, která shrnuje stav úkolu, použitý model, spotřebu a výstupy jednotlivých kol.

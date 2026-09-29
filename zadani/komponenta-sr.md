@@ -12,6 +12,8 @@ Podklady systému ve složce `PAT/` (závazné):
 - `PAT/Obchodní deník.xls` — reálný obchodní deník s reálnými obchody,
 - `PAT/obrazky-obchodu/` — obrázky jednotlivých obchodů.
 
+**Tržní data:** jediný zdroj tržních dat je adresář `data/`. Původ dat (soubory Sierra Chart `.scid`), jejich export, formát, obchodní den, rollover, díry a ověření popisuje [`data/README.md`](../data/README.md); fakta o jednotlivých trzích jsou v `data/<SYMBOL>/README.md`. Jiná tržní data se nepoužívají.
+
 ## 1. Dodatky k zapracování
 
 > **Úkol pro recenzenta:** body níže jsou dodatky zadavatele. Zapracuj každý do příslušných sekcí dokumentu jako konkrétní řešení. Po zapracování tuto sekci odstraň; zapracování zaznamenej v rozhodovacím logu.
@@ -23,3 +25,4 @@ Podklady systému ve složce `PAT/` (závazné):
 5. Cílem není vracet co nejvíce úrovní, ale ty nejspolehlivější.
 6. Metoda zjišťování a délka okna nejsou dány; k jejich stanovení lze využít jakýchkoliv prostředků a technických metod.
 7. Každá SR ve výstupu ponese svůj typ, aby šlo později vyhodnocovat, které SR byly úspěšné.
+8. Tržní data a jejich pravidla (zdroj, formát, obchodní den, spojitá řada, díry) jsou v [`data/README.md`](../data/README.md) a `data/<SYMBOL>/README.md`. Komponenta SR pracuje nad stejnou spojitou řadou jako trend komponenta (`zadani/komponenta-trend.md`, dodatek 16: zpětný aditivní posun o spready rollů), aby byly její úrovně ve stejných cenách.
