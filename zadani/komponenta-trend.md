@@ -12,11 +12,12 @@ Podklady systému ve složce `PAT/` (závazné):
 - `PAT/Obchodní deník.xls` — reálný obchodní deník s reálnými obchody,
 - `PAT/obrazky-obchodu/` — obrázky jednotlivých obchodů.
 
-Doplňkové podklady (odvozené z obrázků, přesnost ±1 tick a ±1 min, viz jejich popis):
+Doplňkové podklady (odvozené z obrázků, přesnost ±1 tick a ±1 min, viz jejich popis). Jsou to důležitý zdroj; jak ho využít, rozhodne recenzent:
 
 - `PAT/PAT_obchody_z_obrazku.csv` — obchody z obrázků ve struktuře deníku, včetně změřených TL (sklon v bodech/min, kotvy), úrovní OHLC a S/R a typu vstupní zóny,
-- `PAT/PAT_obchody_z_obrazku_POPIS.md` — popis sloupců a metod měření,
-- `PAT/PAT_obrazky_progress.csv` — stav zpracování obrázků.
+- [`PAT/PAT_obchody_z_obrazku_POPIS.md`](../PAT/PAT_obchody_z_obrazku_POPIS.md) — popis sloupců, metodika a skripty, kterými data vznikla,
+- `PAT/PAT_obrazky_progress.csv` — stav zpracování obrázků (zpracování ještě běží),
+- `PAT/obrazky-obchodu/` — surové obrázky; znovu se neanalyzují, jsou k dispozici jako zdroj pro případ potřeby (např. ověření konkrétního obchodu).
 
 Deník a obrázky jsou pouze podklad; způsob jejich použití je omezen v 3.6 (nesmí kontaminovat algoritmus).
 

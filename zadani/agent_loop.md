@@ -12,6 +12,8 @@ Podklady systému ve složce `PAT/` (závazné):
 - `PAT/Obchodní deník.xls` — reálný obchodní deník s reálnými obchody,
 - `PAT/obrazky-obchodu/` — obrázky jednotlivých obchodů.
 
+**Obchody z obrázků:** `PAT/PAT_obchody_z_obrazku.csv` obsahuje obchody ze screenshotů převedené do struktury deníku (vstup, SL, PT, výsledek, MAE/MFE, TL, úrovně OHLC a S/R, vstupní zóna). Je to důležitý zdroj; jak ho využít, rozhodne recenzent. Sloupce, metodiku a skripty, kterými data vznikla, popisuje [`PAT/PAT_obchody_z_obrazku_POPIS.md`](../PAT/PAT_obchody_z_obrazku_POPIS.md); stav zpracování je v `PAT/PAT_obrazky_progress.csv` (zpracování ještě běží). Surové obrázky jsou v `PAT/obrazky-obchodu/`; znovu se neanalyzují, jsou k dispozici jako zdroj pro případ potřeby (např. ověření konkrétního obchodu).
+
 **Tržní data:** úkoly, které pracují s tržními daty, se řídí [`data/README.md`](../data/README.md) (původ dat ze souborů Sierra Chart `.scid`, export, formát, obchodní den, rollover, ověření) a `data/<SYMBOL>/README.md`. Z adresáře `data/` jsou v gitu jen soubory `.md`; data samotná se necommitují.
 
 ## 1. Účel
