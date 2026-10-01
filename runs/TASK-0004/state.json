@@ -1,14 +1,16 @@
 {
     "task":  "TASK-0004",
     "status":  "running",
-    "phase":  "queued",
-    "round":  0,
+    "phase":  "between_rounds",
+    "round":  1,
     "run_start_round":  0,
     "started_at":  "2026-10-01T08:31:19+02:00",
     "ended_at":  null,
-    "heartbeat":  "2026-10-01T08:31:19+02:00",
-    "last_status":  null,
-    "last_summary":  null,
+    "heartbeat":  "2026-10-01T08:59:47+02:00",
+    "last_status":  "CONTINUE",
+    "last_summary":  "Zapracovány dodatky 15–17 (data Sierra, konvence open, pásmo Praha, spojitá řada) a zadání SR jako modul 3.10 s parametry 12.4 a testy 13.14; sekce dodatků odstraněna, log D-47 až D-61; zbývá úplný kontrolní průchod celým dokumentem.",
     "push_failed":  false,
-    "updated_at":  "2026-10-01T08:31:19+02:00"
+    "updated_at":  "2026-10-01T08:59:47+02:00",
+    "current_round":  1,
+    "agent_pid":  22956
 }

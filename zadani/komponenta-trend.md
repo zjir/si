@@ -1,6 +1,6 @@
 # Zadání: Komponenta detekce trendu a pullbacku (pro obchodní systém P.A.T.)
 
-Verze: revize kolo 1 (TASK-0002, 2026-09-25) · dokument je psaný pro AI implementátora a AI testera, ne pro čtení člověkem · rozhodnutí jsou závazná (16), historie změn v 17.
+Verze: revize kolo 2 (TASK-0004 kolo 1, 2026-10-01; kolo 1 = TASK-0002, 2026-09-25) · dokument je psaný pro AI implementátora a AI testera, ne pro čtení člověkem · rozhodnutí jsou závazná (16), historie změn v 17. Zadání komponenty SR je od kola 2 součástí tohoto dokumentu (modul SR, 3.10).
 
 ## 0. Kontext: obchodní systém P.A.T.
 
@@ -21,7 +21,15 @@ Doplňkové podklady (odvozené z obrázků, přesnost ±1 tick a ±1 min, viz j
 
 Deník a obrázky jsou pouze podklad; způsob jejich použití je omezen v 3.6 (nesmí kontaminovat algoritmus).
 
-**Tržní data:** jediný zdroj tržních dat je adresář `data/`. Původ dat (soubory Sierra Chart `.scid`), jejich export, formát, obchodní den, rollover, díry a ověření popisuje [`data/README.md`](../data/README.md); fakta o jednotlivých trzích jsou v `data/<SYMBOL>/README.md`. Jiná tržní data se nepoužívají.
+**Tržní data:** jediný zdroj tržních dat je adresář `data/`. Původ dat (soubory Sierra Chart `.scid`), jejich export, formát, obchodní den, rollover, díry a ověření popisuje [`data/README.md`](../data/README.md); fakta o jednotlivých trzích jsou v `data/<SYMBOL>/README.md`. Jiná tržní data se nepoužívají. Starší popisy dat (export NinjaTrader, CSV z grafu Sierra v UTC) neplatí (D-47).
+
+| Trh | Obchodní dny v datech | 1min barů | Role v tomto zadání |
+|---|---|---|---|
+| NQ (CME, tick 0,25) | 2010-12-31 až 2026-09-25 | 5 357 648 | **primární trh**: kalibrace, brány, historický běh |
+| FDAX (Eurex, mřížka 0,5) | 2013-01-07 až 2026-09-25 | 3 403 495 | druhý trh: zkušební běhy a robustnostní brána 13.11 se stejnými parametry (poznámka zadavatele kola 2) |
+| ES, YM | chybí (R2, 3.8) | — | až pro závěrečnou robustnostní bránu 13.11; do té doby se nepoužívají |
+
+Čas dat je `Europe/Prague`, bar je označen začátkem intervalu (3.1); parametry trhu (tick, pásmo burzy, hlavní seance, obchodní den, rozsah barů pro detekci) nese `MarketSpec` (3.2).
 
 ## 1. Účel a rozsah
 
@@ -34,7 +42,7 @@ Komponenta musí v každém uzavřeném baru, bez pohledu do budoucnosti, odpov�
 | Jsem v trendu? Kterým směrem? | `in_trend` (bool), `direction` (UP / DOWN / NONE) | `in_trend` = `direction ≠ NONE`; `direction` podle 7.3 | 6, 7 |
 | Jak silný je trend? | `strength` (float 0–1 nebo null), `strength_class` (WEAK / MEDIUM / STRONG / null) | 8.3 | 8 |
 | Začíná pullback? | `pullback_starting` (bool), `pullback_active` (bool), `pullback_age_bars` (int nebo null) | 7.4 | 7 |
-| Bude trend pokračovat? | `continuation_score` (float 0–1 nebo null), `continuation_n` (int nebo null), `continuation_source` (TABLE / ML / null) | odhad pravděpodobnosti, že cena dosáhne dřív +k·atr než −k·atr ve směru trendu (15.4, 15.5); null, když tabulka pokračování není načtena nebo bin nemá dost vzorků | 15.3–15.5 |
+| Bude trend pokračovat? | `continuation_score` (float 0–1 nebo null), `continuation_n` (int nebo null), `continuation_source` (TABLE / ML / null), `continuation_ci_lo`, `continuation_ci_hi` (float 0–1 nebo null) | odhad pravděpodobnosti, že cena dosáhne dřív +k·atr než −k·atr ve směru trendu (15.4, 15.5); null, když tabulka pokračování není načtena nebo bin nemá dost vzorků; `ci_*` = 95% Wilsonův interval odhadu z tabulky (15.4), null u zdroje ML | 15.3–15.5 |
 | Detaily pro P.A.T. | zbytek stavu (10.3) | TL s kotvami a projekcí, swingy, fáze, PW-SW, vzdálenosti k TL a k úrovním, kvalita | 6–9 |
 
 Odpověď na Ø1 je hlavní kritérium hodnocení komponenty (13.6, 13.7); metody, kterými se odpovědi dosahuje, nejsou omezeny na metody P.A.T. (15).
@@ -48,9 +56,9 @@ Komponenta (knihovna) zpracovává proud barů (primárně 1min, 3.7) a v každ�
 3. zda je trh v pullbacku v rámci trendu, nebo zda byl trend prolomen,
 4. metriky kvality trendu včetně filtrů PW-SW a odhad pokračování trendu.
 
-Komponenta **přijímá cenové úrovně jako vstup** (3.5): S/R, OHLC minulého dne, premarket. Úrovně mění klasifikaci pullbacku, kotvení TL, stáří trendu i váhu prolomení a bez nich nelze rozlišit chop od zdržení na úrovni, jak vyžaduje PW-SW 3 (kapitola VIII). Komponenta ale **musí fungovat i s prázdným seznamem úrovní**, jen s horší kvalitou; rozdíl mezi během s úrovněmi a bez nich se měří (13.9). Druhým volitelným vnějším vstupem je ekonomický kalendář zpráv (3.9); ten detektor A nečte, slouží jen jako rys pro report, detektor D a spotřebitele.
+Detektory trendu **přijímají cenové úrovně jako vstup** přes rozhraní 3.5: S/R, OHLC minulého dne, premarket. Úrovně mění klasifikaci pullbacku, kotvení TL, stáří trendu i váhu prolomení a bez nich nelze rozlišit chop od zdržení na úrovni, jak vyžaduje PW-SW 3 (kapitola VIII). Úrovně počítá **modul SR** (3.10), který je součástí téže knihovny, ale detektor A ho vidí výhradně přes rozhraní 3.5 (acyklicita); hledání trendu tak běží nad průběžně aktualizovanými úrovněmi jako pomocným zdrojem (poznámka zadavatele kola 2). Komponenta ale **musí fungovat i s prázdným seznamem úrovní**, jen s horší kvalitou; rozdíl mezi během s úrovněmi a bez nich se měří (13.9). Druhým volitelným vnějším vstupem je ekonomický kalendář zpráv (3.9); ten detektor A nečte, slouží jen jako rys pro report, detektor D a spotřebitele.
 
-Komponenta **neřeší**: výpočet S/R úrovní (jen je přijímá), vstupní zóny, profit target, stop-loss, vstup, výstup, velikost pozice, vzdálenosti ceny ke swingům ani obchodní výsledek systému. Tyto části systému P.A.T. komponentu používají jako vstup (viz 2). Součástí zadání jsou akceptační kritéria a požadavky na testovatelnost (13); postup testů je samostatné zadání (1.4).
+Komponenta **neřeší**: vstupní zóny, profit target, stop-loss, vstup, výstup, velikost pozice, vzdálenosti ceny ke swingům ani obchodní výsledek systému. Tyto části systému P.A.T. komponentu používají jako vstup (viz 2). Součástí zadání jsou akceptační kritéria a požadavky na testovatelnost (13); postup testů je samostatné zadání (1.4).
 
 ### 1.3 Detektory
 
@@ -62,12 +70,13 @@ Komponenta obsahuje více druhů detekce (dodatek zadavatele; katalog metod a d�
 | B — statistický | síla trendu z regrese, efficiency ratio a variance ratio v klouzavém okně | zapnutý ve výchozím nastavení, vypnutelný | 15.2 |
 | C — tabulka pokračování | empirická pravděpodobnost pokračování podle binů (fáze, síla, `reversal_hint`), zmrazená z vývojového období | zapnutý, je-li tabulka dodána; jinak `continuation_score = null` | 15.4 |
 | D — strojové učení | gradient boosting nad rysy A + B + úrovně, cíl = pokračování; walk-forward | specifikován, vypnutý; zapne se jen po splnění brány 15.5 | 15.5 |
-| delta | zigzag a TL nad kumulativní deltou (kapitola IX) | volitelný, vyžaduje bid/ask objem | 9 |
+| delta | zigzag a TL nad kumulativní deltou (kapitola IX) | volitelný; bid/ask objem je v datech (R1 splněn), kumulativní deltu dodává datová vrstva | 9 |
+| SR — modul úrovní | mechanické úrovně (OHLC minulého dne, premarket, open seance) a odrazové S/R ze shluků změřených odrazů; poskytovatel rozhraní 3.5 | zapnutý ve výchozím nastavení (`levels` = instance modulu SR), vypnutelný (`levels_enabled = false`, 13.9) | 3.10, 12.4, 13.14 |
 
 ### 1.4 Vztah k ostatním zadáním
 
-- `zadani/komponenta-sr.md` — komponenta SR; její výstup je vstupem této komponenty přes rozhraní poskytovatele úrovní (3.5). Rozhraní 3.5 je pro komponentu SR závazná smlouva (pole, sémantika platnosti, acyklicita). Rozpor obou zadání se řeší úpravou zadání SR, protože spotřebitelem je tato komponenta.
-- `zadani/testy.md` — testy komponent; předmětem testů je tato komponenta. Tento dokument definuje **co** se testuje (brány, metriky, referenční hodnoty, akceptační kritéria, sekce 13) a **co komponenta musí poskytnout, aby byla testovatelná** (10.5); `zadani/testy.md` definuje **jak** se testy provádějí (data, harness, formát reportu). Při rozporu platí pro obsah bran a metrik tento dokument.
+- **Komponenta SR** je od kola 2 součástí tohoto dokumentu jako modul SR (3.10, rozhodnutí D-55 podle poznámky zadavatele: jedno zadání, hledání trendu běží s aktualizovanými SR jako pomocným zdrojem). Rozhraní 3.5 je pro modul závazná smlouva (pole, sémantika platnosti, acyklicita). Soubor `zadani/komponenta-sr.md` je tímto zrušen; jeho smazání a oprava odkazů v `zadani/testy.md` (řádek o komponentě SR a fixture 3.5) a v `data/README.md` 10 jsou mimo rozsah recenzenta tohoto dokumentu (požadavek R5, 3.8).
+- `zadani/testy.md` — testy komponent; předmětem testů je tato komponenta včetně modulu SR. Tento dokument definuje **co** se testuje (brány, metriky, referenční hodnoty, akceptační kritéria, sekce 13; pro modul SR 13.14) a **co komponenta musí poskytnout, aby byla testovatelná** (10.5); `zadani/testy.md` definuje **jak** se testy provádějí (data, harness, formát reportu). Při rozporu platí pro obsah bran a metrik tento dokument. `zadani/testy.md` dosud popisuje čas v ET a kalendář session CME napevno; po tomto kole má převzít `MarketSpec` (3.2) a pásmo `Europe/Prague` (jeho vlastní sekce dodatků to už uvádí).
 
 ### 1.5 Další vstupy
 
@@ -79,7 +88,9 @@ Průchod popisem P.A.T. kapitolu po kapitole; každé pravidlo, které se týká
 
 | Část P.A.T. | Požadavek systému (parafráze) | Výstup komponenty | Poznámka |
 |---|---|---|---|
-| I.1, I.2 OHLC minulého dne, S/R premarketu a minulého dne; podstatné S/R vzniklé během seance | úrovně jsou zakresleny před seancí, další přibývají během ní | vstup 3.5 (`valid_from` může být uvnitř seance) | komponenta úrovně nepočítá; SR komponenta (1.4) |
+| I.1 OHLC minulého dne | čtyři úrovně minulého dne zakreslené před seancí | modul SR 3.10.1: `PDH`, `PDL`, `PDO`, `PDC` (aktivní od konce rozsahu `pd_scope` dne D do konce dne D+1) | vstup detektoru A přes 3.5 |
+| I.2 S/R premarketu a S/R minulého dne; podstatné S/R vzniklé během seance; autor považuje S/R premarketu za vlivnější | úrovně jsou zakresleny před seancí, další přibývají během ní; premarket závisí na trhu (dodatek SR-4) | modul SR 3.10.1 (`PREMARKET_H`, `PREMARKET_L`, `premarket_enabled` v `MarketSpec`) a 3.10.2 (`SR` ze shluků odrazů za posledních `sr_lookback_days` dnů, publikace i uvnitř seance, `valid_from` uvnitř seance) | 3.5, 3.10 |
+| I.5, III PT:B, PT:C „silná S/R oblast“, „nejbližší S/R“ | spotřebitel potřebuje rozlišit silnou úroveň a nejbližší úroveň ve směru | `strength` a `meta` každé úrovně (3.5, 3.10.2), `dist_to_next_level_atr` (8.1) | výběr PT dělá spotřebitel |
 | I.3 Hlavní trend | uptrend určuje TL přes swing low, downtrend TL přes swing high; TL se kreslí tam, kde se cena pohybovala nejvíce, dlouhé knoty nemají význam | `main_tl`, `anchor_mode = body` | 6.2, 4.4 |
 | Pravidlo 1 | long jen v jasném uptrendu, short jen v jasném downtrendu (určeném TL) | `trend_valid`, `direction` | jasný = TL existuje (≥ 2 kotvy) a není prolomená, 7.2 |
 | I.4 Aktuální trend | nová TL při strmějším nebo pozvolnějším pokračování; strmější není podmínka; TL se během seance průběžně dokreslují | `curr_tl`, události `CURR_TL_NEW`, `CURR_TL_DROP`, `TL_UPDATE` | 6.3 |
@@ -91,7 +102,7 @@ Průchod popisem P.A.T. kapitolu po kapitole; každé pravidlo, které se týká
 | IV SL:B | úroveň TL nejaktuálnějšího trendu v čase svíčky | `curr_tl.value_at(x)` | |
 | V Pravidlo 4 | vstup nejdál 10 svíček od křížení linek | `bar_index`, projekce TL | počítá spotřebitel |
 | VI OUT:B | výstup při překročení TL určující trend (v ukázce aktuální, zelená) | událost `TL_BREAK` s `which ∈ {MAIN, CURR}` | 6.5 |
-| VII Závěr | systém je použitelný na NQ, ES, YM; 1min TF není podmínka, vyšší TF dává méně příležitostí | žádná konstanta trhu v kódu, prahy v ATR, `tf_minutes` parametr | 3.7, 11.3 |
+| VII Závěr | systém je použitelný na NQ, ES, YM; 1min TF není podmínka, vyšší TF dává méně příležitostí | žádná konstanta trhu v kódu, prahy v ATR, `tf_minutes` parametr, vlastnosti trhu v `MarketSpec` (3.2); FDAX jako druhý trh (0) | 3.7, 11.3 |
 | VIII PW-SW 1 | H/L swingů v souladu s trendem: před vstupní zónou stále vyšší low (uptrend) / nižší high (downtrend); rostoucí low v downtrendu je varování | `pw1_trend_side`, `pw1_counter_side` | část je interpretace ilustrace, 8.2 |
 | VIII PW-SW 2 | trh stále poblíž aktuální TL; mírné odchylky se tolerují, velký odklon ne | `tl_max_dev_atr_curr`, `tl_max_dev_atr_main`, `pw2` | obrázek v kapitole VIII mluví o aktuální TL, 8.2 |
 | VIII PW-SW 3 | žádný chop před vstupní zónou; chvilkové zdržení na S/R chop není | `chop_bars`, `pw3`; vyloučení barů u úrovně | 8.2, vyžaduje vstup úrovní 3.5 |
@@ -103,16 +114,17 @@ Průchod popisem P.A.T. kapitolu po kapitole; každé pravidlo, které se týká
 
 ### 3.1 Bary
 
-Primárně 1min NQ, ETH, spojitá řada (export NinjaTrader, Merge back adjusted). Jiné TF a trhy musí fungovat bez změny kódu (parametry `tf_minutes`, `tick_size`, 12).
+Primárně 1min bary spojité řady z `data/<SYMBOL>/<SYMBOL>-1-min.csv` (formát `data/README.md` 5), kterou datová vrstva sestaví zpětným aditivním posunem o spready rollů (`data/README.md` 7.3, D-48); primární trh NQ, druhý FDAX (0). Datová vrstva před vstupem do komponenty: (1) lokalizuje čas do `Europe/Prague`, (2) přiřadí obchodní den a session podle burzy (3.2), (3) vynechá bary mimo obchodní hodiny burzy a mimo `session_scope` (3.2), (4) posune ceny o `adj(d)`, (5) doplní sloupec `delta` (9) a předá `roll_dates` (3.3) a díry (11.2). Jiné TF a trhy musí fungovat bez změny kódu (parametry `tf_minutes`, `MarketSpec`, 12).
 
 | Pole | Typ | Jednotka | Pravidlo |
 |---|---|---|---|
-| `ts` | tz-aware timestamp | — | libovolné pásmo na vstupu, interně převod do `America/New_York`; konvence viz níže |
-| `open`, `high`, `low`, `close` | float64 | body ceny | násobky `tick_size` (kontrola níže) |
-| `volume` | int64 ≥ 0 | kontrakty | 0 je platná hodnota |
-| `delta` | float64, volitelné | kontrakty | kumulativní delta na konci baru (modul 9); chybí-li sloupec, modul je neaktivní |
+| `ts` | tz-aware timestamp | — | čas **začátku** baru; datová vrstva dodává `Europe/Prague` (D-52). Komponenta porovnává časy jako absolutní okamžiky (UTC), lokální čas používá jen přes `MarketSpec.tz` (kontrola konvence níže, rysy denní doby 15.5); výstupní `ts_*` se serializují v pásmu vstupu |
+| `open`, `high`, `low`, `close` | float64 | body ceny | násobky `tick_size` (kontrola níže); po posunu `adj(d)` zůstávají na mřížce (posun je násobek ticku) |
+| `volume` | int64 ≥ 0 | kontrakty | 0 je platná hodnota (export bary s nulovým objemem nevytváří, chybějící minuta = žádný obchod) |
+| `delta` | float64, volitelné | kontrakty | kumulativní delta na konci baru (modul 9) = kumulativní součet `AskVolume − BidVolume` od prvního baru session, počítá datová vrstva z CSV (`data/README.md` 5); chybí-li sloupec, modul je neaktivní |
+| `contract` | str, volitelné | — | zdrojový kontrakt (sloupec `Contract`); komponenta ho jen předává do `states` pro kontrolu dne rollu (3.3) |
 
-**Konvence timestampu.** Parametr `bar_timestamp ∈ {close, open}`, výchozí `close` (NinjaTrader exportuje čas uzavření baru; **neověřeno**). Interně se pracuje s `ts_open(t)` a `ts_close(t) = ts_open(t) + tf_minutes`; `bar_timestamp = close` znamená `ts_open = ts − tf_minutes`. Kontrola při implementaci: na vývojových datech se spočítá průměrný objem 1min barů podle minuty dne (ET) v okně 09:00–10:00 ET; maximum musí padnout do baru s `ts_open = 09:30 ET` (skok objemu při otevření RTH); pokud padne do 09:29 nebo 09:31, konvence je nastavena špatně a běh se zastaví chybou `TimestampConventionError`. Kontrola se provádí jednou při startu dávkového běhu nad prvními 30 obchodními dny dat a je součástí brány 13.2.6.
+**Konvence timestampu.** Parametr `bar_timestamp ∈ {open, close}`, výchozí **`open`** (ověřeno ze zdroje: Sierra Chart ukládá čas obchodu, export označuje bar začátkem intervalu, `data/README.md` 5; D-47 nahrazuje D-28). Interně se pracuje s `ts_open(t)` a `ts_close(t) = ts_open(t) + tf_minutes`; `bar_timestamp = close` znamená `ts_open = ts − tf_minutes` a zůstává jen pro cizí zdroje. **Kontrola konvence** (test datové vrstvy, součást brány 13.2.6): nad prvními 30 obchodními dny dat, které mají hlavní seanci, se spočítá průměrný objem 1min barů podle minuty dne v pásmu `MarketSpec.tz` v okně `[rth_open − 30 min, rth_open + 30 min)`; maximum musí padnout do baru s `ts_open = rth_open` (NQ 08:30 `America/Chicago`, FDAX 09:00 `Europe/Berlin`; u FDAX ověřeno v `data/FDAX/README.md`). Padne-li do `rth_open − tf_minutes`, je zdroj v konvenci `close`; padne-li jinam, jde o posun pásma. V obou případech se běh zastaví chybou `TimestampConventionError`.
 
 **Kdy je stav platný.** `update(bar)` se volá až po uzavření baru; všechny hodnoty stavu v baru t jsou vypočtené z plných OHLC baru t a barů před ním a jsou platné od `ts_close(t)`. Spotřebitel, který jedná uvnitř otevřeného baru t+1, používá stav baru t. Uvnitř komponenty se žádný indikátor z otevřeného baru nepočítá. Prahy, které se v baru t aplikují, používají `atr_ref(t) = atr1(t−1)` (4.1), takže bar sám nemění práh, kterým je posuzován (dodatek zadavatele o indikátorech z aktuální svíčky).
 
@@ -128,44 +140,67 @@ Chování při neplatném baru řídí parametr `on_invalid_bar ∈ {raise, skip
 
 **Kontrola časového pásma** je odpovědnost datové vrstvy; komponenta provádí jen kontrolu konvence timestampu výše.
 
-### 3.2 Kalendář session
+### 3.2 Specifikace trhu (`MarketSpec`) a kalendář session
 
-Vstup, komponenta rozvrh CME nezná ani neodvozuje (rozvrh se v historii měnil; správnost je odpovědnost datové vrstvy).
+**`MarketSpec`** je vstupní datová třída s vlastnostmi trhu (D-49). Komponenta nemá v kódu žádnou konstantu vázanou na trh ani na pásmo ET; vše, co se mezi trhy liší, je zde. Hodnoty pro známé trhy (zdroj: `data/README.md` 2, 6 a README symbolů):
+
+| Pole | NQ | FDAX | Význam |
+|---|---|---|---|
+| `symbol`, `exchange` | `NQ`, `CME` | `FDAX`, `EUREX` | identifikace; `exchange` určuje pravidlo obchodního dne (`data/README.md` 6) |
+| `tick_size` | 0,25 | 0,5 | mřížka cen exportu; u FDAX platí 0,5 v celé historii, i když se od 2020-12-21 obchoduje v krocích 1,0 (D-50) |
+| `tz` | `America/Chicago` | `Europe/Berlin` | pásmo burzy: lokální časy rozvrhu níže, kontrola konvence (3.1), rysy denní doby (15.5) |
+| `session_rule` | `CME`: obchodní den D od 17:00 `tz` dne D−1 do konce seance dne D (16:00 od 2016; 16:15 / 16:30 dřív, pátek 15:15 v letech 2011–2012, `data/NQ/README.md`) | `EUREX`: kalendářní den v `tz`; začátek 08:00 do roku 2018, od 2019 01:15 v zimě a 02:15 v létě; konec 22:00 | z pravidla datová vrstva sestaví kalendář session níže a vynechá bary mimo obchodní hodiny (např. FDAX po 22:00) |
+| `rth_open`, `rth_close` | 08:30, 15:00 (`tz`) | 09:00, 17:30 (`tz`) | hlavní seance; zkrácené dny podle README symbolu doplní datová vrstva do kalendáře |
+| `session_scope` | `ETH` | `WINDOW` | které bary obchodního dne vstupují do detektorů: `ETH` = všechny, `RTH` = `[rth_open, rth_close)`, `WINDOW` = `[scope_from, scope_to)` v `tz` (D-51) |
+| `scope_from`, `scope_to` | — | 09:00, 22:00 | jen pro `WINDOW` |
+| `premarket_enabled` | true | false | modul SR: zda vydávat `PREMARKET_H/L` (dodatek SR-4, 3.10.1) |
+| `pd_scope` | `RTH` | `WINDOW` | z kterých barů dne se počítá OHLC minulého dne (3.10.1) |
+| `news_currencies` | {USD} | {EUR, USD} | filtr kalendáře zpráv (3.9) |
+
+Nový trh (ES, YM) = nový řádek s hodnotami z README symbolu; kód se nemění (11.3). Hodnoty `MarketSpec` nevstupují do `params_hash` (10.1).
+
+**Rozsah `WINDOW` u FDAX (D-51, předpoklad):** trendy se hledají od otevření hlavní seance Xetra 09:00 do konce obchodování 22:00 (zahrnuje otevření USA 15:30); noční seance 01:15/02:15–09:00 má malou likviditu a do detekce nevstupuje, slouží jen modulu SR jako premarket (je-li zapnut). Kontrola při implementaci: report 13.6 členěný podle minut od `rth_open` porovná běh `WINDOW` s během `ETH` na FDAX; dá-li `ETH` o ≥ 5 p.b. vyšší úspěšnost pokračování (13.4) v barech 09:00–22:00, změní se výchozí rozsah zápisem do logu. U NQ zůstává `ETH` (D-42: kapitola I.2 počítá s premarketem, autor obchoduje celý den od 17:30 SEČ).
+
+**Kalendář session** (vstup; komponenta rozvrh burzy nezná ani neodvozuje; rozvrh se v historii měnil a správnost je odpovědnost datové vrstvy, která ho sestaví ze `session_rule` a README symbolu):
 
 | Pole | Typ | Pravidlo |
 |---|---|---|
-| `session_id` | int, rostoucí | identifikace session (obchodní den ETH) |
-| `session_open`, `session_close` | tz-aware | ETH začátek a konec, `[open, close)` |
-| `rth_open`, `rth_close` | tz-aware | RTH uvnitř session; `rth_open ≥ session_open`, `rth_close ≤ session_close` |
-| `trading_date` | date | obchodní datum session (datum RTH) |
+| `session_id` | int, rostoucí | identifikace session (obchodní den burzy) |
+| `session_open`, `session_close` | tz-aware | začátek a konec obchodního dne, `[open, close)` |
+| `rth_open`, `rth_close` | tz-aware nebo null | hlavní seance uvnitř session; `rth_open ≥ session_open`, `rth_close ≤ session_close`; null u dne bez hlavní seance (`data/NQ/README.md`: Velký pátek, dny státního smutku) |
+| `scope_open`, `scope_close` | tz-aware | hranice rozsahu `session_scope` v této session (`ETH`: = session; `RTH`: = rth; `WINDOW`: `scope_from`/`scope_to` téhož dne v `tz`); při `rth_open = null` a `session_scope = RTH` session nemá žádný bar v rozsahu |
+| `trading_date` | date | obchodní datum session (den burzy, `data/README.md` 6) |
 
-Přiřazení: bar patří do session, jejíž `[session_open, session_close)` obsahuje `ts_open(t)`. Bar mimo všechny session (chyba kalendáře, halt přes konec session) dostane `session_id` poslední předchozí session a příznak `outside_session = true`; počet takových barů se hlásí varováním `BARS_OUTSIDE_SESSION` jednou za běh. Parametr `session_scope ∈ {ETH, RTH}` (výchozí ETH): při `RTH` se bary mimo RTH vynechávají před vstupem do komponenty (osa x je pak jen z RTH barů; mezera přes noc je hranice session).
+Přiřazení: bar patří do session, jejíž `[session_open, session_close)` obsahuje `ts_open(t)`. Bar mimo všechny session (chyba kalendáře, halt přes konec session) dostane `session_id` poslední předchozí session a příznak `outside_session = true`; počet takových barů se hlásí varováním `BARS_OUTSIDE_SESSION` jednou za běh. Bary mimo `[scope_open, scope_close)` vynechává datová vrstva před vstupem do detektorů (osa x je jen z barů v rozsahu; mezera do dalšího dne je hranice session). Modul SR (3.10) naproti tomu dostává **všechny** bary obchodního dne, protože premarket leží mimo rozsah.
 
 Hranice session pro účely 4.1 a 8.1: bar t je první bar session, pokud `session_id(t) ≠ session_id(t−1)`.
 
-### 3.3 Data rollu
+### 3.3 Data rollu a spojitá řada
 
-Seznam `roll_dates` (obchodní data, `trading_date`) z nastavení rolloveru exportu (NinjaTrader), ne z kalendáře expirací; spojitá řada mění kontrakt jindy než v týdnu expirace. Bar rollu = první bar session, jejíž `trading_date ≥ roll_date` (první taková session pro každé datum). Řada je back-adjusted, takže se ceny nepřepočítávají; komponenta jen značí `roll_in_structure` (8.1) a modul delta se přes den rollu vypíná (9). Kontrola: pokud v baru rollu `|open(t) − close(t−1)| > 5 × atr_ref(t)`, vznikne varovná událost `ROLL_GAP` (řada zřejmě není back-adjusted); běh pokračuje.
+- **Spojitá řada** (D-48, dodatek 16): export ceny neupravuje (sloupec `Contract`); datová vrstva sestaví řadu **zpětným aditivním posunem** `adj(d) = Σ spread_to_minus_from` přes rolly s `roll_day > d` (`data/README.md` 7.3). Poslední kontrakt má skutečné ceny, posun je násobek ticku, mřížka a vzdálenosti uvnitř kontraktu se nemění. Komponenta ceny nepřepočítává. Úrovně a obchody se skutečnými cenami (deník, CSV z obrázků, 3.6, 13.13) se před porovnáním s řadou posunou o `adj(d)` dne obchodu.
+- **`roll_dates`** = sloupec `roll_day` z `data/<SYMBOL>/<SYMBOL>-rolls.csv` (`data/README.md` 7.2; pravidlo objemu, ne kalendář expirací). Bar rollu = první bar session, jejíž `trading_date ≥ roll_day` (první taková session pro každé datum); kontrola datové vrstvy: sloupec `contract` se mění právě v barech rollu, jinak chyba dat.
+- Komponenta jen značí `roll_in_structure` (8.1), `is_roll_bar` (10.3) a modul delta se v session rollu vypíná (9). Kontrola: pokud v baru rollu `|open(t) − close(t−1)| > 5 × atr_ref(t)`, vznikne varovná událost `ROLL_GAP` (řada zřejmě není posunutá); běh pokračuje.
 
 ### 3.4 Volitelné vstupy
 
-- **Kumulativní delta** (`delta` sloupec, 3.1) pro modul 9. Zda export 1min barů z NinjaTraderu obsahuje bid/ask objem, není známo (požadavek 3.8).
-- **1s data (`intrabar`)**: poskytovatel `IntrabarProvider.bars_1s(t) -> list[Bar1s]` vrací sekundové bary uvnitř 1min baru t (stejná validace jako 3.1). Použití je omezeno na tři místa: (i) pořadí high a low uvnitř baru v zigzagu (5.3), (ii) jemný čas extrému swingu `ts_ext_fine` (5.4, informativní), (iii) v testu 13.4 pro rozhodnutí, který z cílů byl dosažen dřív, když oba padly do téhož 1min baru. Parametr `intrabar_mode ∈ {auto, heuristic}`, výchozí `auto` = 1s data se použijí, jsou-li pro bar k dispozici, jinak heuristika 5.3. Bez 1s dat musí komponenta dávat úplné výstupy; rozdíl mezi režimy smí být jen v barech označených `intrabar_ambiguous = true` (13.2.7). 1s data nikdy nemění osu x (bary zůstávají 1min) ani prahy.
+- **Kumulativní delta** (`delta` sloupec, 3.1) pro modul 9. Bid/ask objem je u všech barů exportu (`BidVolume`, `AskVolume`, `data/README.md` 5; R1 splněn), kumulaci od začátku session dělá datová vrstva.
+- **1s data (`intrabar`)**: zdroj `data/<SYMBOL>/<SYMBOL>-1-sec.csv` (stejné dny a konvence jako 1min, agregace 1s → 1min ověřena, `data/README.md` 9; R3 splněn). Poskytovatel `IntrabarProvider.bars_1s(t) -> list[Bar1s]` vrací sekundové bary uvnitř 1min baru t (stejná validace jako 3.1; ceny posunuté o totéž `adj(d)`). Použití je omezeno na tři místa: (i) pořadí high a low uvnitř baru v zigzagu (5.3) a tím i pořadí konce a začátku pullbacku v témže baru (6.1.1 krok 5, 7.4), (ii) jemný čas extrému swingu `ts_ext_fine` (5.4, informativní), (iii) v testu 13.4 pro rozhodnutí, který z cílů byl dosažen dřív, když oba padly do téhož 1min baru. Parametr `intrabar_mode ∈ {auto, heuristic}`, výchozí `auto` = 1s data se použijí, jsou-li pro bar k dispozici, jinak heuristika 5.3. Bez 1s dat musí komponenta dávat úplné výstupy; rozdíl mezi režimy smí být jen v barech označených `intrabar_ambiguous = true` (13.2.7). 1s data nikdy nemění osu x (bary zůstávají 1min) ani prahy. Stav nese `intrabar_order ∈ {LOW_FIRST, HIGH_FIRST, SINGLE, UNKNOWN}` (10.3): skutečné pořadí z 1s dat, `SINGLE` u režimu `close`, `UNKNOWN` při heuristice. **Širší použití 1s dat** (poznámka zadavatele kola 2: „potvrzování intra svíček, lepší zjištění pullbacku“) je rozhodnutím D-54 odloženo: stav platí od uzavření 1min baru (3.1) a spotřebitel rozhoduje v okně 3–5 min, takže průběžný stav uvnitř baru nepřináší dřívější rozhodnutí; jediné místo, kde 1s data mění výsledek detekce, je pořadí extrémů v baru, které je už pokryto. Rozšíření (např. provizorní stav uvnitř baru) se zváží až podle podílu barů `intrabar_ambiguous` z 13.2.7, zápisem do logu.
 - **Tabulka pokračování** (`continuation_table`, JSON, 15.4) pro `answer.continuation_score`; bez ní je skóre null.
 
 ### 3.5 Cenové úrovně (vstup, volitelný)
 
-Úrovně dodává poskytovatel za rozhraním `LevelProvider` (10.2); komponenta je nepočítá. Referenční implementace poskytovatele je komponenta SR (`zadani/komponenta-sr.md`); pro ni je tato sekce závazná smlouva.
+Úrovně dodává poskytovatel za rozhraním `LevelProvider` (10.2); detektory je nepočítají. Referenční implementace poskytovatele je modul SR (3.10, součást knihovny); pro něj i pro jakéhokoli jiného poskytovatele je tato sekce závazná smlouva.
 
 | Pole | Typ | Popis |
 |---|---|---|
 | `level_id` | str | jednoznačná identifikace (poskytovatel + pořadové číslo); dvě úrovně se stejnou cenou mají různá id |
-| `price` | float64 | cena úrovně (body) |
+| `price` | float64 | cena úrovně (body, v souřadnicích spojité řady 3.3), násobek `tick_size`; po publikaci se nemění (3.10.2) |
 | `kind` | enum | `PDH`, `PDL`, `PDO`, `PDC`, `PREMARKET_H`, `PREMARKET_L`, `SESSION_OPEN`, `SR`; neznámá hodnota → úroveň se přeskočí s varováním `UNKNOWN_LEVEL_KIND` |
 | `valid_from` | tz-aware | okamžik, od kterého je úroveň známa (nikdy dřív, než vznikla) |
 | `valid_to` | tz-aware nebo null | konec platnosti (exkluzivně); null = bez konce |
-| `strength` | float 0–1 nebo null | volitelná síla; null = neznámá; komponenta ji jen předává (nepoužívá v rozhodování) |
-| `source` | str | identifikace poskytovatele |
+| `strength` | float 0–1 nebo null | volitelná síla; null = neznámá; detektory ji jen předávají (nepoužívají v rozhodování); u modulu SR 3.10.2 |
+| `source` | str | identifikace poskytovatele, např. `sr-module/1.0` |
+| `meta` | dict nebo null | typ úrovně pro pozdější vyhodnocení (dodatek SR-7): u modulu SR klíče 3.10.2 (`cluster_id`, `n_touches`, `score`, `side_mix`, `origin`, `first_touch_ts`, `last_touch_ts`); detektory `meta` nečtou, jen předávají do reportu 13.14 |
 
 - **Aktivní úroveň v baru t**: `valid_from ≤ ts_open(t)` a (`valid_to` je null nebo `ts_open(t) < valid_to`). Úroveň známá při uzavření baru k (`valid_from = ts_close(k)`) je tedy aktivní od baru k+1. Komponenta volá `levels_at(ts_open(t))` jednou za bar; poskytovatel musí být deterministický a smí vracet jen úrovně s `valid_from ≤ ts_open(t)`. Porušení (úroveň s `valid_from > ts_open(t)`) → výjimka `LookaheadLevelError`.
 - **Dvě třídy úrovní za týmž rozhraním.** Mechanické (OHLC předchozího dne, premarket high a low, open seance) jsou bez diskrece a dostupné hned. Skutečné S/R (shluky swingů, opakovaně testované hladiny) jsou samostatná úloha (komponenta SR) a doplní se jako druhá implementace téhož rozhraní.
@@ -176,18 +211,19 @@ Seznam `roll_dates` (obchodní data, `trading_date`) z nastavení rolloveru expo
 
 ### 3.6 Obchodní deník autora a obchody z obrázků (podklad, mimo běh komponenty)
 
-K dispozici je obchodní deník autora systému: 597 obchodů z let 2010 až 2014, trh NQ, sloupce datum, čas, kontrakt, směr, vstup, SL, SL v ticích, PT, PT v ticích, RRR, MAE, MFE a P/L. Ověřeno proti záznamu z chartbooku ze 7. 3. 2014, hodnoty sedí. Doplňkem je `PAT/PAT_obchody_z_obrazku.csv` (obchody z obrázků, včetně změřených TL v bodech/min a úrovní; přesnost ±1 tick, ±1 min).
+K dispozici je obchodní deník autora systému: 597 obchodů z let 2010 až 2014 (15. 9. 2010 až 14. 8. 2014), trh NQ, sloupce datum, čas, kontrakt, směr, vstup, SL, SL v ticích, PT, PT v ticích, RRR, MAE, MFE a P/L. Ověřeno proti záznamu z chartbooku ze 7. 3. 2014, hodnoty sedí. Doplňkem je `PAT/PAT_obchody_z_obrazku.csv` (obchody z obrázků, včetně změřených TL v bodech/min a úrovní; přesnost ±1 tick, ±1 min). Časy obou zdrojů jsou středoevropské, tj. v pásmu dat (`Europe/Prague`); ceny jsou skutečné ceny kontraktu a před porovnáním se spojitou řadou se posunou o `adj(d)` dne obchodu (3.3). Obchody před začátkem dat NQ (2010-12-31) nelze vyhodnotit; jejich počet uvádí report 13.13.
 
 Co je to za data: **reálná rozhodnutí člověka**, tedy okamžiky, ve kterých autor viděl platný trend daného směru a pullback ve vstupní zóně. Z hodnot lze zpětně odvodit i polohu struktury, kterou viděl: u SL typu A leží stop tick pod posledním swing low, u PT typu A tick pod předchozím swing high, u PT typu B a C a SL typu B leží cíl nebo stop na úrovni, kterou autor považoval za S/R.
 
 Omezení: deník neříká, kudy vedla trendline, a obsahuje jen kladné příklady; kde autor neobchodoval, nevíme, zda trend nebyl, nebo jen nevstoupil. Typ vstupní zóny, PT a SL je jen v chartboocích a v CSV z obrázků, ne v deníku.
 
-**Rozhodnutí o využití (D-31, D-32):** deník a CSV z obrázků nesmí kontaminovat algoritmus (dodatek zadavatele). Povolená použití jsou přesně dvě:
+**Rozhodnutí o využití (D-31, D-56; D-56 nahrazuje D-32):** deník a CSV z obrázků nesmí kontaminovat algoritmus (dodatek zadavatele). Povolená použití jsou přesně tři:
 
 1. **Kontrola shody s rozhodnutími autora** (13.13): pro každý obchod se zjistí stav komponenty v baru vstupu; hlásí se podíl obchodů, u nichž `direction` odpovídá směru obchodu a `phase ∈ {PULLBACK, IMPULSE}`, a podíl s `phase = PULLBACK`. Je to report, ne brána, a parametry se podle něj neladí.
 2. **Kalibrace jediného parametru `min_slope`** (12.3) ze sloupce `TL sklon (bodů/min)` CSV z obrázků, protože pravidlo 2 (45°) nelze z popisu číselně určit jinak.
+3. **Porovnání úrovní modulu SR s čarami autora** (13.14.3): sloupce `OHLC předchozího dne`, `S/R úrovně` a `Úroveň vstupní zóny` CSV z obrázků jsou jediný záznam toho, které úrovně autor považoval za S/R; hlásí se překryv s úrovněmi modulu v čase vstupu. Je to report, ne brána; parametry modulu SR (12.4) se podle něj neladí.
 
-Jakékoli jiné použití (ladění θ, ε, δ, W, tvaru algoritmu podle deníku) je zakázáno; do bran 13.2 ani do historických metrik 13.6 deník nevstupuje.
+Jakékoli jiné použití (ladění θ, ε, δ, W, parametrů SR, tvaru algoritmu podle deníku) je zakázáno; do bran 13.2 a 13.14.1 ani do historických metrik 13.6 a 13.14.2 deník nevstupuje.
 
 ### 3.7 Časový rámec (rozhodnutí D-33)
 
@@ -197,28 +233,38 @@ Vhodnost jiného TF se přesto měří (13.12): detektor A se spustí nad 1, 2, 
 
 ### 3.8 Otevřené požadavky na vstupy
 
-Požadavky předané zadavateli (dodatek zadavatele: o chybějící vstupy se musí požádat). Do jejich splnění platí uvedené náhradní chování.
+Požadavky předané zadavateli (dodatek zadavatele: o chybějící vstupy se musí požádat). Do jejich splnění platí uvedené náhradní chování. Splněné požadavky zůstávají v tabulce kvůli dohledatelnosti.
 
-| # | Požadavek | Proč | Náhradní chování |
-|---|---|---|---|
-| R1 | potvrdit, zda export 1min barů z NinjaTraderu obsahuje bid/ask objem (sloupec pro kumulativní deltu) | modul 9 | modul 9 neaktivní, pole null |
-| R2 | 1min data ES a YM (stejný formát jako NQ) | robustnostní brána 13.11 přes trhy | brána běží jen na NQ (roky) a syntetice |
-| R3 | rozsah 1s dat (od kdy, formát, konvence timestampu) | 3.4, test 13.2.7 | `intrabar_mode = heuristic` |
-| R4 | potvrdit konvenci timestampu 1min exportu (čas uzavření vs. otevření) | 3.1 | kontrola objemem při startu |
+| # | Požadavek | Proč | Stav | Náhradní chování |
+|---|---|---|---|---|
+| R1 | bid/ask objem v 1min datech (sloupec pro kumulativní deltu) | modul 9 | **splněn** (kolo 2): `BidVolume`, `AskVolume` u všech barů, `data/README.md` 5 | — |
+| R2 | 1min a 1s data ES a YM (stejný formát jako NQ, `data/<SYMBOL>/`) | závěrečná robustnostní brána 13.11 přes trhy (kapitola VII) | **trvá**; zadavatel dodá později (v Sierra jsou soubory prázdné, `data/README.md` 12) | brána běží na NQ (roky, období), FDAX a syntetice; ES/YM se doplní bez změny kódu (`MarketSpec`) |
+| R3 | rozsah a konvence 1s dat | 3.4, test 13.2.7 | **splněn** (kolo 2): `<SYMBOL>-1-sec.csv`, stejné dny a konvence jako 1min | — |
+| R4 | konvence timestampu 1min dat | 3.1 | **splněn** (kolo 2): bar = začátek intervalu, ověřeno ze zdroje (D-47) | kontrola objemem zůstává jako test datové vrstvy |
+| R5 | smazat `zadani/komponenta-sr.md` a nahradit odkazy na něj (`zadani/testy.md` řádek o komponentě SR a fixture 3.5, `data/README.md` 10) odkazem na 3.10 tohoto dokumentu | zadání SR je sloučeno sem (1.4, D-55); recenzent smí měnit jen tento soubor | **otevřen** (kolo 2) | zrušený soubor se ignoruje; platí 3.10 |
+| R6 | zdroj kalendáře zpráv pro 2025-04-08 až konec dat (2026-09-25): export Forex Factory za toto období, nebo povolení stažení (recenzent nemá web) | 3.9 pokrytí celého období dat (poznámka zadavatele kola 2) | **otevřen** (kolo 2) | vrstvené zdroje 3.9: oficiální kalendáře + FRED/ALFRED bez `Forecast` (`surprise_missing = true`); není-li ani to, `state.news = null` po `news_end` |
 
 ### 3.9 Ekonomický kalendář zpráv (vstup, volitelný)
 
 Rozhodnutí D-45: kalendář je **doplňkový rys**, ne součást definice trendu. Detektor A (5–8) ho nečte, takže fáze, TL a swingy jsou s kalendářem i bez něj totožné. Kalendář slouží: (a) členění reportu 13.6 (bary v okně zprávy vs. mimo), (b) rysům detektoru D (15.5), (c) spotřebiteli přes `state.news`. Důvod: P.A.T. zprávy neřeší; zásah do definice trendu podle vnějších dat by porušil soulad se systémem. Hypotéza, že se pokračování trendu v okolí zpráv s vysokým dopadem liší, se ověří členěním 13.6 (předpoklad); teprve podle výsledku se rozhodne o dalším použití (např. bin tabulky pokračování), zápisem do logu.
 
-**Zdroj:** Forex Factory Calendar, Hugging Face `Ehsanrs2/Forex_Factory_Calendar` (2007-01-01 až 2025-04-07, ~83 400 řádků; pole `DateTime`, `Currency`, `Impact` (4 třídy), `Event`, `Actual`, `Forecast`, `Previous`, `Detail`). Načítá **datová vrstva / harness**, ne komponenta: `pd.read_csv("hf://datasets/Ehsanrs2/Forex_Factory_Calendar/<soubor>.csv")` (vyžaduje `huggingface_hub`, volitelná závislost); stažený soubor se uloží lokálně a jeho SHA-256 se zapíše do reportu.
+**Zdroje (D-57, vrstvený seznam `news_sources` s prioritou):** kalendář je sjednocení více zdrojů, každý normalizovaný do téhož schématu (`DateTime` v UTC, `Currency`, `Impact`, `Event`, `Actual`, `Forecast`, `Previous`, `source_id`). Pro okamžik `d` se použije vydání ze zdroje s nejvyšší prioritou, který ho obsahuje; `news_end` = poslední den pokrytý kterýmkoli zdrojem; report uvádí pro každý zdroj rozsah, počet řádků a SHA-256 souboru.
+
+| Priorita | Zdroj | Pokrytí | Stav |
+|---|---|---|---|
+| 1 | Forex Factory Calendar, Hugging Face `Ehsanrs2/Forex_Factory_Calendar` (~83 400 řádků; pole `DateTime`, `Currency`, `Impact` (4 třídy), `Event`, `Actual`, `Forecast`, `Previous`, `Detail`); načtení `pd.read_csv("hf://datasets/Ehsanrs2/Forex_Factory_Calendar/<soubor>.csv")` (`huggingface_hub`, volitelná závislost) | 2007-01-01 až 2025-04-07 | k dispozici |
+| 2 | druhý export téhož kalendáře (Forex Factory) za 2025-04-08 až konec dat: týdenní stránky kalendáře nebo novější veřejný dataset se stejnými poli; dodá zadavatel nebo povolí stažení (R6) | 2025-04-08 až 2026-09-25 | **neověřeno** (recenzent nemá web); do dodání se vrstva přeskočí |
+| 3 | náhradní oficiální zdroj: rozvrhy vydání BLS, BEA, Census, DOL a kalendář FOMC (Fed) + hodnoty `Actual` z FRED/ALFRED jako **první vydání** (vintage, ne revidovaná hodnota); `Forecast` není k dispozici → `surprise_missing = true`; `Impact` a název události se mapují na názvy Forex Factory pevnou tabulkou datové vrstvy; EUR události (ECB, Destatis) analogicky z rozvrhů ECB/Destatis, jen rozvrh a `Actual` | 2025-04-08 až konec dat | **neověřeno** (dostupnost API a mapování); kontrola níže |
+
+Načítá **datová vrstva / harness**, ne komponenta. **Kontrola náhradního zdroje při implementaci:** na překryvu 2024-01-01 až 2025-04-07 musí ≥ 90 % událostí zdroje 1 s `Impact = High` a `Currency ∈ news_currencies` mít protějšek ve zdroji 3 se shodným časem (±1 min) a shodným `Actual` (po normalizaci čísel, tolerance 1 % hodnoty); nesplnění → zdroj 3 se nepoužije a report to uvede. Zdroj 3 se nikdy nepoužije pro období, které pokrývá zdroj 1 nebo 2 (žádné míchání zdrojů v jednom období; členění 13.6 uvádí zdroj).
 
 **Normalizace (datová vrstva, deterministická):**
 
-1. **Čas:** `DateTime` se interpretuje jako `Asia/Tehran` a převede přes IANA na `America/New_York` (IANA zahrnuje zrušení letního času v Íránu v roce 2022). Řádky bez přesného času (All Day, Tentative, prázdný čas) se vyřadí. **Kontrola pásma** (předpoklad, neověřeno): po převodu musí „Non-Farm Employment Change“ (USD) a „Unemployment Claims“ padat na 08:30 ET v ≥ 95 % výskytů a „FOMC Statement“ na 14:00 ET v ≥ 90 % výskytů od roku 2013. Nesplnění → `NewsTimezoneError`, kalendář se nepoužije (`state.news = null` všude) a report to uvede.
-2. **Filtr:** `Currency = USD`, `Impact ∈ {High, Medium}`.
+1. **Čas:** `DateTime` zdroje 1 (a 2) se interpretuje jako `Asia/Tehran` a převede přes IANA na UTC (IANA zahrnuje zrušení letního času v Íránu v roce 2022); oficiální zdroje mají čas v pásmu vydavatele (ET, CET) a převedou se na UTC. Řádky bez přesného času (All Day, Tentative, prázdný čas) se vyřadí. **Kontrola pásma** (předpoklad, neověřeno) pro každý zdroj zvlášť: po převodu musí „Non-Farm Employment Change“ (USD) a „Unemployment Claims“ padat na 08:30 `America/New_York` v ≥ 95 % výskytů a „FOMC Statement“ na 14:00 `America/New_York` v ≥ 90 % výskytů od roku 2013 (u zdrojů 2 a 3 v jejich období). Nesplnění → `NewsTimezoneError`, zdroj se nepoužije (`state.news = null` v jeho období) a report to uvede.
+2. **Filtr:** `Currency ∈ MarketSpec.news_currencies` (NQ {USD}, FDAX {EUR, USD}), `Impact ∈ {High, Medium}`.
 3. **Čísla:** `Actual`, `Forecast`, `Previous` → float: odstranit mezery, `%`, znaky `<`, `>`; přípony `K`, `M`, `B`, `T` = ×10³, ×10⁶, ×10⁹, ×10¹²; záporná čísla se znaménkem; neparsovatelné → null.
-4. **Překvapení:** pro vydání zprávy `E` v čase `d`: `surprise_raw = Actual − Forecast` (null, chybí-li některé). `surprise_z = surprise_raw / sd`, kde `sd` = výběrová směrodatná odchylka `surprise_raw` **minulých vydání téže zprávy** (stejný `Event`, `DateTime < d`) s definovaným `surprise_raw`; podmínka **≥ 12 minulých vydání** (`news_min_history`). Jinak (méně vydání, `sd = 0`, `surprise_raw` null) `surprise_z = 0` a `surprise_missing = true` (indikátor dodatku `prekvapeni_chybi = 1`). Vydání se zpracovávají v pořadí `DateTime`; hodnoty pozdějších vydání se nikdy nepoužijí.
-5. **Konec dat:** vydání a rozvrh po 2025-04-07 se nepoužívají; pro bary s `ts_open` po 2025-04-07 23:59 ET je `state.news = null`.
+4. **Překvapení:** pro vydání zprávy `E` v čase `d`: `surprise_raw = Actual − Forecast` (null, chybí-li některé). `surprise_z = surprise_raw / sd`, kde `sd` = výběrová směrodatná odchylka `surprise_raw` **minulých vydání téže zprávy** (stejný `Event`, `DateTime < d`, napříč zdroji po mapování názvů) s definovaným `surprise_raw`; podmínka **≥ 12 minulých vydání** (`news_min_history`). Jinak (méně vydání, `sd = 0`, `surprise_raw` null) `surprise_z = 0` a `surprise_missing = true` (indikátor dodatku `prekvapeni_chybi = 1`). Vydání se zpracovávají v pořadí `DateTime`; hodnoty pozdějších vydání se nikdy nepoužijí.
+5. **Konec dat:** vydání a rozvrh po `news_end` se nepoužívají; pro bary s `ts_open > news_end 23:59 America/New_York` je `state.news = null`. Dnes `news_end = 2025-04-07` (jen zdroj 1); data NQ i FDAX sahají do 2026-09-25, takže bez zdroje 2 nebo 3 je 2025-04-08 až 2026-09-25 (≈ 17,5 měsíce, zhruba třetina testovacího období 13.3) bez zpráv; report 13.6 tyto bary vede jako samostatnou kategorii „bez kalendáře“, ne jako „mimo okno“.
 
 **Rozhraní** (10.2): `NewsProvider.scheduled_between(ts_from, ts_to) -> list[ScheduledEvent]` (`DateTime`, `Event`, `Impact`; bez `Actual`) a `NewsProvider.released_until(ts) -> list[Release]` (vydání s `DateTime ≤ ts`, včetně `surprise_z`, `surprise_missing`). Pravidla proti pohledu do budoucnosti: v baru t se smí použít rozvrh (čas, název, dopad) libovolné budoucí události (je znám předem) a `Actual`/`surprise_z` jen u vydání s `DateTime ≤ ts_open(t)` (rezerva jednoho baru proti minutové přesnosti kalendáře; vydání uvnitř baru t se použije až v baru t+1). `Forecast` se samostatně nepoužívá (dataset neuchovává historii revizí, hodnota mohla být revidovaná po vydání), jen uvnitř `surprise_z` po vydání. Poskytovatel, který vrátí vydání s `DateTime > ts`, → `LookaheadNewsError`.
 
@@ -235,6 +281,117 @@ Rozhodnutí D-45: kalendář je **doplňkový rys**, ne součást definice trend
 | `in_high_impact_window` | bool | totéž jen pro události s `Impact = High` |
 
 Použití: 13.6 členění, 15.5 rysy, robustnost 13.11 s kalendářem i bez něj (jen pro D). Brána 13.2.1 zahrnuje i poskytovatele zpráv.
+
+### 3.10 Modul SR (referenční poskytovatel úrovní)
+
+Zadání komponenty SR je od kola 2 zapracováno zde (D-55; poznámka zadavatele: jedno zadání, hledání trendu běží s aktualizovanými SR jako pomocným zdrojem). Dodatky zrušeného zadání SR jsou označeny SR-1 až SR-8 (D-61). Modul SR (`SRModule`) je součást téže knihovny a implementuje rozhraní 3.5; detektory ho používají jen přes toto rozhraní. Parametry jsou v 12.4, brány a vyhodnocení v 13.14.
+
+#### 3.10.1 Zásady
+
+1. **Účel (SR-1, SR-2):** dodat detektorům a spotřebiteli úrovně podle kapitol I.1 (OHLC minulého dne), I.2 (S/R premarketu a minulého dne, podstatné S/R vzniklé během seance) a III (silná a nejbližší S/R pro PT:B a PT:C), výhradně pro P.A.T.
+2. **Málo, ale spolehlivých (SR-5):** v každém baru je publikováno nejvýš `sr_max_levels` (výchozí 6) odrazových úrovní vedle mechanických (nejvýš 4 + 2 + 1). Kapitola I.5: autor má za den zřídka víc než 10 vstupních zón, obvykle polovinu; počet úrovní tomu odpovídá.
+3. **Metoda (SR-6, poznámka zadavatele „měřit odrazy“):** odraz = potvrzený swing vlastního zigzagu modulu (5), tj. místo, kde se cena otočila o ≥ `theta_sr × atr`. Úroveň = shluk odrazů v cenové toleranci za posledních `sr_lookback_days` obchodních dnů („pár dnů zpět“); síla z počtu, stáří a velikosti odrazů. Metodu ani okno P.A.T. nedává; obojí je kalibrovatelné (12.4, 13.14.2). Předpoklad.
+4. **Typ u každé úrovně (SR-7):** `kind` a `meta` (3.5), aby šlo vyhodnotit, které druhy úrovní trh respektuje (13.14.2).
+5. **Stejná řada (SR-8):** modul běží nad touž spojitou řadou (3.3, zpětný aditivní posun) jako detektory; úrovně jsou v týchž souřadnicích.
+6. **Acyklicita a kauzalita (3.5):** modul čte jen bary (všechny bary obchodního dne, i mimo `session_scope`, 3.2), kalendář session a `MarketSpec`; nikdy stav detektorů. Úroveň odvozená z baru k má `valid_from ≥ ts_close(k)`.
+7. **Determinismus:** čistá funkce barů a parametrů; dávkový a streamingový běh jsou totožné; `snapshot()` / `from_snapshot()`; žádný globální stav, žádná náhodnost.
+8. **Premarket podle trhu (SR-4):** `MarketSpec.premarket_enabled` (NQ true, FDAX false; předpoklad, 13.14.2 porovná obě varianty na obou trzích).
+
+#### 3.10.2 Mechanické úrovně
+
+D = obchodní den, D+1 = následující obchodní den s bary. `pd_scope ∈ {RTH, WINDOW, ETH}` z `MarketSpec` vymezuje bary dne, ze kterých se OHLC počítá (`RTH` = `[rth_open, rth_close)`, `WINDOW` = `[scope_open, scope_close)`, `ETH` = celá session). Vždy skutečné `high`, `low`, `open`, `close` barů bez ohledu na `anchor_mode`.
+
+| `kind` | `price` | `valid_from` | `valid_to` | `level_id` |
+|---|---|---|---|---|
+| `PDH`, `PDL` | max `high` / min `low` barů `pd_scope` dne D | `ts_close` posledního baru `pd_scope` dne D | okamžik vydání následující sady PD* (= `ts_close` posledního baru `pd_scope` nejbližšího dalšího dne, který takové bary má; obvykle D+1) | `PDH:<trading_date D+1>`, obdobně ostatní |
+| `PDO` | `open` prvního baru `pd_scope` dne D | jako `PDH` | jako `PDH` | |
+| `PDC` | `close` posledního baru `pd_scope` dne D | jako `PDH` | jako `PDH` | |
+| `PREMARKET_H`, `PREMARKET_L` | max `high` / min `low` barů dne D+1 od `session_open(D+1)` s `ts_close ≤ rth_open(D+1)` | `rth_open(D+1)` | `session_close(D+1)` | `PREMARKET_H:<trading_date D+1>` |
+| `SESSION_OPEN` | `open` prvního baru dne D+1 s `ts_open ≥ rth_open(D+1)` | `ts_close` tohoto baru | `session_close(D+1)` | `SESSION_OPEN:<trading_date D+1>` |
+
+Pravidla:
+
+1. `strength = null`, `meta = {"origin": "MECHANICAL", "pd_source_date": <datum dne, z něhož je OHLC>}`, `source = "sr-module/<verze>"`.
+2. Den D bez barů v `pd_scope` (svátek jen s nočním obchodováním, den bez hlavní seance s `rth_open = null`): PD* pro D+1 se odvodí z posledního dne, který bary v `pd_scope` má; report 13.14.2 uvádí počet takových dnů.
+3. Premarket bez barů (halt, mezera, `rth_open = null`): `PREMARKET_*` se nevydají. `premarket_enabled = false` → nevydávají se nikdy.
+4. `rth_open = null` → `SESSION_OPEN` se nevydá.
+5. Zkrácený den: `rth_close` z kalendáře; při `pd_scope = RTH` je `PDC` close posledního baru před `rth_close`.
+6. Studený start: první obchodní den dat nemá PD*; premarket a open se vydají, má-li den RTH.
+7. Dvě mechanické úrovně mohou mít stejnou cenu (např. `PDC` = `PDO`); mají různá `level_id` (duplicity 3.5).
+8. Při `pd_scope = RTH` na NQ se PD* a `PREMARKET_*` rovnají fixture `MechanicalLevels` v `zadani/testy.md` 3.5 (brána 13.14.1 bod 4).
+9. `SESSION_OPEN` je jediná úroveň odvozená z baru, ve kterém se vydává (jeho `open`); vydává se s `valid_from = ts_close` tohoto baru (aktivní od dalšího baru), aby platilo pravidlo 3.10.1 bod 6 bez výjimky. Fixture v `zadani/testy.md` ji má o bar dřív; rozdíl je záměr a 13.14.1 bod 4 s ním počítá.
+10. Sada PD* se vydává v prvním baru proudu modulu s `ts_open ≥ ts_close` posledního baru `pd_scope` dne D (u NQ s `RTH` je to první bar po 15:00 `America/Chicago`, u FDAX s `WINDOW` první bar dalšího dne); `valid_from` této sady je tedy vždy `≤ ts_open` baru vydání a bary mezi koncem `pd_scope` a koncem session už mají novou sadu (kapitola I.1: úrovně se kreslí před seancí).
+
+#### 3.10.3 Odrazové úrovně (`kind = SR`)
+
+**Dotyk (odraz).** Modul vede vlastní instanci zigzagu (5.1–5.6) s parametry `theta_sr` (výchozí = θ), `anchor_mode_sr` (výchozí `wick`; S/R leží na extrémech, kapitola III PT:A počítá s tickem pod high swingu) a vlastním `atr1_sr`, `atr_ref_sr` (definice 4.1 nad bary modulu) nad všemi bary obchodního dne. Každý potvrzený swing je dotyk:
+
+| Pole dotyku | Definice |
+|---|---|
+| `price` | cena swingu (`ext_*` podle `anchor_mode_sr`) |
+| `side` | `HIGH` (odraz dolů) / `LOW` (odraz nahoru) |
+| `t_ext`, `t_conf`, `ts_conf`, `atr_ext` | z 5.5; dotyk je znám v `ts_close(t_conf)` |
+| `trading_date` | obchodní den baru `t_ext` |
+| `bounce_atr` | velikost odrazu: při potvrzení `|close(t_conf) − price| / atr_ext` (provizorní); po potvrzení následujícího swingu opačného typu `|price_next − price| / atr_ext` (konečná, známá v `ts_close(t_conf_next)`) |
+| `origin` | `PREMARKET` (`ts_open(t_ext) < rth_open`), `RTH` (`ts_open(t_ext) ∈ [rth_open, rth_close)`), `AFTER_RTH` (jinak); `NO_RTH` u dne bez hlavní seance |
+
+**Shluk.** Stav modulu je seznam shluků `C` s poli `cluster_id` (pořadové od 0), `touches`, `price`, `published` (bool), `level_id` (aktuální publikace nebo null), `price_pub`, `n_pub` (počet publikací shluku). Při každém novém dotyku `T` v baru t:
+
+1. kandidáti = shluky s `|T.price − C.price| ≤ sr_cluster_tol × atr_ref_sr(t)` (`sr_cluster_tol` výchozí 0,5); vybere se shluk s nejmenší vzdáleností, remíza → menší `cluster_id`;
+2. existuje-li, `T` se přidá; u **nepublikovaného** shluku `C.price` = medián cen dotyků v okně zaokrouhlený na tick (sudý počet → aritmetický průměr dvou prostředních hodnot; hodnota přesně mezi dvěma ticky → nižší tick); u publikovaného shluku se `price` nemění (`= price_pub`);
+3. jinak vznikne nový shluk s jediným dotykem a `price = T.price`.
+
+**Okno a stáří.** `age_days(T, t)` = počet obchodních dnů s bary od `T.trading_date` do `trading_date(t)` (0 = týž den). Dotyk je v okně, pokud `age_days ≤ sr_lookback_days − 1` (výchozí 5 → dnešní den a čtyři předchozí). Dotyky mimo okno se ze shluku odstraní v prvním baru každého nového obchodního dne; shluk bez dotyků zaniká (publikovaný se stáhne, důvod `AGED_OUT`).
+
+**Skóre a síla** (přepočet v každém baru; mění se stáří i konečné `bounce_atr`):
+
+- `w_age(T, t) = 0,5 ^ (age_days / sr_half_life_days)` (výchozí 2),
+- `w_bounce(T) = min(1, bounce_atr / (2 × theta_sr))` (odraz o dvojnásobek prahu = plná váha),
+- `score(C, t) = Σ_{T ∈ C v okně} w_age(T, t) × w_bounce(T)`,
+- `n_touches_window(C, t)` = počet dotyků v okně,
+- `strength(C, t) = min(1, score / sr_strength_scale)` (výchozí 3,0).
+
+Mění se tedy `strength` publikované úrovně, nikdy její cena.
+
+**Kvalifikace:** `n_touches_window ≥ sr_min_touches` (výchozí 2) a `score ≥ sr_min_score` (výchozí 1,0). Dva dotyky téhož shluku jsou vždy různé swingy a leží aspoň dva swingy od sebe (sousední swingy mají opačný typ a liší se o ≥ `theta_sr × atr`, což je víc než tolerance shluku).
+
+**Publikace, náhrada, stažení (hystereze), v každém baru t po zpracování swingů a stáří:**
+
+1. **Stažení:** publikovaný shluk, u něhož `n_touches_window < sr_min_touches` nebo `score < sr_retire_factor × sr_min_score` (výchozí 0,5), se stáhne: `valid_to = ts_close(t)`, událost `LEVEL_RETIRED(reason = WEAK)` (`AGED_OUT`, zanikl-li bez dotyků).
+2. **Sloučení:** dva publikované shluky s `|price_pub₁ − price_pub₂| ≤ sr_cluster_tol × atr_ref_sr(t)`: mladší publikace se stáhne (`MERGED`), jeho dotyky přejdou do staršího shluku; cena staršího zůstává.
+3. **Publikace:** kvalifikované nepublikované shluky seřazené podle `score` sestupně (remíza: novější `last_touch_ts`, pak menší `cluster_id`); pro každý v tomto pořadí: je-li publikovaných < `sr_max_levels`, publikuje se; jinak, je-li `score > (1 + sr_replace_margin) × min(score publikovaných)` (výchozí 0,25), stáhne se nejslabší publikovaný (`REPLACED`) a kandidát se publikuje; jinak se nepublikuje. Publikace: `n_pub += 1`, `level_id = "SR:<cluster_id>:<n_pub>"`, `price_pub = C.price`, `valid_from = ts_close(t)`, `valid_to = null`, událost `LEVEL_PUBLISHED`.
+4. Cena publikované úrovně je **zmrazená** (nakreslená čára se nepřesouvá); nové dotyky v toleranci jen zvyšují skóre. Vzdálí-li se medián dotyků od `price_pub`, úroveň se nestahuje (hystereze); po stažení a opětovné kvalifikaci dostane shluk novou publikaci s novým `level_id` a aktuální cenou.
+5. Role support / rezistence se nerozlišuje: proražená úroveň platí dál (druhá role); `side_mix` nese typ dotyků.
+
+**`meta` úrovně SR** (hodnoty v okamžiku dotazu `levels_at`): `cluster_id`, `n_touches` (celkem), `n_touches_window`, `score`, `side_mix ∈ {HIGH, LOW, MIXED}`, `origin` (= `origin` prvního dotyku), `first_touch_ts`, `last_touch_ts`.
+
+**Události modulu** (vlastní proud nezávislý na 10.4; pole `event_id`, `type`, `t_known`, `ts_known`, `level_id`, `payload`): `LEVEL_PUBLISHED` (celá úroveň), `LEVEL_RETIRED` (`valid_to`, `reason ∈ {EXPIRED, AGED_OUT, WEAK, REPLACED, MERGED}`; `EXPIRED` jen u mechanických), `LEVEL_UPDATED` (`strength`, `meta`; vzniká jen při změně `n_touches_window` nebo `side_mix`, ne při každé změně skóre).
+
+#### 3.10.4 Pořadí v baru a rozhraní
+
+Pořadí v baru t (modul SR):
+
+1. validace baru (3.1), `atr1_sr`, `atr_ref_sr`, session, obchodní den;
+2. první bar s `ts_open ≥ ts_close` posledního baru `pd_scope` naposledy dokončeného dne: vydat novou sadu PD* (3.10.2 bod 10; `valid_from` = ten okamžik) a stáhnout předchozí sadu (`EXPIRED`); první bar nového obchodního dne: odstranit dotyky mimo okno, stáhnout shluky bez dotyků;
+3. první bar s `ts_open ≥ rth_open`: vydat `PREMARKET_*` (je-li zapnut a existují bary premarketu); po uzavření tohoto baru `SESSION_OPEN`;
+4. zigzag SR: zprávy HIGH/LOW v pořadí 5.3 → potvrzené swingy → nové dotyky → shluky; aktualizace konečného `bounce_atr` předchozího dotyku;
+5. přepočet skóre, stažení, sloučení, publikace (3.10.3);
+6. zápis událostí. `levels_at(ts)` vrací publikované úrovně s `valid_from ≤ ts` a (`valid_to` null nebo `ts < valid_to`), seřazené podle ceny vzestupně, remíza podle `level_id`.
+
+Rozhraní (Python, stejná pravidla jako 10.1):
+
+```python
+sr = SRModule(sr_params, market, session_calendar)   # SRParams (12.4), MarketSpec (3.2)
+events = sr.update(bar)              # všechny bary obchodního dne v pořadí; vrací události modulu z tohoto baru
+levels = sr.levels_at(ts_open)       # rozhraní 3.5 (LevelProvider)
+snap = sr.snapshot(); sr2 = SRModule.from_snapshot(snap, market, session_calendar)
+levels_df, level_events_df = sr.run(df_all_bars)
+# levels_df: jeden řádek na publikaci (level_id, kind, price, valid_from, valid_to, strength_at_pub, meta_at_pub, source)
+```
+
+Skládání s detektory (datová vrstva, **závazné pořadí**, D-60): pro každý bar obchodního dne nejdřív `sr.update(bar)`, potom, je-li bar v rozsahu `session_scope`, `engine.update(bar)`; engine volá `sr.levels_at(ts_open(t))`. Pořadí je závazné, protože mechanické úrovně mají `valid_from ≤ ts_open(t)` baru, ve kterém se vydávají (PD* po konci `pd_scope`, `PREMARKET_*` v `rth_open`), a obrácené pořadí by je zpozdilo o bar; úrovně odvozené z baru t (`SR`, `SESSION_OPEN`) mají `valid_from = ts_close(t)` a `levels_at(ts_open(t))` je vrátí až od baru t+1. V dávkovém režimu se `levels_df` zabalí do deterministického `LevelProvider` (10.1); `strength` z `levels_df` je hodnota při publikaci; detektory `strength` nepoužívají (3.5), takže dávkový a streamingový běh detektorů jsou totožné (brána 13.14.1 bod 3).
+
+Studený start: zigzag SR má warmup `atr_n` barů (4.1); do první kvalifikace není žádná úroveň `SR` (detektory to řeší přes `levels_missing`, 3.5). Okrajové případy: mezery, halty a den rollu jako 5.6 (spojitá řada, žádný reset); víkend a svátek nejsou obchodní dny, stáří se počítá v obchodních dnech s bary; `atr1_sr` prvního baru dne má `TR = high − low` (4.1). Výkon: `O(N × počet shluků)`; počet shluků v okně je řádově desítky, publikace nejvýš `sr_max_levels`.
 
 ## 4. Normalizace a osy
 
@@ -293,9 +450,10 @@ Zápisy `<`, `>`, `≤`, `≥`, `=` u cen v sekcích 5–9 znamenají tyto opera
 | `dir` | `UNDEF` (před prvním swingem), `UP` (hledá se swing high, poslední potvrzený je low), `DOWN` (hledá se swing low) |
 | `cand_hi`, `cand_hi_t`, `cand_hi_atr` | kandidát swing high: cena `ext_high`, index baru, `atr_ref` v jeho baru |
 | `cand_lo`, `cand_lo_t`, `cand_lo_atr` | kandidát swing low |
+| `cand_hi_lvl`, `cand_lo_lvl` | bool nebo null: zda byl kandidát v baru, kde vznikl, u aktivní úrovně (D-59): `null` při `levels_missing(t)`, jinak `existuje aktivní úroveň L v baru t s |p − L.price| ≤ level_tol × atr_ref(t)`; ukládá se při každém nastavení nebo posunu kandidáta a při potvrzení přechází do záznamu swingu (`on_level`, 5.5). Modul SR (3.10) tento příznak neukládá (nepotřebuje ho) |
 | `swings` | seznam potvrzených swingů v pořadí potvrzení |
 
-Inicializace v prvním baru po warmupu (`t0 = atr_n`): `dir = UNDEF`, `cand_hi = ext_high(t0)`, `cand_lo = ext_low(t0)`, oba s `t = t0` a `atr = atr_ref(t0)`.
+Inicializace v prvním baru po warmupu (`t0 = atr_n`): `dir = UNDEF`, `cand_hi = ext_high(t0)`, `cand_lo = ext_low(t0)`, oba s `t = t0`, `atr = atr_ref(t0)` a `lvl` podle úrovní aktivních v `t0`.
 
 ### 5.3 Pořadí uvnitř baru
 
@@ -351,6 +509,7 @@ Pravidla:
 | `t_conf`, `ts_conf` | int, tz-aware | potvrzení |
 | `atr_ext` | float | `atr_ref(t_ext)` |
 | `conf_delay_bars` | int | `t_conf − t_ext` |
+| `on_level` | bool nebo null | `cand_*_lvl` kandidáta v okamžiku potvrzení (5.2): extrém ležel u úrovně aktivní v baru `t_ext`; null, když v baru `t_ext` nebyla žádná aktivní úroveň |
 
 Událost `SWING_CONFIRMED` v baru `t_conf` nese celý záznam. Swingy jsou globální (nezávislé na směru trendu); struktury 6.1 z nich vybírají.
 
@@ -525,7 +684,7 @@ Podmínky se nepřekrývají (pořadí je rozhodující) a pokrývají všechny 
 | `t_start`, `bars` | int, int | bar začátku; `bars = t − t_start + 1` |
 | `pb_low`, `t_pb_low` | float, int | `min ext_low(x)` pro `x ∈ [t_H, t]` (rovnost nechává starší) |
 | `pb_depth_atr` | float | `(H − pb_low) / atr_ref(t_H)` |
-| `pb_retrace` | float | `(H − pb_low) / (H − prev_major_low)`; jmenovatel je > 0, protože `H > prev_major_low` |
+| `pb_retrace` | float nebo null | `(H − pb_low) / (H − prev_major_low)`; null, pokud `H − prev_major_low ≤ 0,5 × tick_size` (jmenovatel je kladný vždy, když struktura má hlavní high nad `prev_major_low`; ochrana proti dělení nulou u ploché struktury, D-59) |
 | `n_inner_swings` | int | počet potvrzených swingů (obou typů) s `t_ext > t_H` a `t_conf ≤ t` |
 | `dist_to_tl_atr_main`, `dist_to_tl_atr_curr` | float | `(close_t − TL(t)) / atr_ref(t)`; kladná = nad TL (počítá se i mimo pullback jako pole TL, 10.3) |
 | `dist_to_level_atr` | float nebo null | vzdálenost close k nejbližší aktivní úrovni **na straně, ke které pullback míří** (uptrend: `price ≤ close`; nejbližší = největší taková cena): `(close − price)/atr_ref(t)`; null, když taková úroveň není nebo `levels_missing` |
@@ -567,8 +726,8 @@ Počítají se pro každou stranu s existujícím `L₀` (i ve fázi `CANDIDATE`
 | `tl_dev_atr_now` | float | `(ext_high(t) − TL_curr(t)) / atr_ref(t)` | null bez TL |
 | `levels_crossed` | int | počet různých `level_id`, které byly od `t₀` proraženy closem ve směru trendu: úroveň `L` aktivní v baru `x ∈ (t₀, t]` je proražena v x, pokud `close_{x−1} ≤ L.price < close_x` (uptrend, v ticích); každé `level_id` nejvýš jednou | null při `levels_missing` po celý úsek; 0, když úrovně jsou, ale nic proraženo |
 | `dist_to_next_level_atr` | float | nejbližší aktivní úroveň s `price > close_t`: `(price − close_t)/atr_ref(t)` | null, když taková není nebo `levels_missing` |
-| `anchors_on_level` | float 0–1 | podíl kotev (`L₀` + přijatá low), jejichž cena je u úrovně aktivní v baru `t_ext` kotvy (tolerance `level_tol × atr_ref(t_ext)`) | null při `levels_missing` |
-| `L0_on_level` | bool | `L₀` u úrovně aktivní v `t₀` | null při `levels_missing` |
+| `anchors_on_level` | float 0–1 | podíl kotev (`L₀` + přijatá low) s `on_level = true` mezi kotvami s `on_level ≠ null` (příznak uložený při vzniku kandidáta v baru `t_ext`, 5.2, 5.5; komponenta úrovně minulých barů znovu nenačítá) | null, nemá-li žádná kotva `on_level` definované |
+| `L0_on_level` | bool | `L₀.on_level` | null, když `L₀.on_level` je null |
 | `levels_missing` | bool | v baru t není aktivní žádná úroveň (3.5) | — |
 | `session_cross` | bool | `session_id(t) ≠ session_id(t₀)` | — |
 | `roll_in_structure` | bool | v `(t₀, t]` leží bar rollu (3.3) | — |
@@ -601,7 +760,7 @@ Předpoklad s kalibrací (D-24). Složky, každá v [0, 1], se počítají pro s
 
 ## 9. Modul cumulative delta (volitelný, kapitola IX)
 
-- **Vstup:** sloupec `delta` (3.1) = kumulativní delta (Σ(ask objem − bid objem) od začátku session) na konci baru. Modul je aktivní, jen když je sloupec přítomen a `delta_enabled = true` (výchozí `true`); jinak jsou všechna pole modulu null. Delta se na začátku každé session resetuje na 0 (kumulace jen uvnitř session); pokud vstup kumuluje přes session, komponenta ho převede odečtením hodnoty na konci předchozí session (parametr `delta_cumulates_across_sessions`, výchozí `false`).
+- **Vstup:** sloupec `delta` (3.1) = kumulativní delta na konci baru, kterou datová vrstva počítá z CSV jako `Σ (AskVolume − BidVolume)` přes bary téže session od jejího prvního baru (`data/README.md` 5; bary s `BidVolume + AskVolume ≠ Volume`, ojedinělé v letech 2010–2012, se berou tak, jak jsou). Modul je aktivní, jen když je sloupec přítomen a `delta_enabled = true` (výchozí `true`); jinak jsou všechna pole modulu null. Delta se na začátku každé session resetuje na 0 (kumulace jen uvnitř session); pokud vstup kumuluje přes session, komponenta ho převede odečtením hodnoty na konci předchozí session (parametr `delta_cumulates_across_sessions`, výchozí `false`). Při `session_scope ≠ ETH` kumuluje datová vrstva jen přes bary v rozsahu (osa x detektorů).
 - **Řada delty jako „cena“:** `open = delta_{t−1}` (0 na začátku session), `close = delta_t`, `high = max(open, close)`, `low = min(open, close)`; `anchor_mode` pro deltu je vždy `close`. `atr_delta(t)` = průměr `|delta_t − delta_{t−1}|` přes `atr_n` barů s podlahou 1 kontrakt; `atr_delta_ref(t) = atr_delta(t−1)`.
 - Nad touto řadou běží tentýž zigzag (5) s prahem `θ_delta × atr_delta_ref` (`θ_delta = θ`) a tatáž struktura a TL (6) s `ε_delta = ε`, nezávisle na cenové struktuře (druhá instance téhož kódu).
 - `delta_tl_agrees` (bool): strana `direction` má na deltě strukturu s `trend_valid = true` (TL téhož směru existuje a není prolomená). null při `direction = NONE`.
@@ -616,8 +775,8 @@ Předpoklad s kalibrací (D-24). Složky, každá v [0, 1], se počítají pro s
 Jazyk: Python ≥ 3.11; povinné závislosti jen `numpy` a `pandas` (dávkový režim); vše ostatní volitelné.
 
 ```python
-engine = TrendEngine(params, session_calendar, roll_dates,
-                     levels=None,            # LevelProvider (3.5) nebo None = bez úrovní
+engine = TrendEngine(params, market, session_calendar, roll_dates,
+                     levels=None,            # LevelProvider (3.5): instance SRModule (3.10) nebo jiný poskytovatel; None = bez úrovní
                      intrabar=None,          # IntrabarProvider (3.4) nebo None
                      news=None,              # NewsProvider (3.9) nebo None
                      continuation_table=None,# cesta k JSON (15.4) nebo None
@@ -626,13 +785,14 @@ state = engine.update(bar)          # streaming, volá se po uzavření baru; vr
 states, events = engine.run(df, levels_df=None)   # dávkově; výsledky identické se streamingem
 engine.reset()                      # zpět do stavu po konstrukci (warmup znovu)
 snap = engine.snapshot()            # serializovatelný vnitřní stav (10.5)
-engine2 = TrendEngine.from_snapshot(snap, session_calendar, roll_dates, levels, intrabar, news, continuation_table)
+engine2 = TrendEngine.from_snapshot(snap, market, session_calendar, roll_dates, levels, intrabar, news, continuation_table)
 ```
 
-- `bar` je záznam se sloupci 3.1; `df` DataFrame s týmiž sloupci seřazený podle `ts`; `levels_df` DataFrame se sloupci 3.5 (v dávkovém režimu se zabalí do deterministického `LevelProvider`).
+- `bar` je záznam se sloupci 3.1 (jen bary v rozsahu `session_scope`, 3.2); `df` DataFrame s týmiž sloupci seřazený podle `ts`; `levels_df` DataFrame se sloupci 3.5 (v dávkovém režimu se zabalí do deterministického `LevelProvider`; u modulu SR je to `levels_df` z `sr.run`, 3.10.4).
+- `market` je `MarketSpec` (3.2); `params.tick_size` se musí rovnat `market.tick_size`, jinak `ValueError`.
 - `run` vrací `states` (DataFrame, jeden řádek na platný bar, sloupce = zploštělá pole 10.3 s prefixy `up_`, `down_`, `answer_`) a `events` (DataFrame se sloupci 10.4). `run` musí být implementován jako smyčka nad `update` nebo dávkově s totožným výsledkem (13.2.3).
 - `params` je datová třída `TrendParams` s poli z 12; neznámé pole → `ValueError` při konstrukci; hodnoty mimo povolený rozsah → `ValueError`.
-- Verze: `engine.version` (semver knihovny) a `engine.params_hash` (SHA-256 kanonického JSON parametrů) jsou součástí každého stavu a logu.
+- Verze: `engine.version` (semver knihovny) a `engine.params_hash` jsou součástí každého stavu a logu. **`params_hash`** = SHA-256 kanonického JSON (klíče seřazené, float jako nejkratší round-trip `repr`) jen z **chováníurčujících** parametrů: všech polí 12.1 kromě `tick_size`, `tf_minutes`, `bar_timestamp`, `on_invalid_bar`, `session_scope`, `levels_enabled`, `intrabar_mode`, `detectors`, `news_*` (vlastnosti dat a běhu); `MarketSpec` do hashe nevstupuje (D-49). Do hashe naopak vstupuje `levels_provider_hash`: `sr_params_hash` modulu SR (12.4), `"none"` bez úrovní (`levels = None` nebo `levels_enabled = false`), nebo hash dodaný jiným poskytovatelem (`LevelProvider.params_hash`), protože úrovně mění `pw3`, `reversal_hint` a tím biny tabulky pokračování. Důvod vyloučení trhu: tabulka pokračování (15.4) je v jednotkách ATR a má jít použít na jiném trhu; tabulka nese `market` a při neshodě trhu vzniká varování `CONTINUATION_TABLE_MARKET_MISMATCH` (skóre se použije), při neshodě hashe se odmítne (15.4).
 
 ### 10.2 Protokoly vstupů
 
@@ -661,9 +821,10 @@ Společná pole:
 |---|---|---|
 | `bar_index`, `ts_open`, `ts_close` | int, tz-aware, tz-aware | aktuální bar (4.2) |
 | `session_id`, `outside_session`, `is_roll_bar`, `gap_before_min` | int, bool, bool, float | 3.2, 3.3; `gap_before_min = (ts_open(t) − ts_close(t−1))` v minutách, 0 u prvního baru |
+| `contract` | str nebo null | zdrojový kontrakt baru (3.1), jen předáno |
 | `warmup` | bool | 4.1 |
 | `atr1`, `atr_ref` | float, float | 4.1 (null ve warmupu) |
-| `intrabar_ambiguous`, `intrabar_used` | bool, bool | 5.3 |
+| `intrabar_ambiguous`, `intrabar_used`, `intrabar_order` | bool, bool, enum | 5.3, 3.4 (`LOW_FIRST`, `HIGH_FIRST`, `SINGLE`, `UNKNOWN`) |
 | `levels_missing`, `n_levels_active` | bool, int | 3.5 |
 | `direction`, `direction_phase` | enum, enum nebo null | 7.3 |
 | `swings_new` | list[Swing] | swingy potvrzené v tomto baru (5.5) |
@@ -710,7 +871,7 @@ Společná pole:
 | `created_at`, `updated_at` | int, int | bar vzniku, poslední změny |
 | `value_at(x)` | metoda | 6.4 |
 
-`Answer`: pole z 1.1 (`in_trend`, `direction`, `strength`, `strength_class`, `pullback_starting`, `pullback_active`, `pullback_age_bars`, `continuation_score`, `continuation_n`, `continuation_source`) plus `reversal_hint` a `phase` strany `direction`.
+`Answer`: pole z 1.1 (`in_trend`, `direction`, `strength`, `strength_class`, `pullback_starting`, `pullback_active`, `pullback_age_bars`, `continuation_score`, `continuation_n`, `continuation_source`, `continuation_ci_lo`, `continuation_ci_hi`) plus `reversal_hint` a `phase` strany `direction`.
 
 ### 10.4 Události
 
@@ -731,7 +892,7 @@ Každá událost má: `event_id` (int, pořadové), `type`, `side` (UP / DOWN / 
 | `TL_REVALIDATED` | strana | `t_known` | `main_tl` |
 | `TREND_END` | strana | `t_known` | `reason ∈ {STRUCTURE, LL_SWING}`, `L0`, `H_final` (= běžící maximum `H` v okamžiku konce; nemusí být potvrzený swing), `t_H_final` (= `t_H`), `duration_bars`, `n_swings` |
 | `BAR_SKIPPED` | null | `t_known` (index, který by bar dostal) | `ts`, `reason` |
-| `ROLL_GAP`, `NON_TICK_PRICE`, `BARS_OUTSIDE_SESSION`, `UNKNOWN_LEVEL_KIND`, `CONTINUATION_TABLE_MISMATCH` | null | `t_known` | `detail` |
+| `ROLL_GAP`, `NON_TICK_PRICE`, `BARS_OUTSIDE_SESSION`, `UNKNOWN_LEVEL_KIND`, `CONTINUATION_TABLE_MISMATCH`, `CONTINUATION_TABLE_MARKET_MISMATCH` | null | `t_known` | `detail` |
 
 Varovné události (poslední řádek) se zároveň logují přes `logging` na úrovni WARNING; ostatní na úrovni DEBUG. Pořadí událostí v baru: 6.7.
 
@@ -755,13 +916,13 @@ Varovné události (poslední řádek) se zároveň logují přes `logging` na �
 
 ### 11.2 Data
 
-- **Mezery:** chybějící minuty se nedoplňují; mezera ≥ `gap_min` uvnitř session se označí (8.1); hranice session mění TR (4.1).
+- **Mezery:** chybějící minuty se nedoplňují; mezera ≥ `gap_min` uvnitř session se označí (8.1); hranice session mění TR (4.1). Díry a vyřazené dny z exportu (`gaps`, `missing_weekdays`, `excluded_days` v reportu exportu a README symbolu, dodatek 17) předává datová vrstva jako obyčejné mezery; komponenta je od ostatních mezer nerozlišuje a nic nedoplňuje. Chybějící celé dny jsou pro komponentu hranice session jako víkend.
 - **Neplatné bary:** 3.1 (`raise` výchozí).
 - **Studený start:** warmup 4.1; po něm první swingy vznikají přirozeně; žádné pole nesmí být NaN tam, kde dokument říká null (null se serializuje jako `null`, ne NaN).
 
 ### 11.3 Obecnost trhu a odolnost proti overfittingu
 
-- **Žádná konstanta trhu v kódu:** velikost ticku, TF, rozvrh session, data rollu jsou vstupy nebo parametry; všechny prahy jsou v násobcích `atr_ref` nebo v barech. Primární trh je NQ; ES a YM (kapitola VII) musí běžet beze změny kódu a se stejnými výchozími parametry (doladění pro jiné trhy může přijít později, ale nesmí být nutné pro běh).
+- **Žádná konstanta trhu v kódu:** velikost ticku, pásmo burzy, rozvrh seance, rozsah barů, pravidlo obchodního dne a data rollu jsou vstupy (`MarketSpec` 3.2, kalendář, `roll_dates`) nebo parametry; žádný čas v ET ani v Praze není zapsaný v kódu; všechny prahy jsou v násobcích `atr_ref` nebo v barech. Primární trh je NQ; FDAX běží beze změny kódu a se stejnými výchozími parametry jako druhý trh (zkušební běhy a 13.11); ES a YM (kapitola VII) musí běžet stejně, až budou data (R2), a vstupují jen do závěrečné robustnostní brány (poznámka zadavatele kola 2). Doladění pro jiné trhy může přijít později, ale nesmí být nutné pro běh.
 - **Stejné parametry pro syntetiku i reálná data:** brána 13.2.5 (syntetika) i historický běh (13.3) používají tytéž výchozí parametry; jakákoli sada parametrů, která projde jen na jednom z nich, je odmítnuta.
 - **Robustnostní brána 13.11:** výsledky s týmiž parametry na syntetice, NQ (po letech), ES a YM se smí lišit jen v mezích 13.11; perturbace parametrů ±25 % nesmí výsledky zlomit. Nesplnění = overfitting → mění se parametry (zápis do logu), ne kritéria.
 - **Počet parametrů** ladících se kalibrací je omezen tabulkou 12.1; přidání parametru vyžaduje záznam v logu s důvodem a musí projít 13.11.
@@ -769,14 +930,14 @@ Varovné události (poslední řádek) se zároveň logují přes `logging` na �
 
 ### 11.4 Chyby a logování
 
-- Výjimky: `InvalidBarError`, `TimestampConventionError`, `LookaheadLevelError`, `ValueError` (parametry). Po výjimce z `update` je engine v nedefinovaném stavu a musí se resetovat nebo obnovit ze snapshotu.
+- Výjimky: `InvalidBarError`, `TimestampConventionError`, `LookaheadLevelError`, `LookaheadNewsError`, `ValueError` (parametry, neshoda `tick_size` s `MarketSpec`); `NewsTimezoneError` vzniká v datové vrstvě (3.9). Po výjimce z `update` je engine (i modul SR) v nedefinovaném stavu a musí se resetovat nebo obnovit ze snapshotu.
 - Varování vznikají jako události (10.4) i přes `logging`; každé varování nejvýš jednou za typ a běh, s počítadlem v `engine.warnings` (dict typ → počet).
 - Žádný výstup na stdout.
 
 ### 11.5 Výkon
 
 - Časová složitost: `O(N + Σ_trendy (délka × počet přepočtů TL))`; přepočty TL jen při přijetí low (6.2). Paměť: `O(atr_n + W + délka aktivních struktur)` na stranu, plus výstupy.
-- Celá historie 2007–2025 (řádově 6 mil. 1min barů ETH) do 10 min na jednom jádře v dávkovém režimu, včetně zápisu `states` a `events`; měří se v 13.2.9. Volitelná akcelerace (numba) nesmí měnit výsledky (bitová shoda s čistou implementací, 13.2.4).
+- Celá historie jednoho trhu (NQ 2010-12-31 až 2026-09-25, 5,36 mil. 1min barů; FDAX 3,40 mil.) do 10 min na jednom jádře v dávkovém režimu, včetně modulu SR a zápisu `states`, `events` a `levels_df`; měří se v 13.2.9. Volitelná akcelerace (numba) nesmí měnit výsledky (bitová shoda s čistou implementací, 13.2.4).
 
 ## 12. Parametry a kalibrace
 
@@ -786,11 +947,11 @@ Sloupec „Kalibrace“: **ne** = vstupní vlastnost dat nebo pevné rozhodnutí
 
 | Parametr | Typ | Výchozí | Kalibrace | Sekce |
 |---|---|---|---|---|
-| `tick_size` | float > 0 | 0,25 (NQ) | ne (vlastnost trhu) | 4.5 |
+| `tick_size` | float > 0 | = `MarketSpec.tick_size` (NQ 0,25; FDAX 0,5) | ne (vlastnost trhu; mimo `params_hash`) | 3.2, 4.5 |
 | `tf_minutes` | int ≥ 1 | 1 | ne (3.7) | 3.1 |
-| `bar_timestamp` | close / open | close | ne | 3.1 |
+| `bar_timestamp` | open / close | open | ne (ověřeno, D-47) | 3.1 |
 | `on_invalid_bar` | raise / skip | raise | ne | 3.1 |
-| `session_scope` | ETH / RTH | ETH | ne | 3.2 |
+| `session_scope`, `scope_from`, `scope_to` | ETH / RTH / WINDOW, čas, čas | z `MarketSpec` (NQ ETH; FDAX WINDOW 09:00–22:00) | ne (D-51; změna jen záznamem v logu po kontrole 3.2) | 3.2 |
 | `gap_min` | float, min | 5 | ne | 8.1 |
 | `atr_n` | int | 30 | 20–60 | 4.1 |
 | `atr_floor_ticks` | int | 2 | ne | 4.1 |
@@ -842,6 +1003,29 @@ Metriky shody: shoda fáze po barech (podíl barů se shodným `direction`), roz
 - **PW3:** stejně jako PW2 pro W, `er_chop`, `pw3_max`.
 - **θ, ε, `anchor_mode`:** podle shody s ruční anotací (12.2), ne podle úspěšnosti (aby se definice trendu nepřizpůsobila výsledku).
 
+### 12.4 Parametry modulu SR (`SRParams`) a jejich kalibrace
+
+| Parametr | Typ | Výchozí | Kalibrace (rozsah, krok) | Sekce |
+|---|---|---|---|---|
+| `theta_sr` | float nebo null (= θ) | null | 2–4, krok 0,5 | 3.10.3 |
+| `anchor_mode_sr` | body / wick / close | wick | wick / body | 3.10.3 |
+| `atr_n_sr` | int nebo null (= `atr_n`) | null | ne | 3.10.3 |
+| `sr_cluster_tol` | float (× `atr_ref_sr`) | 0,5 | 0,25–1, krok 0,25 | 3.10.3 |
+| `sr_lookback_days` | int (obchodní dny) | 5 | 3, 5, 10 | 3.10.3 |
+| `sr_half_life_days` | float (obchodní dny) | 2 | 1–5, krok 1 | 3.10.3 |
+| `sr_min_touches` | int | 2 | 2–3 | 3.10.3 |
+| `sr_min_score` | float | 1,0 | 0,5–2, krok 0,5 | 3.10.3 |
+| `sr_retire_factor` | float | 0,5 | ne | 3.10.3 |
+| `sr_replace_margin` | float | 0,25 | ne | 3.10.3 |
+| `sr_max_levels` | int | 6 | 4, 6, 8 | 3.10.3 |
+| `sr_strength_scale` | float | 3,0 | ne (přezkum podle monotonie 13.14.2) | 3.10.3 |
+| `sr_break_atr` | float (× `atr_ref`) | 0,5 | ne (jen vyhodnocení) | 13.14.2 |
+| `premarket_enabled`, `pd_scope` | z `MarketSpec` | NQ true / RTH; FDAX false / WINDOW | varianty běhu v 13.14.2 | 3.2, 3.10.2 |
+
+`sr_params_hash` = SHA-256 kanonického JSON polí výše (bez `MarketSpec`); zapisuje se do reportu a do `levels_df` a vstupuje do `params_hash` detektorů jako `levels_provider_hash` (10.1). Neznámé pole nebo hodnota mimo rozsah → `ValueError`. Tolerance testu úrovně v 13.14.2 je `level_tol` z 12.1 (není parametrem modulu).
+
+**Kalibrace** (jen vývojové období 13.3, mřížka v rozsazích výše, deterministicky; předpoklad D-55): kritérium = **zisk podílu udržení** `lift = hold_rate(SR) − hold_rate(reference)` (13.14.2) přes všechny publikace `SR` na vývojovém období, při vedlejší podmínce průměrně ≥ 1 a ≤ `sr_max_levels` publikovaných `SR` úrovní na obchodní den a využití (podíl úrovní s ≥ 1 testem) ≥ 50 %. Vybere se sada s největším `lift`; při rozdílu `lift` ≤ 2 p.b. jednodušší sada (menší `sr_lookback_days`, pak menší `sr_max_levels`). Testovací období se vyhodnotí jednou se zmrazenou sadou. Deník a CSV z obrázků se ke kalibraci nepoužívají (3.6); srovnání s čarami autora je jen report 13.14.3. Parametry SR vstupují do perturbační brány 13.11 (±25 %) stejně jako parametry 12.1; běh s modulem SR a bez něj (13.9) měří jejich přínos detektorům.
+
 ## 13. Testování: požadavky a akceptační kritéria
 
 Postup provedení testů (harness, data, formát reportu) je v `zadani/testy.md` (1.4). Tato sekce definuje, co se testuje a kdy je výsledek přijat.
@@ -866,10 +1050,10 @@ Bez splnění všech bran se historické metriky nevyhodnocují. Shoda výstupů
 3. **Replay:** `run(df)` = postupné `update()` (11.1), bitově.
 4. **Determinismus:** dva běhy dávají bitově shodné výstupy (SHA-256 kanonického JSON logu); totéž s akcelerací a bez ní (11.5).
 5. **Syntetické scénáře se známou pravdou** (podsekce „Syntetické scénáře“ níže).
-6. **Okrajové případy:** mezery přes noc a víkend, halt (mezera 30 min uvnitř session), den rollu (s mezerou i bez), extrémně dlouhý knot (knot 10 × atr, tělo 0,2 × atr), plochý trh (200 barů `high == low`), první bary historie (warmup), neplatný bar v obou režimech `on_invalid_bar`, chybná konvence timestampu (`TimestampConventionError`), úroveň s `valid_from` v budoucnosti (`LookaheadLevelError`). Kritérium: žádná výjimka mimo očekávané, žádný NaN, chování podle 3–5.
+6. **Okrajové případy:** mezery přes noc a víkend, halt (mezera 30 min uvnitř session), den rollu (s mezerou i bez), extrémně dlouhý knot (knot 10 × atr, tělo 0,2 × atr), plochý trh (200 barů `high == low`), první bary historie (warmup), neplatný bar v obou režimech `on_invalid_bar`, chybná konvence timestampu (`TimestampConventionError`; simuluje se posunem `ts` o `−tf_minutes` a o +60 min), úroveň s `valid_from` v budoucnosti (`LookaheadLevelError`), hranice rozsahu `WINDOW` (FDAX: první bar 09:00 má `TR = high − low`, `gap_before_min` přes noc, nová session), ceny na mřížce 1,0 při `tick_size = 0,5` (FDAX po 2020-12-21: bez varování `NON_TICK_PRICE`, porovnávání 4.5 beze změny), den bez hlavní seance (`rth_open = null`), zkrácený den. Kritérium: žádná výjimka mimo očekávané, žádný NaN, chování podle 3–5.
 7. **Ekvivalence 1s dat:** běh s `intrabar_mode = auto` (1s data) a `heuristic` nad týmž obdobím (≥ 20 obchodních dnů, kde 1s data jsou): výstupy se smí lišit jen od prvního baru s `intrabar_ambiguous = true` po nejbližší `TREND_END` obou stran; podíl barů `intrabar_ambiguous` se hlásí (očekávání < 2 %; vyšší hodnota není chyba, ale musí být v reportu).
 8. **Snapshot:** běh přerušený v 100 bodech a obnovený z `snapshot()` dává bitově shodné výstupy s nepřerušeným během.
-9. **Výkon:** celá historie 1min NQ ETH v dávkovém režimu do 10 min na jednom jádře (11.5); paměť do 4 GB.
+9. **Výkon:** celá historie 1min NQ (všechny bary obchodního dne) a zvlášť FDAX (okno 09:00–22:00) v dávkovém režimu včetně modulu SR, každý trh do 10 min na jednom jádře (11.5); paměť do 4 GB.
 
 #### Syntetické scénáře (brána 13.2.5)
 
@@ -890,10 +1074,11 @@ Generátor: po částech lineární „ideální“ cesta `m(t)` v jednotkách `
 
 ### 13.3 Historický běh
 
-- **Data:** celá dostupná historie 1min NQ ETH (cílově ~20 let), s ověřenými časy z datové vrstvy (3); 1s data tam, kde jsou (R3).
-- **Období:** chronologicky rozdělené **před prvním během**:
-  - vývojové: prvních ~70 % (např. 2007-01-01 až 2018-12-31) — smí se na něm ladit parametry (12),
-  - testovací: posledních ~30 % (např. 2019-01-01 až konec dat) — vyhodnotí se **jednou** se zmrazenými parametry.
+- **Data:** celá dostupná historie 1min NQ (2010-12-31 až 2026-09-25, všechny bary obchodního dne, `session_scope = ETH`) a FDAX (2013-01-07 až 2026-09-25, `WINDOW`) z datové vrstvy (3); 1s data pro stejné dny (3.4). Díry a vyřazené dny podle README symbolů se nedoplňují (11.2).
+- **Období (D-53):** chronologicky rozdělené **před prvním během**, stejný dělicí den pro všechny trhy, aby testovací období bylo srovnatelné:
+  - vývojové: od začátku dat do **2021-12-31** (NQ 11,0 let ≈ 70 %; FDAX 9,0 let ≈ 65 %) — smí se na něm ladit parametry (12),
+  - testovací: **2022-01-01 až konec dat** (4,7 roku; NQ ≈ 30 %) — vyhodnotí se **jednou** se zmrazenými parametry.
+  - ES a YM (až budou, R2) se dělí týmž dnem.
 - Pokud se parametry po pohledu na testovací období změní, testovací období se stává vývojovým a report to uvede.
 - **Log odhadů:** `states` a `events` z `run` (10.1) uložené jako parquet; obsahuje pro každý bar `direction`, fáze, TL (kotvy, sklon, intercept), `answer`, PW-SW, kvalitu; události s `t_known`.
 
@@ -912,7 +1097,7 @@ Pro uptrend; downtrend zrcadlově. Kontrola používá stejnou definici swingů 
 | Trend UP v baru t (nezávisle na swingech) | zda cena (`high`/`low` baru) dosáhla dřív `close_t + k × atr_ref(t)`, nebo `close_t − k × atr_ref(t)`, v horizontu h barů | **pravda** při dosažení horní úrovně první / **nepravda** / **NEVYŘEŠENO** |
 
 - **Remíza v témže baru** (oba cíle v jednom baru): 1s data, jsou-li; jinak heuristika 5.3 (býčí bar: dolní cíl dřív; medvědí: horní dřív). Podíl remíz se hlásí.
-- Výsledek pullbacku se reportuje ve dvou variantách: do 5 session a do konce téže session (`rth_close`), protože P.A.T. je intradenní systém.
+- Výsledek pullbacku se reportuje ve dvou variantách: do 5 session a do konce téže session, protože P.A.T. je intradenní systém. **Konec téže session** = `rth_close` obchodního dne, do kterého bar `PULLBACK_START` patří; bar po `rth_close` (večerní a noční bary u `ETH`, bary 17:30–22:00 u FDAX) má horizont `rth_close` **následujícího** obchodního dne; u session bez hlavní seance se použije `scope_close`. U trhů se `session_scope = WINDOW` se navíc reportuje varianta do `scope_close` téhož dne.
 - Poslední kontrola (pokračování trendu) nepoužívá swingy, takže měří, zda trend skutečně pokračoval, ne jen zda komponenta správně aplikovala vlastní definici. Primárně k = θ, h = 240 barů; citlivost k = 2θ a h = 60.
 - Zpoždění začátku trendu je zčásti nevyhnutelné: trend smí být vyhlášen až po potvrzení druhého swing low. Report uvádí i minimální možné zpoždění.
 
@@ -937,7 +1122,7 @@ Referenční výpočty používají vzdálenosti ke swingům. V testu je to povo
 - **Swingy:** rozdělení zpoždění potvrzení v barech a v násobcích `atr_ext`.
 - **Pokračování trendu:** podíl pravdivých odhadů pro UP a DOWN vs. obě reference; zvlášť podle `strength_class` a `phase` (Ø1).
 - **Skóre pokračování:** Brier skóre a kalibrační křivka `continuation_score` proti výsledku kontroly pokračování (jen bary se skóre ≠ null), na testovacím období; srovnání s konstantou (roční základní podíl).
-- **Členění:** po letech, směrech, RTH / noc, kvintilech `atr1`, vývojové / testovací období, v okně zprávy / mimo (`in_news_window` a `in_high_impact_window`, 3.9; jen je-li kalendář k dispozici).
+- **Členění:** po trzích (NQ, FDAX; později ES, YM), letech, směrech, RTH / mimo RTH, denní době (minuty od `rth_open` po 30 min, záporné před RTH), kvintilech `atr1`, vývojové / testovací období, v okně zprávy / mimo okna / bez kalendáře (`in_news_window` a `in_high_impact_window`, 3.9; bary po `news_end` jsou kategorie „bez kalendáře“ se zdrojem kalendáře v popisku), s modulem SR / bez úrovní (13.9).
 - **Intervaly:** 95% intervaly blokovým bootstrapem po týdnech (výsledky uvnitř týdne nejsou nezávislé).
 
 ### 13.7 Vyhodnocení filtrů PW-SW a síly
@@ -973,7 +1158,7 @@ P.A.T. je vizuální systém; číselná kontrola nezachytí vše.
 
 ### 13.11 Robustnostní brána (overfitting, obecnost trhu)
 
-Jádrové metriky: (a) přesnost `direction` po barech proti „vždy trend“ (rozdíl v p.b.), (b) úspěšnost pullbacků minus průměrné `p₀`, (c) úspěšnost pokračování minus roční základní podíl. Se **stejnými** parametry se spočítají na: syntetice S1–S10 (jen a), NQ po letech vývojového období, NQ testovací období, ES a YM (jsou-li data, R2).
+Jádrové metriky: (a) přesnost `direction` po barech proti „vždy trend“ (rozdíl v p.b.), (b) úspěšnost pullbacků minus průměrné `p₀`, (c) úspěšnost pokračování minus roční základní podíl. Se **stejnými** parametry (12.1 i 12.4) se spočítají na: syntetice S1–S10 (jen a), NQ po letech vývojového období, NQ testovací období, FDAX (vývojové a testovací období; druhý trh, k dispozici), ES a YM (až budou data, R2; závěrečný běh brány podle poznámky zadavatele). Do té doby je brána „průběžná“ (NQ + FDAX + syntetika) a report to uvádí.
 
 | Kritérium | Pass |
 |---|---|
@@ -990,7 +1175,7 @@ Detektor A se spustí nad 1, 2, 3 a 5min bary (agregace z 1min: open prvního, c
 
 ### 13.13 Shoda s rozhodnutími autora (report, ne brána)
 
-Pro každý obchod z `PAT/Obchodní deník.xls` a `PAT/PAT_obchody_z_obrazku.csv` (čas vstupu převedený na `ts_open` 1min baru v ET; časy v deníku i v CSV jsou středoevropské podle osy grafu, převod přes IANA `Europe/Prague` → `America/New_York`; dny, kdy se liší přechod na letní čas v EU a USA, se převádějí stejně, protože IANA pásma tyto rozdíly obsahují) se z logu 13.3 vezme stav baru **před** barem vstupu (spotřebitel jedná na uzavřeném baru) a hlásí se:
+Pro každý obchod z `PAT/Obchodní deník.xls` a `PAT/PAT_obchody_z_obrazku.csv` (časy obou zdrojů jsou středoevropské, tj. přímo pásmo dat `Europe/Prague`, žádný převod; bar vstupu = 1min bar s `ts_open` = čas vstupu, a není-li takový bar, nejbližší předchozí bar téhož obchodního dne; ceny deníku a CSV posunuté o `adj(d)`, 3.3; obchody před 2010-12-31 se nehodnotí a jejich počet se uvádí) se z logu 13.3 vezme stav baru **před** barem vstupu (spotřebitel jedná na uzavřeném baru) a hlásí se:
 
 - podíl obchodů s `direction` = směr obchodu,
 - podíl s `direction` = směr obchodu a `phase = PULLBACK`,
@@ -999,9 +1184,56 @@ Pro každý obchod z `PAT/Obchodní deník.xls` a `PAT/PAT_obchody_z_obrazku.csv
 
 Bez cílové hodnoty; slouží k rozboru odchylek ve vizuálním auditu. Parametry se podle něj nemění (3.6).
 
+### 13.14 Modul SR: brány a vyhodnocení
+
+#### 13.14.1 Brány (pass / fail)
+
+1. **Kauzalita:** zkrácení dat (jako 13.2.1) pro 1 000 bodů t: `levels_at(ts_open(x))` pro všechna `x ≤ t` je shodné při běhu do t a na celých datech; úroveň s `valid_from > ts_open(x)` se nikdy nevrátí (detektory by vyhodily `LookaheadLevelError`). Změna budoucnosti (13.2.2) nezmění žádnou publikaci s `valid_from ≤ ts_open(t)` ani její `strength` a `meta` v barech ≤ t.
+2. **Replay a determinismus:** `sr.run(df)` = postupné `sr.update()` (bitově shodné `levels_df` a `level_events_df`); dva běhy mají shodný SHA-256; běh přerušený ve 100 bodech a obnovený ze `snapshot()` je shodný s nepřerušeným.
+3. **Shoda streamingu a dávky:** streaming v závazném pořadí (`sr.update` před `engine.update`, 3.10.4) a dávkový běh detektorů s `levels_df` dávají bitově shodné `states` a `events`; `levels_at(ts_open(t))` nikdy nevrátí úroveň s `valid_from > ts_open(t)` (jinak `LookaheadLevelError`). Obrácené pořadí volání je chyba datové vrstvy; test ověří, že ji brána 13.2.3 (replay) odhalí jako rozdíl.
+4. **Shoda mechanických úrovní:** na NQ s `pd_scope = RTH` a `premarket_enabled = true` je množina (`kind`, `price`, `valid_from`, `valid_to`) PD* a `PREMARKET_*` za vývojové období shodná s fixture `MechanicalLevels` (`zadani/testy.md` 3.5) po přepočtu časů fixture do pásma dat; u `SESSION_OPEN` je `valid_from` o jeden bar později (3.10.2 bod 9, záměr). Jiný rozdíl je chyba jedné ze stran a řeší se ve prospěch 3.10.2.
+5. **Syntetické scénáře** (generátor 13.2.5, bez detektorů):
+   - SR1: cesta S1 s vloženými třemi dotyky na ceně P ve třech různých obchodních dnech (odraz 4A od P): po potvrzení 2. dotyku v baru t obsahuje `levels_at(ts_open(t+1))` úroveň `SR` s `|price − P| ≤ 1 tick` a `n_touches_window = 2`; po 3. dotyku `score` vzroste a `price` se nezmění; po `sr_lookback_days` obchodních dnech bez dotyku úroveň zmizí (`AGED_OUT`).
+   - SR2: deset shluků s různým skóre → publikováno přesně `sr_max_levels` nejsilnějších; nový shluk se skóre > 1,25 × nejslabšího publikovaného ho nahradí (`REPLACED`), slabší kandidát nic nezmění.
+   - SR3: den bez hlavní seance → žádné `PREMARKET_*` a `SESSION_OPEN`; PD* následujícího dne pocházejí z posledního dne s bary v `pd_scope`.
+   - SR4: `premarket_enabled = false` → žádné `PREMARKET_*`, ostatní úrovně bitově shodné s během `true`.
+   - SR5: zrcadlo SR1 (× −1) → shodné výsledky se zrcadlenými cenami.
+   Kritérium: přesná shoda barů a cen s referenčním výpočtem podle 3.10.
+6. **Okrajové případy:** mezera, halt, den rollu (žádný reset), první den dat (bez PD*), FDAX změna kroku 2020-12-21 (ceny shluků na mřížce 0,5), `rth_open = null`, zkrácený den; žádná výjimka mimo očekávané, žádný NaN.
+7. **Výkon:** v limitu 11.5 spolu s detektory.
+
+#### 13.14.2 Vyhodnocení (report, bez pevných cílů)
+
+Pohled do budoucnosti má jen test. Pro každou publikaci úrovně `L` (interval `[valid_from, valid_to)`, u `valid_to = null` do konce dat) se v barech rozsahu `session_scope` hledají **testy úrovně**: bar x, ve kterém se cena k úrovni přiblíží poprvé po předchozím vzdálení, tj. `low_x ≤ L.price + level_tol × atr_ref(x)` při příchodu shora (předchozí bar měl `close > L.price + level_tol × atr_ref`), zrcadlově zdola. Výsledek testu:
+
+- **HOLD:** od baru x se cena vrátí na stranu příchodu o ≥ `theta_sr × atr_ref(x)` od `L.price` dřív, než close překročí úroveň na druhou stranu o > `sr_break_atr × atr_ref(x)`;
+- **BREAK:** opačně;
+- **NEVYŘEŠENO:** nic z toho do konce platnosti úrovně ani do 2 session.
+
+Remíza v témže baru: 1s data, jinak heuristika 5.3. Reportuje se i varianta s horizontem do `rth_close` téhož obchodního dne (13.4).
+
+Metriky, členěné podle `kind`, `meta.origin`, `meta.side_mix`, tercilů `strength` v čase testu, trhu, roku, vývojové / testovací období, denní doby testu (minuty od `rth_open` po 30 min) a podle variant běhu (`premarket_enabled` true/false, `pd_scope` RTH/WINDOW):
+
+- počet publikací, průměrný počet aktivních `SR` úrovní na bar a na obchodní den, průměrná doba platnosti,
+- **využití** = podíl publikací s ≥ 1 testem,
+- **hold rate** = HOLD / (HOLD + BREAK), zvlášť pro první test a pro všechny testy,
+- **reference:** tytéž metriky pro posunuté úrovně `L.price ± 1,0 × atr_ref(valid_from)` (obě strany, tytéž intervaly platnosti, posunuté úrovně nemají důvod být respektovány); `lift = hold_rate − hold_rate_ref`; 95% interval blokovým bootstrapem po týdnech,
+- **úspěšnost podle typu (SR-7):** tabulka `kind × origin × tercil strength` s hold rate a lift; očekávání: hold rate roste s tercilem `strength`; nesplnění není chyba, ale `sr_strength_scale` a váhy skóre se přezkoumají zápisem do logu,
+- **vazba na detektory (13.9):** podíl pullbacků se `stopped_at_level = true` a jejich úspěšnost (13.4) proti pullbackům bez úrovně; rozdíl běhu s modulem SR a bez úrovní pro každou metriku 13.6.
+
+#### 13.14.3 Shoda s čarami autora (report, ne brána; D-56)
+
+Pro každý obchod z `PAT/PAT_obchody_z_obrazku.csv` s vyplněným sloupcem `OHLC předchozího dne` nebo `S/R úrovně` se ceny čar posunou o `adj(d)` (3.3) a porovnají s `levels_at(ts_open)` baru vstupu (čas CSV = pásmo dat):
+
+- **pokrytí:** podíl čar autora (zvlášť OHLC a S/R, zvlášť podle barvy), ke kterým existuje úroveň modulu s `|price − cena čáry| ≤ max(level_tol × atr_ref, 2 × tick_size)` (přesnost měření ±1 tick),
+- **přebytek:** podíl úrovní modulu bez čáry autora v téže toleranci (graf autora ukazuje jen část dne, hodnota je orientační),
+- **úroveň vstupní zóny:** podíl obchodů, u nichž je `Úroveň vstupní zóny` pokryta.
+
+Bez cílové hodnoty; slouží k rozboru ve vizuálním auditu 13.8 (do jeho vzorku se přidá 30 publikací `SR` s grafem 300 barů před a po publikaci). Parametry 12.4 se podle toho nemění.
+
 ## 14. Mimo rozsah
 
-- **Výpočet** S/R, OHLC minulého dne a premarketu; komponenta je přijímá jako vstup (3.5), sama je neurčuje.
+- Vstupní zóny jako průnik TL a úrovní; komponenta dodá projekci TL (6.4) a úrovně (3.10), křížení počítá spotřebitel. Výpočet úrovní samotných je od kola 2 v rozsahu (modul SR, 3.10); detektory je dál jen přijímají (3.5).
 - Vstupní zóny (křížení TL s úrovněmi) počítá spotřebitel z projekce TL a ze seznamu úrovní.
 - Profit target, stop-loss, vstup, výstup, position sizing.
 - Vzdálenosti ceny ke swingům a geometrie obchodu.
@@ -1033,8 +1265,23 @@ Zadavatel požaduje vyčerpat použitelné metody (klasické, statistické, stro
 | M15 | tabulka pokračování (empirické základní podíly) | P(pokračování \| bin) z vývojového období | 3 | nejjednodušší kalibrovaný odhad; ≤ 24 binů, nelze přeučit | hrubé | **detektor C** (15.4) |
 | M16 | fraktální dimenze, entropie výnosů | složitost cesty | 1 | — | redundantní s M3/M4, bez jasné výhody | zamítnuto |
 | M17 | ekonomický kalendář zpráv (dodatek zadavatele) | okno kolem zpráv s vysokým dopadem, standardizované překvapení | 3 (rys), členění reportu | vnější informace, kterou cena nenese; známý rozvrh | mimo definici P.A.T.; riziko pohledu do budoucnosti přes časové pásmo a revize | **vstup 3.9**: rys pro D a členění 13.6; detektor A nečte |
+| M18 | objemový profil (objem v ceně za den nebo okno: POC, VAH/VAL, HVN/LVN) | úrovně z rozdělení objemu v ceně | úrovně (modul SR) | objektivní, z dat, která máme (objem a bid/ask v 1s barech) | není v P.A.T.; volba okna; výstupem jsou zóny, ne čáry | **později**: kandidát na další `kind` modulu SR (`VPOC`) po vyhodnocení 13.14.2; přidá se jen se záznamem v logu a stejnou bránou |
+| M19 | Williamsovy fraktály / N-barové pivoty jako alternativa zigzagu | extrém s N bary po obou stranách | 1, 2, úrovně | jednoduché | potvrzení až po N barech = pevné zpoždění; zigzag s θ v ATR je adaptivní a dává totéž bez druhého parametru | zamítnuto |
+| M20 | Donchian / rozsahové definice trendu (nové N-barové maximum) | průlom N-barového rozsahu | 1 | triviální | bez TL a swingů; ignoruje strukturu P.A.T. | zamítnuto jako detektor; povolen jako rys D (`is_new_high_60`) |
+| M21 | lineární regresní kanál, Andrewsova vidlička | kanál kolem regresní přímky | 2 (odklon), PW2 | podobné `tl_max_dev` | redundantní s A + B | zamítnuto |
+| M22 | jiná osa x: Renko, range bary, objemové nebo tickové bary | bary po pohybu nebo objemu, ne po čase | 1, 2 (méně šumu) | tlumí šum mimo seanci | P.A.T. je definován na 1min grafu, spotřebitel jedná v minutách; mapování událostí zpět na čas | zamítnuto pro běh; 13.12 zůstává jediným testem jiného rámce |
+| M23 | vícestupňové swingy (druhý zigzag s θ₂ = 2θ nad swingy prvního stupně) | struktura vyššího stupně | 1 (stupeň trendu), 3 | explicitní „hlavní vs. aktuální“ | 6.1 řeší stupně přes korekce bez dalšího parametru | později; jen pokud vizuální audit 13.8 ukáže, že A dělí trendy jinak než autor |
+| M24 | klasifikace obrazu grafu (vision model nad vykresleným grafem) | model „vidí“ trend jako autor | 1, 2 | P.A.T. je vizuální; 760 obrázků autora | obrázky obsahují bary po vstupu (pohled do budoucnosti), jen kladné příklady, nedeterminismus; zákaz kontaminace D-31 | zamítnuto |
+| M25 | posilované učení | agent optimalizuje obchodní výsledek | — | — | optimalizuje mimo rozsah (vstup, výstup), ne detekci stavu; nereprodukovatelné | zamítnuto |
+| M26 | konformní predikce / intervaly spolehlivosti nad C a D | kalibrovaný interval pro `continuation_score` | 3 | levné, bez učení, dává míru jistoty | žádný dopad na fáze | **přijato pro C**: 95% Wilsonův interval binu (`continuation_ci_lo/hi`, 15.4), bez nového parametru; pro D později |
+| M27 | režim volatility (GARCH, kvintily ATR) jako rys | režim jako rys | 3 | — | GARCH přidává parametry bez zjevné výhody | pokryto kvintilem `atr1` (15.5, 13.6); GARCH zamítnut |
+| M28 | sezónnost denní doby (minuty od otevření seance), den v týdnu | rys a členění | 3 | poznámka zadavatele k FDAX od 9:00 ukazuje význam | — | pokryto: `session_scope` (3.2), rys 15.5, členění 13.6 |
+| M29 | mezitržní potvrzení (ES, YM vs. NQ; ESTX50 vs. FDAX) | shoda směru na příbuzném trhu | 1, 3 | levné | data ES, YM chybí (R2); souběžnost barů napříč trhy | později, po R2; jen jako rys D |
+| M30 | ensemble (vážené hlasování A, B, C, D) | kombinace detektorů | 1, 3 | — | zakrývá, který detektor nese informaci; 1.3 požaduje výstupy vedle sebe | zamítnuto v v1; D je jediné povolené místo kombinace |
+| M31 | online adaptace tabulky C (klouzavý přepočet po letech) | aktualizace podílů | 3 | sleduje drift | pohled do budoucnosti při vyhodnocení testovacího období | zamítnuto pro hodnocení; po přijetí verze se tabulka přepočte jen zápisem do logu |
+| M32 | Nadaraya–Watson a jiné jádrové vyhlazení | hladký odhad trendu | 1 | — | oboustranné jádro = pohled do budoucnosti; jednostranné ≈ EMA (M7) | zamítnuto |
 
-Rozhodnutí (D-2): v1 = A + B + C; D specifikován a vypnutý; ostatní později nebo zamítnuto s důvodem výše.
+Rozhodnutí (D-2): v1 = A + B + C; D specifikován a vypnutý; ostatní později nebo zamítnuto s důvodem výše. Katalog byl v kole 2 znovu prověřen na úplnost (dotaz zadavatele, D-58): doplněny M18–M32; nic z toho nemění v1 kromě intervalu u C (M26).
 
 ### 15.2 Detektor B (statistický)
 
@@ -1064,15 +1311,15 @@ Detektor B nemění fáze ani `trend_valid`; slouží pro report (13.6), jako ry
 ### 15.4 Detektor C: tabulka pokračování
 
 - **Vznik:** testovací harness (`zadani/testy.md`) spočítá na **vývojovém období** pro každý bar s `trend_valid = true` výsledek kontroly pokračování (13.4, k = θ, h = 240; NEVYŘEŠENO se vynechá) a agreguje podle binu `(direction, phase ∈ {IMPULSE, PULLBACK}, strength_class ∈ {WEAK, MEDIUM, STRONG}, reversal_hint ∈ {false, true})` → nejvýš 24 binů. Pro každý bin: `p` = podíl pravda, `n` = počet.
-- **Formát:** JSON `{ "params_hash": …, "k": 3, "h": 240, "period": ["2007-01-01", "2018-12-31"], "bins": [ {"direction": "UP", "phase": "PULLBACK", "strength_class": "STRONG", "reversal_hint": false, "p": 0.57, "n": 12345}, … ] }`.
-- **Použití v komponentě:** při konstrukci se tabulka načte; pokud `params_hash` neodpovídá `engine.params_hash`, tabulka se odmítne s varováním `CONTINUATION_TABLE_MISMATCH` a skóre je null. V baru se vyhledá bin; `continuation_score = p`, `continuation_n = n`, jen pokud `n ≥ 500`; jinak null. Bez `direction` null.
+- **Formát:** JSON `{ "params_hash": …, "market": "NQ", "k": 3, "h": 240, "period": ["2010-12-31", "2021-12-31"], "bins": [ {"direction": "UP", "phase": "PULLBACK", "strength_class": "STRONG", "reversal_hint": false, "p": 0.57, "n": 12345}, … ] }`.
+- **Použití v komponentě:** při konstrukci se tabulka načte; pokud `params_hash` neodpovídá `engine.params_hash` (10.1, bez vlastností trhu), tabulka se odmítne s varováním `CONTINUATION_TABLE_MISMATCH` a skóre je null; pokud se liší jen `market` od `MarketSpec.symbol`, vznikne varování `CONTINUATION_TABLE_MARKET_MISMATCH` a tabulka se použije (biny jsou v jednotkách ATR; report 13.6 Brier ukáže, zda přenos mezi trhy platí). V baru se vyhledá bin; `continuation_score = p`, `continuation_n = n`, jen pokud `n ≥ 500`; jinak null. Bez `direction` null. `continuation_ci_lo`, `continuation_ci_hi` = 95% Wilsonův interval pro `p` při `n` (z = 1,96; D-58, M26), null, je-li skóre null nebo zdroj ML.
 - **Anti-overfitting:** biny jsou pevné (žádné učení hranic), tabulka jen z vývojového období, ověření kalibrace na testovacím období (13.6 Brier). Tabulka je součást parametrizace (verze v reportu).
 - Bin s `reversal_hint = null` nebo `strength_class = null` → null.
 
 ### 15.5 Detektor D (strojové učení)
 
 - **Cíl:** totéž jako C (pokračování v horizontu h), jako pravděpodobnost.
-- **Rysy (jen kauzální, z baru t):** `slope_norm_main`, `slope_norm_curr`, `slope_ratio`, `er`, `r2`, `n_swings`, `duration_bars`, `tl_max_dev_atr_curr`, `tl_dev_atr_now`, `dist_to_tl_atr_main/curr`, `pb_depth_atr`, `pb_retrace`, `bars` pullbacku, `n_inner_swings`, `pw1_*`, `pw2`, `chop_bars`, `dist_to_level_atr`, `dist_to_next_level_atr`, `stopped_at_level`, `levels_crossed`, `stat.*`, hodina session (kategorie), kvintil `atr1` v rámci roku, a je-li kalendář (3.9): `news.next_event_min`, `news.last_event_min`, `news.last_surprise_z`, `news.last_surprise_missing`, dopad nejbližší a poslední události (kategorie), `in_news_window`. Null → chybějící hodnota (GBDT ji umí).
+- **Rysy (jen kauzální, z baru t):** `slope_norm_main`, `slope_norm_curr`, `slope_ratio`, `er`, `r2`, `n_swings`, `duration_bars`, `tl_max_dev_atr_curr`, `tl_dev_atr_now`, `dist_to_tl_atr_main/curr`, `pb_depth_atr`, `pb_retrace`, `bars` pullbacku, `n_inner_swings`, `pw1_*`, `pw2`, `chop_bars`, `dist_to_level_atr`, `dist_to_next_level_atr`, `stopped_at_level`, `levels_crossed`, `stat.*`, denní doba = minuty od `rth_open` zaokrouhlené na 30 min (kategorie; záporné před RTH; `rth_open` z kalendáře 3.2, u session bez RTH null), den v týdnu (kategorie), kvintil `atr1` v rámci roku, a je-li kalendář (3.9): `news.next_event_min`, `news.last_event_min`, `news.last_surprise_z`, `news.last_surprise_missing`, dopad nejbližší a poslední události (kategorie), `in_news_window`. Null → chybějící hodnota (GBDT ji umí).
 - **Model:** histogramový gradient boosting (např. `sklearn.ensemble.HistGradientBoostingClassifier`), hloubka ≤ 4, ≤ 200 stromů, learning rate 0,05, jednovláknový, pevné semínko; kalibrace isotonic na validační části.
 - **Walk-forward:** pro každý rok y vývojového období: trénink na letech < y (min. 3 roky), validace y; finální model pro testovací období: trénink na celém vývojovém období.
 - **Brána zapnutí:** Brier skóre lepší než C o ≥ 0,01 v **každém** walk-forward roce a na testovacím období, a robustnostní brána 13.11 projde s D zapnutým. Jinak `ml_enabled = false` zůstává a D je jen v reportu.
@@ -1127,11 +1374,11 @@ Stav: Platí / Předpoklad (s kontrolou při implementaci) / Zrušeno (kolo NN).
 | D-25 | Modul delta: vstup kumulativní delta na bar, režim `close`, reset na začátku session, null v session rollu | kapitola IX; objem rozdělený mezi kontrakty | 1 | Platí |
 | D-26 | Rozhraní: Python ≥ 3.11, numpy + pandas; `snapshot`/`from_snapshot`; události s pevnými payloady; `params_hash` | testovatelnost (dodatek 4) | 1 | Platí |
 | D-27 | `min_slope` výchozí vypnuto; kalibrace = 10. percentil `slope_norm` TL z obrázků obchodů autora | pravidlo 2 nelze převést na číslo bez měřítka; obrázky ukazují úhly 9°–56° | 1 | Předpoklad (kalibrace 12.3) |
-| D-28 | `bar_timestamp = close` výchozí s kontrolou objemem v 09:30 ET; chyba zastaví běh | konvence exportu neověřena (R4) | 1 | Předpoklad (kontrola při implementaci) |
+| D-28 | `bar_timestamp = close` výchozí s kontrolou objemem v 09:30 ET; chyba zastaví běh | konvence exportu neověřena (R4) | 1 | Zrušeno (kolo 2) → D-47 |
 | D-29 | Neplatný bar: `raise` výchozí, `skip` s událostí `BAR_SKIPPED`; ceny mimo tick jen varování | správnost dat je věc datové vrstvy; tichý průchod by skryl chybu | 1 | Platí |
 | D-30 | Úroveň aktivní od `valid_from ≤ ts_open(t)`; acyklicita = poskytovatel nečte výstupy komponenty a používá jen bary s `ts_close ≤ valid_from` (i z aktuální seance); duplicity podle `level_id` | kapitola I.2 počítá s S/R vzniklými během seance; původní omezení na uzavřené seance bylo zbytečně přísné | 1 | Platí |
 | D-31 | Obchodní deník se používá jen pro kontrolu shody 13.13 (report, ne brána, ne kalibrace) | dodatek 9: nesmí kontaminovat algoritmus; obsahuje jen kladné příklady | 1 | Platí |
-| D-32 | CSV z obrázků se používá jen pro kalibraci `min_slope` (D-27) a pro 13.13 | jediný zdroj číselné informace k pravidlu 2 | 1 | Platí |
+| D-32 | CSV z obrázků se používá jen pro kalibraci `min_slope` (D-27) a pro 13.13 | jediný zdroj číselné informace k pravidlu 2 | 1 | Zrušeno (kolo 2) → D-56 |
 | D-33 | Základní TF 1min; 1s data jen pro pořadí v baru, jemný čas extrému a remízy v testu; jiné TF se měří v 13.12 s pravidlem doporučení | dodatky 2, 3; P.A.T. je 1min systém s rozhodovacím oknem 3–5 min | 1 | Platí |
 | D-34 | Robustnostní brána 13.11: shodné znaménko zisku, rozdíl mezi trhy ≤ 10 p.b., perturbace ±25 % ≤ 10 p.b. | dodatky 6, 10; konkrétní měřitelná definice „podobných výsledků“ | 1 | Předpoklad (prahy se mohou po prvním běhu zpřísnit, ne uvolnit) |
 | D-35 | Tabulka pokračování: ≤ 24 pevných binů, `n ≥ 500`, jen vývojové období, kontrola `params_hash` | odpověď na „bude trend pokračovat“ bez učení hranic | 1 | Platí |
@@ -1142,10 +1389,25 @@ Stav: Platí / Předpoklad (s kontrolou při implementaci) / Zrušeno (kolo NN).
 | D-40 | Syntetické scénáře S1–S10 s nezávislým referenčním výpočtem událostí na ideální cestě | brána 13.2.5 musí mít pass/fail | 1 | Platí |
 | D-41 | Zapracování dodatků: 1 → 1.5, 3.8; 2 → 3.4, 5.3; 3 → 3.7, 13.12; 4 → 1.4, 10.5, 13; 5 → 1.1, 7.4, 8.3, 15.4; 6 → 11.3, 13.11; 7, 8, 13 → 1.3, 15; 9 → 3.6, 13.13; 10 → 11.3, 13.11; 11 → 3.1, 4.1; 12 → 1.4, 3.5; 14 (kalendář zpráv, doplněný zadavatelem během kola 1) → 3.9, 10.2, 13.6, 15.5, D-45; sekce Dodatky odstraněna | úkol kola 1 | 1 | Platí |
 | D-42 | `session_scope = ETH` výchozí; RTH filtrováním barů před vstupem | kapitola I.2 pracuje s premarketem, autor obchoduje od 17:30 SEČ | 0/1 | Platí |
-| D-43 | Roll: řada back-adjusted, jen příznak `roll_in_structure`; podezřelá mezera → `ROLL_GAP` | spojitá řada z exportu | 1 | Platí |
+| D-43 | Roll: řada back-adjusted, jen příznak `roll_in_structure`; podezřelá mezera → `ROLL_GAP` | spojitá řada z exportu | 1 | Zrušeno (kolo 2) → D-48 |
 | D-44 | Konstanty jen v `TrendParams`; přidání parametru vyžaduje záznam v logu a bránu 13.11 | omezení počtu laděných parametrů | 1 | Platí |
 | D-45 | Kalendář zpráv (Forex Factory) jako doplňkový rys (3.9): detektor A ho nečte; `Actual`/překvapení jen u vydání s `DateTime ≤ ts_open(t)`; překvapení z ≥ 12 minulých vydání téže zprávy, jinak 0 + `surprise_missing`; pásmo `Asia/Tehran` → ET s kontrolou na NFP / Unemployment Claims / FOMC; použití = členění 13.6 a rysy D | dodatek 14; P.A.T. zprávy neřeší, zásah do definice trendu podle vnějších dat by porušil soulad; vliv zpráv na pokračování se nejdřív změří | 1 | Předpoklad (kontrola pásma při načtení; přínos ověří 13.6) |
 | D-46 | Korekce = `[t_H, t_H')`; bar nového maxima začíná novou korekci; `H_final` v `TREND_END` = běžící maximum při konci (nemusí být potvrzený swing) | jednoznačné přiřazení přijatých low ke korekcím; konec trendu může nastat dřív, než je `H` potvrzený swing | 1 | Platí |
+| D-47 | Zdroj dat = `data/README.md` (Sierra Chart `.scid`, export `tools/scid_export.py`); `bar_timestamp = open` ověřeno ze zdroje; čas dat `Europe/Prague`; R1, R3, R4 splněny; starší popisy (NinjaTrader, CSV z grafu Sierra) neplatí; kontrola konvence objemem zůstává jako test datové vrstvy s časem `rth_open` trhu | dodatek 15; ověřený fakt nahrazuje předpoklad D-28 | 2 | Platí |
+| D-48 | Spojitá řada zpětným aditivním posunem o `spread_to_minus_from` (datová vrstva, `data/README.md` 7.3); `roll_dates` = `roll_day`; úrovně a obchody se skutečnými cenami se posouvají o `adj(d)`; `ROLL_GAP` a `roll_in_structure` zůstávají | dodatek 16 (rozhodnutí zadavatele); nahrazuje odůvodnění D-43 | 2 | Platí |
+| D-49 | `MarketSpec` (3.2): tick, pásmo burzy, RTH, pravidlo obchodního dne, rozsah barů, premarket, `pd_scope`, měny zpráv; žádná konstanta ET ani Praha v kódu; `params_hash` bez vlastností trhu a běhu; tabulka pokračování nese `market` (varování při neshodě, ne odmítnutí) | dodatek 15 (časové konstanty jako parametry trhu); poznámky zadavatele (pásmo Praha, FDAX); tabulka v jednotkách ATR má jít použít napříč trhy | 2 | Platí |
+| D-50 | FDAX: `tick_size = 0,5` v celé historii (mřížka exportu), i když se od 2020-12-21 obchoduje v krocích 1,0; prahy jsou v ATR, tickové položky (tolerance 0,5 ticku, podlaha ATR 2 ticky) zůstávají | dodatek 15: ceny na mřížce 1,0 jsou násobky 0,5, validace projde; tick jako funkce data by komplikoval porovnávání bez přínosu, protože žádný rozhodující práh není v ticích | 2 | Platí |
+| D-51 | FDAX `session_scope = WINDOW` 09:00–22:00 `Europe/Berlin`; NQ zůstává `ETH` (D-42); kontrola proti běhu `ETH` na FDAX členěním 13.6 (přepnutí při ≥ 5 p.b. vyšší úspěšnosti pokračování) | poznámka zadavatele („trendy hlavně v hlavní seanci, od 9:00“); noční seance FDAX má malou likviditu, večer do 22:00 zahrnuje otevření USA | 2 | Předpoklad (kontrola 3.2) |
+| D-52 | Pásmo: vstup i výstup `Europe/Prague`; interně absolutní okamžiky; lokální čas jen přes `MarketSpec.tz`; kalendář zpráv normalizovaný do UTC; deník a CSV bez převodu | poznámka zadavatele (timezone Praha); data jsou v Praze, dřívější převody do ET byly zdrojem chyb | 2 | Platí |
+| D-53 | Vývojové období do 2021-12-31, testovací 2022-01-01 až konec dat, stejný dělicí den pro všechny trhy; NQ primární, FDAX druhý, ES a YM jen pro závěrečný běh brány 13.11 | dodatek 17 (skutečný rozsah dat, ne 2007); poznámka zadavatele k trhům | 2 | Platí |
+| D-54 | 1s data: použití zůstává omezené na pořadí extrémů v baru, jemný čas extrému a remízy v testu; nové pole `intrabar_order`; rozšíření až podle podílu `intrabar_ambiguous` (13.2.7) se záznamem v logu | poznámka zadavatele („mohou se hodit k potvrzování intra svíček“); stav platí od uzavření baru a spotřebitel jedná v minutách, pořadí extrémů je jediné místo, kde 1s data mění detekci | 2 | Platí |
+| D-55 | Zadání SR sloučeno jako modul SR (3.10): mechanické úrovně 3.10.2; odrazové `SR` = shluky potvrzených swingů vlastního zigzagu (`theta_sr = θ`, `wick`), tolerance 0,5 atr, okno 5 obchodních dnů, poločas 2 dny, váha velikosti odrazu, min. 2 dotyky, skóre ≥ 1, nejvýš 6 publikovaných s hysterezí a náhradou, cena zmrazená při publikaci, role S/R nerozlišena; `meta` s typem; parametry 12.4, brány a vyhodnocení 13.14 | poznámka zadavatele (jedno zadání; měřit odrazy; nejsilnější, pár dnů zpět); dodatky SR-1 až SR-8; kapitoly I.1, I.2, III | 2 | Předpoklad (kalibrace 12.4, vyhodnocení 13.14.2) |
+| D-56 | CSV z obrázků má tři povolená použití: kalibrace `min_slope` (D-27), report 13.13, report 13.14.3 (shoda úrovní modulu SR s čarami autora); žádné ladění parametrů | nahrazuje D-32: modul SR je nový a čáry autora jsou jediný záznam, které úrovně považoval za S/R; zůstává report, ne kalibrace (D-31) | 2 | Platí |
+| D-57 | Kalendář zpráv jako vrstvené zdroje s prioritou a `news_end`; pro 2025-04-08 až konec dat druhý export Forex Factory (R6), jinak oficiální náhradní zdroj (BLS, BEA, Census, DOL, Fed, ECB + FRED/ALFRED první vydání) bez `Forecast`; kontrola na překryvu 2024-01-01 až 2025-04-07; měny podle `MarketSpec.news_currencies`; bary bez kalendáře jsou samostatná kategorie reportu | dodatek 17 a poznámka zadavatele (pokrýt celé období dat); recenzent nemá web, dostupnost zdrojů je neověřená | 2 | Předpoklad (R6; kontrola zdroje při implementaci) |
+| D-58 | Katalog metod doplněn o M18–M32; přijato jen M26 jako Wilsonův interval tabulky C (`continuation_ci_*`); M18 (objemový profil) kandidát na další `kind` modulu SR po 13.14; ostatní zamítnuto nebo odloženo s důvodem v 15.1 | dotaz zadavatele, zda jsou uvedena všechna řešení | 2 | Platí |
+| D-59 | `on_level` se ukládá u kandidáta swingu v baru vzniku (5.2) a přechází do záznamu swingu; `anchors_on_level` a `L0_on_level` z něj; `pb_retrace` null při nulovém jmenovateli | komponenta volá `levels_at` jednou za bar (3.5) a úrovně minulých barů nelze znovu načíst; dělení nulou u ploché struktury | 2 | Platí |
+| D-60 | Skládání modulu SR a detektorů: datová vrstva volá **vždy** `sr.update` před `engine.update` téhož baru (závazné pořadí); mechanické úrovně mají `valid_from ≤ ts_open` baru vydání, úrovně z baru t (`SR`, `SESSION_OPEN`) `valid_from = ts_close(t)`; PD* se vydávají hned po konci `pd_scope`; dávkově přes `levels_df` se `strength` při publikaci; `sr_params_hash` vstupuje do `params_hash` | determinismus a replay (brána 13.14.1 bod 3); kapitola I.1 (úrovně před seancí); úrovně mění `pw3` a biny tabulky C; detektory `strength` nepoužívají | 2 | Platí |
+| D-61 | Zapracování dodatků kola 2: 15 → 0, 3.1, 3.2, 3.3, 3.4, 3.8, 9, 12.1, 13.2.6; 16 → 3.3, 3.6, 13.13; 17 → 3.9, 11.2, 13.3; SR-1 → 1.3, 1.4, 3.5; SR-2 → 3.10.1; SR-3 → 3.10.2, 3.10.3; SR-4 → 3.2 (`premarket_enabled`); SR-5 → 3.10.3 (publikace, `sr_max_levels`); SR-6 → 3.10.3, 12.4; SR-7 → 3.5 `meta`, 13.14.2; SR-8 → 3.10.1 bod 5; poznámky zadavatele → D-47 až D-58; sekce 18 odstraněna | úkol kola 2 (TASK-0004) | 2 | Platí |
 
 ## 17. Historie revizí
 
@@ -1153,22 +1415,6 @@ Stav: Platí / Předpoklad (s kontrolou při implementaci) / Zrušeno (kolo NN).
 |---|---|---|---|
 | 0 | — | — | výchozí zadání se sekcí dodatků |
 | 1 | 2026-09-25 | 6 / 58 / 11 | zapracováno 14 dodatků (Ø1, detektory, 1s data, TF, testovatelnost, robustnost, deník, SR, indikátory z předchozí svíčky, katalog metod, kalendář zpráv); definice stupňů swingů, pseudokotvy, porovnávání v ticích, konvence timestampu, pořadí v baru, úplný stavový automat, události s payloady, rozhraní, parametry, syntetické scénáře, robustnostní brána; založen rozhodovací log; druhý průchod opravil interval korekce, `prev_major_low` u nového kandidáta, `H_final`, start pullbacku v baru `TREND_START` |
-
-## 18. Dodatky k zapracování
-
-> **Úkol pro recenzenta:** body níže jsou dodatky zadavatele. Zapracuj každý do příslušných sekcí dokumentu jako konkrétní řešení. Po zapracování tuto sekci odstraň; zapracování zaznamenej v rozhodovacím logu.
-
-Dodatky 15–17 platí obecně pro všechna data a všechny trhy. Nahrazují export z NinjaTraderu i dřívější CSV exporty z grafu Sierra Chart (UTC, continuous rollover, date based rule, minutové bary před rokem 2013). Poznámky k datům v zadání úkolu, které popisují ty staré exporty, už neplatí.
-
-15. **Zdroj pravdy o datech je [`data/README.md`](../data/README.md)** (původ ze souborů Sierra Chart `.scid`, export nástrojem `tools/scid_export.py`, formát, obchodní den, rollover, zařazení dnů, ověření) spolu s `data/<SYMBOL>/README.md` (rozsah, díry a zvláštnosti trhu). Pro komponentu z toho plyne:
-    - Vstupy: `data/<SYMBOL>/<SYMBOL>-1-min.csv` a `data/<SYMBOL>/<SYMBOL>-1-sec.csv`. K dispozici jsou FDAX (obchodní dny 2013-01-07 až 2026-09-25) a NQ (2010-12-31 až 2026-09-25). ES a YM chybí, R2 trvá.
-    - Čas je `Europe/Prague` a bar je označen **začátkem** intervalu (ověřeno ze zdroje): `bar_timestamp = open`. To nahrazuje výchozí `close`, požadavek R4 a předpoklad D-28. Kontrolu objemem ponech jako test datové vrstvy s časem otevření hlavní seance daného trhu (NQ 09:30 ET, FDAX 09:00 Praha). Časové konstanty vázané na trh (pásmo, RTH, čas kontroly) musí být parametry trhu, ne pevně ET.
-    - Obchodní den a session určuje burza (`data/README.md` 6): CME od 17:00 `America/Chicago` předchozího dne, Eurex kalendářní den. Kalendář session 3.2 sestaví datová vrstva z těchto pravidel a vynechá bary mimo obchodní hodiny burzy (u FDAX osamocené obchody po 22:00, které by jinak vytvořily falešné swingy).
-    - Ceny jsou na mřížce ticku. FDAX má tick 0,5 do 2020-12-18 a 1,0 od 2020-12-21; `tick_size = 0,5` projde validací 3.1 v celé historii, ale prahy v ticích mají po 2020-12-21 jiný význam. Rozhodni: tick jako funkce data, nebo prahy v jednotkách ATR.
-    - R1 je splněn: `BidVolume` a `AskVolume` jsou u všech barů, delta baru = `AskVolume − BidVolume`, kumulativní deltu pro modul 9 počítá datová vrstva. R3 je splněn: 1s bary pokrývají stejné dny se stejnou konvencí a jsou zdrojem pro `IntrabarProvider` (3.4).
-
-16. **Rollover (rozhodnutí zadavatele).** Export ceny neupravuje; kontrakt každého baru je ve sloupci `Contract`, rolly a spready v `<SYMBOL>-rolls.csv` (`data/README.md` 7). Vstupem komponenty je spojitá řada, kterou sestaví datová vrstva **zpětným aditivním posunem** o `spread_to_minus_from` (`data/README.md` 7.3): poslední kontrakt má skutečné ceny a mřížka ticku zůstane zachovaná. `roll_dates` (3.3) = sloupec `roll_day`. Toto nahrazuje text 3.3 o NinjaTraderu a odůvodnění D-43 „spojitá řada z exportu“; příznak `roll_in_structure` a kontrola `ROLL_GAP` zůstávají. Úrovně a obchody se skutečnými cenami (3.5, 3.6) se před porovnáním s řadou posunou o stejné `adj(d)`.
-
-17. **Rozsah a úplnost.** Pravidla zařazení dnů (jen ticky s bid/ask, bez víkendů, jen celé dny) jsou v `data/README.md` 8, seznam děr v README symbolů a v reportu exportu (`gaps`, `missing_weekdays`). Díry se nedoplňují, komponenta je dostane jako mezery (11.2). Rozdělení na vývojové a testovací období (13.3) vychází ze skutečného rozsahu dat (NQ začíná 2010-12-31, ne 2007). Kalendář zpráv 3.9 (2007-01-01 až 2025-04-07) pokrývá FDAX od 2013-01-07 a NQ od 2010-12-31, obojí do 2025-04-07; od 2025-04-08 do konce dat zprávy chybí.
+| 2 (TASK-0004 kolo 1) | 2026-10-01 | 2 / 18 / 8 | zapracovány dodatky 15–17 (data Sierra Chart, `bar_timestamp = open`, pásmo Praha, spojitá řada posunem, skutečný rozsah dat) a zadání komponenty SR jako modul 3.10 (parametry 12.4, brány a vyhodnocení 13.14, dodatky SR-1 až SR-8); `MarketSpec` místo konstant ET; FDAX jako druhý trh s oknem 09:00–22:00; FDAX tick 0,5; vývojové období do 2021-12-31; vrstvené zdroje zpráv po 2025-04-07 (R6); katalog metod M18–M32; `on_level`, `intrabar_order`, `continuation_ci_*`, `contract`; `params_hash` bez vlastností trhu; požadavky R1, R3, R4 uzavřeny, R5 a R6 otevřeny; sekce dodatků odstraněna |
 
 KONEC DOKUMENTU

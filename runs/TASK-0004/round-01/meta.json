@@ -1,0 +1,38 @@
+{
+    "task":  "TASK-0004",
+    "round":  1,
+    "mode":  "spec",
+    "requested_model":  "claude-fable-5-1",
+    "requested_effort":  "max",
+    "actual_models":  [
+                          "claude-fable-5-1"
+                      ],
+    "effort_verified":  true,
+    "claude_version":  "2.1.281 (Claude Code)",
+    "bare":  false,
+    "input_tokens":  1026,
+    "output_tokens":  148533,
+    "cache_read_tokens":  6701321,
+    "cache_creation_tokens":  305692,
+    "cost_usd":  15.226080249999999,
+    "num_turns":  94,
+    "is_error":  false,
+    "session_id":  "e40dbdc2-9c9a-4fd7-818a-8edf3d0c78ae",
+    "started_at":  "2026-10-01T08:31:21+02:00",
+    "ended_at":  "2026-10-01T08:59:46+02:00",
+    "duration_s":  1704,
+    "exit_code":  0,
+    "attempts":  1,
+    "timed_out":  false,
+    "fatal_error":  null,
+    "no_result":  false,
+    "scope_violation":  false,
+    "scope_violations":  [
+
+                         ],
+    "model_mismatch":  false,
+    "model_mismatch_detail":  "",
+    "changed_files":  [
+                          "zadani/komponenta-trend.md"
+                      ]
+}
