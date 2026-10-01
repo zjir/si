@@ -1,0 +1,13 @@
+{
+  "task": "TASK-0005",
+  "round": 2,
+  "status": "CONTINUE",
+  "summary": "Průchod celým dokumentem hotov: 3 blokující (syntetické scénáře 13.2.5 nesplnitelné: generátor dává ATR ≈ 0,5A místo A, S3/S5/S6/S7 odporují vlastním pravidlům), 13 středních a 12 drobných míst; zapracování probíhá.",
+  "findings": {"blocking": 3, "medium": 13, "minor": 12},
+  "changed": ["zadani/komponenta-trend.md"],
+  "next": "Dokončit zapracování nálezů kola 2 a druhý průchod nad novým textem.",
+  "requests": [
+    "R7 (trvá): obnovit data/NEWS/info.md z runs/TASK-0004/round-02/discarded/data/NEWS/info.md (3.9 na něj odkazuje; formát je v 3.9 popsán úplně).",
+    "R5 (trvá): smazat zadani/komponenta-sr.md a opravit odkazy v zadani/testy.md a data/README.md 10; mimo rozsah recenzenta."
+  ]
+}
