@@ -1,0 +1,13 @@
+{
+  "task": "TASK-0004",
+  "round": 2,
+  "status": "CONTINUE",
+  "summary": "Úplný kontrolní průchod po sloučení modulu SR: 1 blokující (nesplnitelný test SR1), 17 středních a 15 drobných nálezů zapracováno (nezávislost modulu SR, vydávání a slučování úrovní, 1s data, ukládání hodnot závislých na úrovních minulých barů, kalibrace bez anotace), log D-62 až D-66; druhý průchod nad novým textem našel už jen jeden drobný nález.",
+  "findings": {"blocking": 1, "medium": 17, "minor": 15},
+  "changed": ["zadani/komponenta-trend.md"],
+  "next": "Čistý průchod celým dokumentem (tento průchod našel 18 B+S, DONE zatím nelze): zaměřit se na nový text D-62 až D-66 (3.10.2 body 10–11, 3.10.3 krok 3, 5.3 bod 1, 8.1 log proražení); nenajde-li nic blokujícího ani středního, nastavit DONE. R5 a R6 zůstávají mimo rozsah.",
+  "requests": [
+    "R5: smazat zadani/komponenta-sr.md (zapracováno do zadani/komponenta-trend.md 3.10) a opravit odkazy v zadani/testy.md (řádek 24, fixture 3.5; čas ET → MarketSpec a Europe/Prague) a v data/README.md 10. Mimo rozsah recenzenta.",
+    "R6: zdroj kalendáře zpráv pro 2025-04-08 až 2026-09-25 (export Forex Factory za toto období, nebo povolit recenzentovi WebSearch/WebFetch). Do dodání platí vrstvené zdroje 3.9."
+  ]
+}
