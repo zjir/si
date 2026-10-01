@@ -1,0 +1,14 @@
+{
+    "task":  "TASK-0004",
+    "status":  "running",
+    "phase":  "queued",
+    "round":  0,
+    "run_start_round":  0,
+    "started_at":  "2026-10-01T08:31:19+02:00",
+    "ended_at":  null,
+    "heartbeat":  "2026-10-01T08:31:19+02:00",
+    "last_status":  null,
+    "last_summary":  null,
+    "push_failed":  false,
+    "updated_at":  "2026-10-01T08:31:19+02:00"
+}

@@ -1,0 +1,25 @@
+{
+    "id":  "TASK-0004",
+    "title":  "review 2 trend komponenta",
+    "mode":  "spec",
+    "goal":  "Zreviduj zadani/komponenta-trend.md v roli recenzenta (agent-loop/review-loop/review.md): zapracuj sekci Dodatky k zapracování, vyplň všechna prázdná místa, vše v kontextu systému P.A.T.",
+    "done_when":  "Dodatky jsou zapracované a sekce odstraněná; průchod celým dokumentem nenajde žádný blokující ani střední nález.",
+    "inputs":  [
+                   "PAT/Popis OS P.A.T.pdf",
+                   "PAT/Obchodní deník.xls",
+                   "PAT/PAT_obchody_z_obrazku.csv",
+                   "PAT/PAT_obchody_z_obrazku_POPIS.md",
+                   "/data slozka pro data"
+               ],
+    "scope_allow":  [
+                        "zadani/komponenta-trend.md"
+                    ],
+    "scope_deny":  [
+
+                   ],
+    "max_rounds":  2,
+    "max_minutes":  90,
+    "priority":  100,
+    "notes":  "odpovedi:\n\nnove - vsechna data nejsou z ninjatraderu, ale ze sierra chart, jsou ve slozce /data a tam si precti .md soubor, ktery popisuje, co tam je. \n\n  domnivam se, ze 1 sec data se mohou hodit k potvrzovani intra svicek, napr. k lepsimu zjisteni pullbacku a tak.. ale nechavam na tobe... \n \n - momentalne jsou data za FDAX a NQ a budou i data za ES a YM, ale ale ty az pro finalni test robustnosti... momentalne res jen NQ a muzes zkusit i na tom DAXu\n \n - timezone je praha \n \n\n  - na FDAX je treba trendy hledat hlavne takve v hlavni seanci, takze od 9:00 ? \n\n ve slozce zadadni je zadarni pro SR komponentu, nedelejme ji jako oddelene zadani, ale zadani vprav do zadani teto komponenty, hledani trendu bude probiha jiz s aktualizovanymi SR jako pomocnym zdrojem. Prijde mi, ze nejjednodusi metoda je merit odrazy a podle toho stanovovat SR? nejde o to, abych jich bylo za den 15, ale abychom mely ty nejsilnejsi... par dnu zpet? zadani na sr komponentu smaz.  \n\n pokud zjistis, ze data maji sirsi rozsah nez dataset ze zpravami, vyhledej dalsi zdroj zprav at pokrejes cele obdobi pro ktere mame data. Jsou v zadani zminena vsechna mozna reseni, jak uspet? ",
+    "created_at":  "2026-09-28T17:16:34+02:00"
+}
