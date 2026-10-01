@@ -12,3 +12,4 @@ data/**
 
 # files the Claude desktop app drops into the folder
 Claude outputs/
+github_token

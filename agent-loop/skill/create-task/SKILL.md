@@ -13,11 +13,17 @@ Prostředí: kontejner chatu (bash, git, python3, pdftotext), síť na github.co
 
 Když v tomto chatu už existuje `/home/claude/si` s remote s tokenem, jen ho aktualizuj (`git pull -q --rebase`) a přeskoč body 1–2.
 
-1. Token: požádej uživatele o GitHub token (fine-grained, jen repozitář `zjir/si`, oprávnění Contents: Read and write). Bez tokenu lze jen číst, ne pushnout; v tom případě nepokračuj.
+1. Token: nainstalovaná kopie skillu obsahuje vedle SKILL.md soubor `github_token` (fine-grained token jen pro `zjir/si`, Contents: Read and write). Načti ho:
+
+   ```bash
+   TF=$(find /mnt/skills -name github_token -path '*agent-loop*' 2>/dev/null | head -1); T=$(tr -d ' \r\n' < "$TF")
+   ```
+
+   Když soubor chybí (kopie v repozitáři ho nemá a mít nesmí, repozitář je veřejný) nebo push vrátí 401/403 (token vypršel), požádej uživatele o nový token a řekni mu, ať ho zapíše do `github_token` v nainstalovaném skillu.
 2. Klon (token nikdy nevypisuj, ani v popisu příkazu, ani v odpovědi; výstupy gitu filtruj přes `sed "s/$T/***/g"`):
 
    ```bash
-   cd /home/claude && T='<token>' && git clone -q "https://x-access-token:$T@github.com/zjir/si.git" si 2>&1 | sed "s/$T/***/g"; cd si && git log -1 --oneline
+   cd /home/claude && git clone -q "https://x-access-token:$T@github.com/zjir/si.git" si 2>&1 | sed "s/$T/***/g"; cd si && git log -1 --oneline
    ```
 
 3. Ověř `agent-loop/skill/round.py`, `agent-loop/config.json`, `tasks/`. Když chybí, řekni co a skonči.
