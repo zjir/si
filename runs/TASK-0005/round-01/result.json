@@ -1,0 +1,13 @@
+{
+  "task": "TASK-0005",
+  "round": 1,
+  "status": "CONTINUE",
+  "summary": "Zapracován dodatek zadavatele (kalendář zpráv z data/NEWS/: 3.9 přepsána podle skutečného formátu obou souborů, brána 13.2.10, R6 splněn, D-67) a průchod dokumentem uzavřel 1 blokující (kvintil atr1 v rámci roku jako rys D = pohled do budoucnosti), 16 středních a 19 drobných míst (D-68 až D-73); DONE zatím nelze, je třeba čistý průchod.",
+  "findings": {"blocking": 1, "medium": 16, "minor": 19},
+  "changed": ["zadani/komponenta-trend.md"],
+  "next": "Čistý průchod celým dokumentem se zaměřením na nový text kola 4 (3.9 kroky 1–10 a remízy, 6.2 pseudokód a 6.5 nekladný sklon, 9 reset delty, 10.1 run/levels_df, 10.5 snapshot, 13.2.10, 13.5 simulace, 15.5 kalibrace D) a na položky z runs/TASK-0005/round-01/notes.md; nenajde-li nic blokujícího ani středního, nastavit DONE.",
+  "requests": [
+    "R7: obnovit data/NEWS/info.md (popis formátu kalendáře zpráv): runner ho v TASK-0004 kole 2 přesunul do runs/TASK-0004/round-02/discarded/data/NEWS/info.md jako změnu mimo rozsah; zadání 3.9 na něj odkazuje (formát je ale v 3.9 popsán úplně, soubor je jen doplňkový).",
+    "R5 (trvá): smazat zadani/komponenta-sr.md a opravit odkazy v zadani/testy.md a data/README.md 10; mimo rozsah recenzenta."
+  ]
+}
