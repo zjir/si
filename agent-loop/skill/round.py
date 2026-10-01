@@ -5,8 +5,8 @@ Dělá to, co loop.ps1 dělá kolem jednoho kola; samotnou práci agenta dělá 
 podle agent-loop/prompts/common.md + role z config.json + runs/<id>/round-NN/context.md.
 
   python3 agent-loop/skill/round.py new      --json <soubor s úkolem> [--push]
-  python3 agent-loop/skill/round.py status   [--id TASK-0007]
-  python3 agent-loop/skill/round.py prepare  [--id TASK-0007] --model <id modelu chatu> [--push] [--takeover] [--force]
+  python3 agent-loop/skill/round.py status   [--id TASK-0007 | --latest]
+  python3 agent-loop/skill/round.py prepare  [--id TASK-0007 | --latest] --model <id modelu chatu> [--push] [--takeover] [--force]
   python3 agent-loop/skill/round.py finalize --id TASK-0007 --model <id modelu chatu> [--push]
   python3 agent-loop/skill/round.py abort    --id TASK-0007 [--push]
 
@@ -256,8 +256,14 @@ def validate(F):
     return e
 
 
-def select(task_id):
+def select(task_id, latest=False):
     ts = all_tasks()
+    if latest and not task_id:
+        c = [t for t in ts if t["folder"] == "inbox"]
+        if not c:
+            fail("tasks/inbox je prázdný")
+        c.sort(key=lambda t: (task_num(t["name"][:-5]), str(t["task"].get("created_at") or ""), t["name"]))
+        return c[-1]
     if task_id:
         hit = [t for t in ts if t["name"] == task_id + ".json" or t["task"].get("id") == task_id]
         if not hit:
@@ -313,7 +319,7 @@ def checks(c, need_clean=True):
 
 def cmd_status(a):
     c = cfg()
-    t = select(a.id)
+    t = select(a.id, a.latest)
     F = fields(t["task"], c)
     s = rj("runs/%s/state.json" % (F["id"] or t["name"][:-5])) or {}
     rnd = int(s.get("round") or 0)
@@ -327,7 +333,7 @@ def cmd_status(a):
 def cmd_prepare(a):
     c = cfg()
     _, stop_before = checks(c)
-    t = select(a.id)
+    t = select(a.id, a.latest)
     if t["folder"] == "done":
         fail("úkol je v tasks/done; restart: agent-loop\\start-loop.cmd restart -Id %s" % t["name"][:-5])
     paths = []
@@ -610,6 +616,7 @@ def main():
     ap.add_argument("cmd", choices=["new", "status", "prepare", "finalize", "abort"])
     ap.add_argument("--json")
     ap.add_argument("--push", action="store_true")
+    ap.add_argument("--latest", action="store_true", help="nejnovější úkol v tasks/inbox (nejvyšší číslo)")
     ap.add_argument("--takeover", action="store_true")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--id")
