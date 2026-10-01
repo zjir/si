@@ -1,0 +1,756 @@
+﻿Pořadí;Obrázek;Stav;Počet obchodů;Výsledek;Datum grafu;Zpracováno;Poznámka
+1;1.png;ZPRACOVÁNO;1;GUESSED;2014-10-20;2026-09-24;"přepracováno v2 (nové sloupce, TL, MAE/MFE dle pravidla ověřeného na deníku); bez shody (po konci deníku)"
+2;2.png;ZPRACOVÁNO;1;GUESSED;2014-10-21;2026-09-24;"přepracováno v2; bez shody (po konci deníku); infobox IN/OUT s překlepem 38xx→39xx opraveno"
+3;3.4.png;ZPRACOVÁNO;2;GUESSED;2014-10-22;2026-09-24;"přepracováno v2; 2 obchody; bez shody (po konci deníku)"
+4;5.6.png;ZPRACOVÁNO;2;GUESSED;2014-10-27;2026-09-24;"2 obchody (short ztráta, long zisk); bez shody (po konci deníku)"
+5;7.png;ZPRACOVÁNO;1;REAL;2014-02-04;2026-09-25;"1 obchod; REAL – deník obchod 473; TL zakreslená zelená"
+6;7.8.png;ZPRACOVÁNO;2;GUESSED;2014-10-28;2026-09-24;"2 obchody (short zisk, long ztráta); bez shody (po konci deníku)"
+7;8.png;ZPRACOVÁNO;2;REAL;2014-02-05;2026-09-24;"REAL – deník obchody 474 a 475; TL zakreslené (zelené)"
+8;9.png;ZPRACOVÁNO;1;GUESSED;2014-11-03;2026-09-24;bez shody (po konci deníku)
+9;10.png;ZPRACOVÁNO;1;GUESSED;2014-11-05;2026-09-24;bez shody (po konci deníku)
+10;11.png;ZPRACOVÁNO;1;GUESSED;2014-11-10;2026-09-24;bez shody (po konci deníku)
+11;12.png;ZPRACOVÁNO;1;GUESSED;2014-11-12;2026-09-24;bez shody (po konci deníku)
+12;13.14.png;ZPRACOVÁNO;2;GUESSED;2014-11-17;2026-09-24;"2 obchody (long ztráta, short zisk); bez shody (po konci deníku)"
+13;14.png;ZPRACOVÁNO;1;REAL;2014-02-13;2026-09-24;"REAL – deník obchod 480; obrázek degradovaný (JPEG), TL zakreslená (žlutá)"
+14;15.png;ZPRACOVÁNO;1;GUESSED;2014-11-18;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+15;16.png;ZPRACOVÁNO;1;GUESSED;2014-11-19;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+16;17.png;ZPRACOVÁNO;1;GUESSED;2014-11-24;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+17;18.png;ZPRACOVÁNO;1;GUESSED;2014-11-25;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+18;19.png;ZPRACOVÁNO;2;REAL;2014-02-24;2026-09-25;"2 obchody; REAL – deník obchod 487, 488; TL zakreslená žlutá"
+19;19.20.png;ZPRACOVÁNO;2;GUESSED;2014-12-01;2026-09-25;"2 obchody; GUESSED – graf po konci deníku"
+20;20.png;ZPRACOVÁNO;1;REAL;2014-02-25;2026-09-25;"1 obchod; REAL – deník obchod 489; TL zakreslená žlutá"
+21;21.png;ZPRACOVÁNO;1;REAL;2014-02-26;2026-09-25;"1 obchod; REAL – deník obchod 490; TL zakreslená žlutá"
+22;21.22.png;ZPRACOVÁNO;2;GUESSED;2014-12-02;2026-09-25;"2 obchody; GUESSED – graf po konci deníku"
+23;22.png;ZPRACOVÁNO;1;REAL;2014-02-27;2026-09-25;"1 obchod; REAL – deník obchod 491; TL zakreslená zelená"
+24;23.png;ZPRACOVÁNO;1;GUESSED;2014-12-03;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+25;24.png;ZPRACOVÁNO;1;GUESSED;2014-12-08;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+26;25.png;ZPRACOVÁNO;1;GUESSED;2014-12-09;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+27;26.png;ZPRACOVÁNO;2;GUESSED;2014-12-10;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:bezZony"
+28;27.28.png;ZPRACOVÁNO;2;GUESSED;2014-12-11;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:RRR"
+29;29.30.png;ZPRACOVÁNO;2;GUESSED;2014-12-15;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; příznaky: #1:bezTL, #1:bezZony, #2:bezZony"
+30;39.png;ZPRACOVÁNO;1;REAL;2014-03-03;2026-09-25;"1 obchod; REAL – deník obchod 494; TL zakreslená žlutá; příznaky: #1:bezZony"
+31;40.png;ZPRACOVÁNO;2;REAL;2014-03-04;2026-09-25;"2 obchody; REAL – deník obchod 495, 496; TL zakreslená žlutá"
+32;41.png;ZPRACOVÁNO;2;REAL;2014-03-05;2026-09-25;"2 obchody; REAL – deník obchod 497, 498; TL zakreslená žlutá"
+33;43.png;ZPRACOVÁNO;2;REAL;2014-03-06;2026-09-25;"2 obchody; REAL – deník obchod 499, 500; TL zakreslená žlutá"
+34;45.png;ZPRACOVÁNO;2;REAL;2014-03-07;2026-09-25;"2 obchody; REAL – deník obchod 501, 502; TL zakreslená červená, zakreslená žlutá"
+35;47.png;ZPRACOVÁNO;1;REAL;2014-03-10;2026-09-25;"1 obchod; REAL – deník obchod 503; TL zakreslená žlutá"
+36;49.png;ZPRACOVÁNO;1;REAL;2014-03-11;2026-09-25;"1 obchod; REAL – deník obchod 504; TL zakreslená červená"
+37;51.png;ZPRACOVÁNO;2;REAL;2014-03-13;2026-09-25;"2 obchody; REAL – deník obchod 505, 506; TL zakreslená červená, zakreslená žlutá"
+38;53.png;ZPRACOVÁNO;2;REAL;2014-03-14;2026-09-25;"2 obchody; REAL – deník obchod 507, 508; TL zakreslená červená, zakreslená žlutá"
+39;64.png;ZPRACOVÁNO;2;REAL;2014-03-17;2026-09-25;"2 obchody; REAL – deník obchod 509, 510; TL zakreslená žlutá"
+40;66.png;ZPRACOVÁNO;2;REAL;2014-03-20;2026-09-25;"2 obchody; REAL – deník obchod 511, 512; TL zakreslená žlutá"
+41;68.png;ZPRACOVÁNO;1;REAL;2014-03-21;2026-09-25;"1 obchod; REAL – deník obchod 513; TL zakreslená žlutá"
+42;97.png;ZPRACOVÁNO;1;REAL;2014-03-25;2026-09-25;"1 obchod; REAL – deník obchod 514; TL zakreslená žlutá; příznaky: #1:bezZony"
+43;99.png;ZPRACOVÁNO;1;REAL;2014-03-26;2026-09-25;"1 obchod; REAL – deník obchod 515; TL zakreslená žlutá"
+44;101.png;ZPRACOVÁNO;2;REAL;2014-03-27;2026-09-25;"2 obchody; REAL – deník obchod 516, 517; TL zakreslená žlutá; příznaky: #2:bezZony"
+45;104.png;ZPRACOVÁNO;2;REAL;2014-03-31;2026-09-25;"2 obchody; REAL – deník obchod 518, 519; TL zakreslená žlutá"
+46;106.png;ZPRACOVÁNO;1;REAL;2014-04-01;2026-09-25;"1 obchod; REAL – deník obchod 520; TL zakreslená žlutá"
+47;108.png;ZPRACOVÁNO;2;REAL;2014-04-02;2026-09-25;"2 obchody; REAL – deník obchod 521, 522; TL zakreslená žlutá"
+48;110.png;ZPRACOVÁNO;1;REAL;2014-04-03;2026-09-25;"1 obchod; REAL – deník obchod 523; TL zakreslená žlutá"
+49;113.png;ZPRACOVÁNO;1;REAL;2014-04-07;2026-09-25;"1 obchod; REAL – deník obchod 524; TL zakreslená žlutá"
+50;115.png;ZPRACOVÁNO;2;REAL;2014-04-08;2026-09-25;"2 obchody; REAL – deník obchod 525, 526; TL zakreslená žlutá"
+51;135.png;ZPRACOVÁNO;1;REAL;2014-04-11;2026-09-25;"1 obchod; REAL – deník obchod 527; TL zakreslená žlutá"
+52;137.png;ZPRACOVÁNO;1;REAL;2014-04-14;2026-09-25;"1 obchod; REAL – deník obchod 528; TL zakreslená červená"
+53;139.png;ZPRACOVÁNO;2;REAL;2014-04-15;2026-09-25;"2 obchody; REAL – deník obchod 529, 530; TL zakreslená žlutá"
+54;141.png;ZPRACOVÁNO;2;REAL;2014-04-16;2026-09-25;"2 obchody; REAL – deník obchod 531, 532; TL zakreslená žlutá"
+55;143.png;ZPRACOVÁNO;1;REAL;2014-04-17;2026-09-25;"1 obchod; REAL – deník obchod 533; TL zakreslená žlutá"
+56;145.png;ZPRACOVÁNO;1;REAL;2014-04-22;2026-09-25;"1 obchod; REAL – deník obchod 534; TL zakreslená zelená"
+57;147.png;ZPRACOVÁNO;1;REAL;2014-04-23;2026-09-25;"1 obchod; REAL – deník obchod 535; TL zakreslená žlutá"
+58;149.png;ZPRACOVÁNO;2;REAL;2014-04-24;2026-09-25;"2 obchody; REAL – deník obchod 536, 537; TL zakreslená žlutá"
+59;151.png;ZPRACOVÁNO;2;REAL;2014-04-25;2026-09-25;"2 obchody; REAL – deník obchod 538, 539; TL zakreslená žlutá; příznaky: #2:vs vypočteno, #2:RRR"
+60;153.png;ZPRACOVÁNO;1;REAL;2014-04-29;2026-09-25;"1 obchod; REAL – deník obchod 540; TL zakreslená žlutá"
+61;155.png;ZPRACOVÁNO;1;REAL;2014-04-30;2026-09-25;"1 obchod; REAL – deník obchod 541; TL zakreslená žlutá"
+62;158.png;ZPRACOVÁNO;1;REAL;2014-05-02;2026-09-25;"1 obchod; REAL – deník obchod 542; TL zakreslená žlutá"
+63;160.png;ZPRACOVÁNO;1;REAL;2014-05-06;2026-09-25;"1 obchod; REAL – deník obchod 543; TL zakreslená žlutá"
+64;178.png;ZPRACOVÁNO;1;REAL;2014-05-07;2026-09-25;"1 obchod; REAL – deník obchod 544; TL zakreslená žlutá"
+65;180.png;ZPRACOVÁNO;2;REAL;2014-05-09;2026-09-25;"2 obchody; REAL – deník obchod 545, 546; TL zakreslená žlutá; příznaky: #1:bezZony"
+66;182.png;ZPRACOVÁNO;1;REAL;2014-05-13;2026-09-25;"1 obchod; REAL – deník obchod 547; TL zakreslená žlutá"
+67;242.png;ZPRACOVÁNO;1;REAL;2014-05-20;2026-09-25;"1 obchod; REAL – deník obchod 550; TL zakreslená žlutá"
+68;246.png;ZPRACOVÁNO;2;REAL;2014-05-21;2026-09-25;"2 obchody; REAL – deník obchod 551, 552; TL zakreslená žlutá"
+69;248.png;ZPRACOVÁNO;0;bez obchodu;2014-05-22;2026-09-25;0 obchodů – graf bez vstupu (bez bílé šipky a infoboxu), jen TL a S/R
+70;250.png;ZPRACOVÁNO;1;REAL;2014-05-23;2026-09-25;"1 obchod; REAL – deník obchod 553; TL zakreslená zelená"
+71;251.png;ZPRACOVÁNO;1;GUESSED;2014-04-08;2026-09-25;"1 obchod; GUESSED – v období deníku, bez shody; příznaky: #1:bezZony; obchod kolem 22:00 bez vstupní zóny a typů PT/SL v infoboxu"
+72;252.png;ZPRACOVÁNO;1;GUESSED;2014-04-15;2026-09-25;"1 obchod; GUESSED – v období deníku, bez shody; příznaky: #1:bezZony; obchod kolem 22:00 bez vstupní zóny a typů PT/SL v infoboxu"
+73;253.png;ZPRACOVÁNO;1;GUESSED;2014-04-22;2026-09-25;"1 obchod; GUESSED – v období deníku, bez shody; příznaky: #1:nesedí, #1:bezTL, #1:bezZony; obchod kolem 22:00 bez vstupní zóny a typů PT/SL v infoboxu"
+74;254.png;ZPRACOVÁNO;1;GUESSED;2014-04-23;2026-09-25;"1 obchod; GUESSED – v období deníku, bez shody; příznaky: #1:bezTL, #1:bezZony"
+75;255.png;ZPRACOVÁNO;1;REAL (duplicitní s 151.png);2014-04-25;2026-09-25;"1 obchod; REAL – deník obchod 539; příznaky: #1:bezZony"
+76;256.png;ZPRACOVÁNO;1;GUESSED;2014-05-05;2026-09-25;"1 obchod; GUESSED – v období deníku, bez shody; příznaky: #1:bezZony"
+77;257.png;ZPRACOVÁNO;1;GUESSED;2014-05-16;2026-09-28;"1 obchod; GUESSED – v období deníku, bez shody; příznaky: #1:bezZony"
+78;259.png;ZPRACOVÁNO;0;bez obchodu;2014-05-28;2026-09-25;0 obchodů – graf bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+79;261.png;ZPRACOVÁNO;2;REAL;2014-05-28;2026-09-25;"2 obchody; REAL – deník obchod 554, 555; TL zakreslená žlutá"
+80;265.png;ZPRACOVÁNO;2;GUESSED;2014-06-03;2026-09-25;"2 obchody; GUESSED – v období deníku, bez shody; TL zakreslená žlutá"
+81;267.png;ZPRACOVÁNO;1;REAL;2014-06-04;2026-09-25;"1 obchod; REAL – deník obchod 556; TL zakreslená zelená"
+82;269.png;ZPRACOVÁNO;1;GUESSED;2014-06-05;2026-09-25;"1 obchod; GUESSED – v období deníku, bez shody; příznaky: #1:nesedí, #1:bezZony"
+83;271.png;ZPRACOVÁNO;1;GUESSED;2014-06-06;2026-09-25;"1 obchod; GUESSED – v období deníku, bez shody; příznaky: #1:bezZony"
+84;274.png;ZPRACOVÁNO;1;REAL;2014-06-11;2026-09-25;"1 obchod; REAL – deník obchod 557; TL zakreslená žlutá"
+85;276.png;ZPRACOVÁNO;1;GUESSED;2014-06-09;2026-09-25;"1 obchod; GUESSED – v období deníku, bez shody; příznaky: #1:nesedí"
+86;281.png;ZPRACOVÁNO;1;REAL;2014-06-24;2026-09-25;"1 obchod; REAL – deník obchod 563; TL zakreslená žlutá"
+87;283.png;ZPRACOVÁNO;1;REAL;2014-06-25;2026-09-25;"1 obchod; REAL – deník obchod 564; TL zakreslená žlutá"
+88;284.png;ZPRACOVÁNO;1;REAL;2014-06-30;2026-09-25;"1 obchod; REAL – deník obchod 565; TL zakreslená zelená"
+89;285.png;ZPRACOVÁNO;1;REAL;2014-07-01;2026-09-25;"1 obchod; REAL – deník obchod 566; TL zakreslená žlutá"
+90;286.png;ZPRACOVÁNO;2;REAL;2014-07-03;2026-09-25;"2 obchody; REAL – deník obchod 567, 568; TL zakreslená žlutá"
+91;287.png;ZPRACOVÁNO;1;REAL;2014-07-04;2026-09-28;"1 obchod; REAL – deník obchod 569; TL zakreslená zelená"
+92;288.png;ZPRACOVÁNO;1;REAL;2014-07-08;2026-09-25;"1 obchod; REAL – deník obchod 570; TL zakreslená žlutá"
+93;289.png;ZPRACOVÁNO;1;REAL;2014-07-09;2026-09-25;"1 obchod; REAL – deník obchod 571; TL zakreslená žlutá"
+94;291.png;ZPRACOVÁNO;1;REAL;2014-07-15;2026-09-25;"1 obchod; REAL – deník obchod 572; TL zakreslená žlutá"
+95;292.png;ZPRACOVÁNO;1;REAL;2014-07-15;2026-09-25;"1 obchod; REAL – deník obchod 573; TL zakreslená žlutá"
+96;293.png;ZPRACOVÁNO;1;REAL;2014-07-16;2026-09-25;"1 obchod; REAL – deník obchod 574; TL zakreslená žlutá"
+97;294.png;ZPRACOVÁNO;1;REAL;2014-07-23;2026-09-25;"1 obchod; REAL – deník obchod 575; TL zakreslená žlutá"
+98;295.png;ZPRACOVÁNO;1;REAL;2014-07-23;2026-09-25;"1 obchod; REAL – deník obchod 576; TL zakreslená žlutá"
+99;297.png;ZPRACOVÁNO;2;REAL;2014-07-24;2026-09-25;"2 obchody; REAL – deník obchod 577, 578; TL zakreslená červená"
+100;299.png;ZPRACOVÁNO;2;REAL;2014-07-28;2026-09-25;"2 obchody; REAL – deník obchod 579, 580; TL zakreslená zelená, zakreslená žlutá"
+101;304.png;ZPRACOVÁNO;3;REAL;2014-07-30;2026-09-25;"3 obchody; REAL – deník obchod 581, 582, 583; TL zakreslená žlutá"
+102;307.png;ZPRACOVÁNO;2;REAL;2014-07-31;2026-09-25;"2 obchody; REAL – deník obchod 584, 585; TL zakreslená žlutá"
+103;311.png;ZPRACOVÁNO;1;REAL;2014-08-04;2026-09-25;"1 obchod; REAL – deník obchod 586; TL zakreslená žlutá"
+104;313.png;ZPRACOVÁNO;3;REAL;2014-08-05;2026-09-25;"3 obchody; REAL – deník obchod 587, 588, 589; TL zakreslená žlutá; příznaky: #1:nesedí"
+105;316.png;ZPRACOVÁNO;2;REAL;2014-08-06;2026-09-25;"2 obchody; REAL – deník obchod 590, 591; TL zakreslená žlutá"
+106;320.png;ZPRACOVÁNO;2;REAL;2014-08-11;2026-09-25;"2 obchody; REAL – deník obchod 592, 593; TL zakreslená červená, zakreslená žlutá"
+107;323.png;ZPRACOVÁNO;1;REAL;2014-08-12;2026-09-25;"1 obchod; REAL – deník obchod 594; TL zakreslená žlutá"
+108;326.png;ZPRACOVÁNO;2;REAL;2014-08-13;2026-09-25;"2 obchody; REAL – deník obchod 595, 596; TL zakreslená žlutá"
+109;329.png;ZPRACOVÁNO;1;REAL;2014-08-14;2026-09-25;"1 obchod; REAL – deník obchod 597"
+110;332.png;ZPRACOVÁNO;2;GUESSED;2014-09-02;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+111;335.png;ZPRACOVÁNO;1;GUESSED;2014-09-03;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+112;339.png;ZPRACOVÁNO;1;GUESSED;2014-09-08;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+113;342.png;ZPRACOVÁNO;2;GUESSED;2014-09-09;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+114;346.png;ZPRACOVÁNO;2;GUESSED;2014-09-10;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+115;350.png;ZPRACOVÁNO;1;GUESSED;2014-09-15;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+116;354.png;ZPRACOVÁNO;1;GUESSED;2014-09-17;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+117;357.png;ZPRACOVÁNO;2;GUESSED;2014-09-22;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+118;360.png;ZPRACOVÁNO;2;GUESSED;2014-09-23;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+119;364.png;ZPRACOVÁNO;1;GUESSED;2014-10-13;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; příznaky: #1:bezZony"
+120;367.png;ZPRACOVÁNO;2;GUESSED;2014-10-14;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená červená, zakreslená žlutá; příznaky: #1:bezZony"
+121;370.png;ZPRACOVÁNO;2;GUESSED;2014-10-15;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:bezZony, #2:bezTL, #2:bezZony"
+122;373.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1.png);2014-10-20;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+123;376.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 2.png);2014-10-21;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená zelená"
+124;379.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 3.4.png, 3.4.png);2014-10-22;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená červená, zakreslená žlutá"
+125;382.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 5.6.png, 5.6.png);2014-10-27;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+126;385.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 7.8.png, 7.8.png);2014-10-28;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+127;389.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 9.png);2014-11-03;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+128;392.png;ZPRACOVÁNO;1;GUESSED;2014-11-04;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+129;396.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 10.png);2014-11-05;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+130;399.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 11.png);2014-11-10;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+131;402.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 12.png);2014-11-12;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+132;425.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 13.14.png, 13.14.png);2014-11-17;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená zelená, zakreslená žlutá"
+133;431.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 15.png);2014-11-18;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená zelená"
+134;438.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 16.png);2014-11-19;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+135;442.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 17.png);2014-11-24;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+136;446.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 18.png);2014-11-25;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+137;450.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 19.20.png, 19.20.png);2014-12-01;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená zelená, zakreslená žlutá"
+138;453.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 21.22.png, 21.22.png);2014-12-02;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená zelená, zakreslená žlutá"
+139;457.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 23.png);2014-12-03;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená zelená"
+140;478.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 24.png);2014-12-08;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+141;482.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 25.png);2014-12-09;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+142;487.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 26.png, 26.png);2014-12-10;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+143;493.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+144;494.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+145;495.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+146;496.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+147;498.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+148;499.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+149;501.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+150;503.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+151;504.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+152;505.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+153;506.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+154;507.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+155;508.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+156;509.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+157;510.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+158;512.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+159;513.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+160;515.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+161;516.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+162;517.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+163;519.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+164;520.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+165;523.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+166;524.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 27.28.png, 27.28.png);2014-12-11;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #2:RRR"
+167;526.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1.png);2014-10-20;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+168;527.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 2.png);2014-10-21;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+169;528.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 3.4.png, 3.4.png);2014-10-22;2026-09-25;"2 obchody; GUESSED – graf po konci deníku"
+170;529.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 5.6.png, 5.6.png);2014-10-27;2026-09-25;"2 obchody; GUESSED – graf po konci deníku"
+171;534.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 7.8.png, 7.8.png);2014-10-28;2026-09-25;"2 obchody; GUESSED – graf po konci deníku"
+172;537.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 9.png);2014-11-03;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+173;538.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 10.png);2014-11-05;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+174;539.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 11.png);2014-11-10;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+175;540.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 12.png);2014-11-12;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+176;541.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 13.14.png, 13.14.png);2014-11-17;2026-09-25;"2 obchody; GUESSED – graf po konci deníku"
+177;542.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 15.png);2014-11-18;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+178;544.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 16.png);2014-11-19;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+179;545.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 17.png);2014-11-24;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+180;546.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 18.png);2014-11-25;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+181;547.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 19.20.png, 19.20.png);2014-12-01;2026-09-25;"2 obchody; GUESSED – graf po konci deníku"
+182;548.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 21.22.png, 21.22.png);2014-12-02;2026-09-25;"2 obchody; GUESSED – graf po konci deníku"
+183;550.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 23.png);2014-12-03;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+184;551.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 24.png);2014-12-08;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+185;552.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 25.png);2014-12-09;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+186;553.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 26.png, 26.png);2014-12-10;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:bezZony"
+187;554.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 27.28.png, 27.28.png);2014-12-11;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:RRR"
+188;556.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+189;557.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 29.30.png, 29.30.png);2014-12-15;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená červená, zakreslená žlutá; příznaky: #2:bezZony"
+190;559.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 29.30.png, 29.30.png);2014-12-15;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; příznaky: #1:bezTL, #1:bezZony, #2:bezZony"
+191;560.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+192;561.png;ZPRACOVÁNO;2;GUESSED;2014-12-16;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená červená, zakreslená žlutá; příznaky: #1:bezZony"
+193;562.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 561.png, 561.png);2014-12-16;2026-09-25;"2 obchody; GUESSED – graf po konci deníku"
+194;563.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+195;564.png;ZPRACOVÁNO;2;GUESSED;2014-12-17;2026-09-25;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+196;565.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 564.png, 564.png);2014-12-17;2026-09-25;"2 obchody; GUESSED – graf po konci deníku"
+197;566.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+198;568.png;ZPRACOVÁNO;2;GUESSED;2014-12-18;2026-09-25;"2 obchody; GUESSED – graf po konci deníku"
+199;569.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-25;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+200;570.png;ZPRACOVÁNO;1;GUESSED;2015-01-05;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+201;572.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 570.png);2015-01-05;2026-09-25;"1 obchod; GUESSED – graf po konci deníku"
+202;574.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 570.png);2015-01-06;2026-09-25;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejný obchod jako 570.png (bílá šipka 21:47, tyrkysový SL 4152,75), graf pokračuje do 2015-01-06"
+203;575.png;ZPRACOVÁNO;0;bez obchodu;2015-01-06;2026-09-25;0 obchodů – graf 2015-01-06 (16:08–23:09) bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+204;576.png;ZPRACOVÁNO;0;bez obchodu;2015-01-07;2026-09-28;0 obchodů – graf 2015-01-07 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+205;577.png;ZPRACOVÁNO;1;GUESSED;2015-01-07;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+206;578.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 577.png);2015-01-07;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+207;579.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+208;580.png;ZPRACOVÁNO;2;GUESSED;2015-01-12;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená červená, zakreslená žlutá"
+209;581.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 580.png, 580.png);2015-01-12;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+210;583.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+211;584.png;ZPRACOVÁNO;3;GUESSED;2015-01-13;2026-09-28;"3 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:bezZony, #2:bezZony"
+212;585.png;ZPRACOVÁNO;3;GUESSED (duplicitní s 584.png, 584.png, 584.png);2015-01-13;2026-09-28;"3 obchody; GUESSED – graf po konci deníku; příznaky: #1:bezTL, #1:bezZony, #2:bezZony"
+213;586.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+214;587.png;ZPRACOVÁNO;3;GUESSED;2015-01-14;2026-09-28;"3 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+215;588.png;ZPRACOVÁNO;3;GUESSED (duplicitní s 587.png, 587.png, 587.png);2015-01-14;2026-09-28;"3 obchody; GUESSED – graf po konci deníku; příznaky: #2:bezTL, #2:bezZony"
+216;590.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+217;591.png;ZPRACOVÁNO;2;GUESSED;2015-01-15;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+218;595.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 591.png, 591.png);2015-01-15;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:bezZony"
+219;596.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+220;599.png;ZPRACOVÁNO;3;GUESSED;2015-01-27;2026-09-28;"3 obchody; GUESSED – graf po konci deníku; příznaky: #2:nesedí"
+221;601.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+222;604.png;ZPRACOVÁNO;2;GUESSED;2015-01-28;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+223;606.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 604.png, 604.png);2015-01-28;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+224;608.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+225;612.png;ZPRACOVÁNO;2;GUESSED;2015-01-29;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená zelená, zakreslená žlutá"
+226;615.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 612.png, 612.png);2015-01-29;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+227;619.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+228;621.png;ZPRACOVÁNO;3;GUESSED;2015-02-02;2026-09-28;"3 obchody; GUESSED – graf po konci deníku; TL zakreslená červená, zakreslená žlutá; příznaky: #2:bezZony"
+229;622.png;ZPRACOVÁNO;3;GUESSED (duplicitní s 621.png, 621.png, 621.png);2015-02-02;2026-09-28;"3 obchody; GUESSED – graf po konci deníku; příznaky: #2:bezZony"
+230;624.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+231;628.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+232;630.png;ZPRACOVÁNO;1;GUESSED;2015-02-03;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+233;632.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 630.png);2015-02-03;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+234;633.png;ZPRACOVÁNO;2;GUESSED;2015-02-04;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:nesedí"
+235;634.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 633.png, 633.png);2015-02-04;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; příznaky: #1:nesedí"
+236;637.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+237;639.png;ZPRACOVÁNO;2;GUESSED;2015-02-05;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+238;640.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+239;644.png;ZPRACOVÁNO;1;GUESSED;2015-02-10;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+240;645.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 644.png);2015-02-10;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+241;646.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+242;647.png;ZPRACOVÁNO;1;GUESSED;2015-02-10;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+243;650.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 647.png);2015-02-10;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+244;651.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+245;652.png;ZPRACOVÁNO;0;bez obchodu;2015-02-11;2026-09-28;0 obchodů – graf 2015-02-11 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+246;653.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+247;655.png;ZPRACOVÁNO;1;GUESSED;2015-02-12;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+248;656.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 655.png);2015-02-12;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+249;661.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+250;662.png;ZPRACOVÁNO;1;GUESSED;2015-02-17;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+251;663.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 662.png);2015-02-17;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+252;664.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+253;666.png;ZPRACOVÁNO;1;GUESSED;2015-02-18;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+254;667.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 666.png);2015-02-18;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+255;668.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+256;669.png;ZPRACOVÁNO;2;GUESSED;2015-02-20;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+257;670.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 669.png, 669.png);2015-02-20;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+258;671.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+259;672.png;ZPRACOVÁNO;1;GUESSED;2015-02-23;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+260;673.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 672.png);2015-02-23;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+261;674.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+262;677.png;ZPRACOVÁNO;1;GUESSED;2015-02-24;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:RRR"
+263;678.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 677.png);2015-02-24;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; příznaky: #1:RRR"
+264;679.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+265;680.png;ZPRACOVÁNO;1;GUESSED;2015-02-25;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+266;681.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 680.png);2015-02-25;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+267;682.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+268;684.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+269;685.png;ZPRACOVÁNO;2;GUESSED;2015-03-02;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+270;686.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 685.png, 685.png);2015-03-02;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+271;688.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+272;690.png;ZPRACOVÁNO;1;GUESSED;2015-03-05;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:RRR"
+273;694.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+274;695.png;ZPRACOVÁNO;1;GUESSED;2015-03-09;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+275;696.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 695.png);2015-03-09;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+276;697.png;ZPRACOVÁNO;2;GUESSED;2015-03-10;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+277;698.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 697.png, 697.png);2015-03-10;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+278;700.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-28;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+279;701.png;ZPRACOVÁNO;1;GUESSED;2015-03-11;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+280;702.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 701.png);2015-03-11;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+281;717.png;ZPRACOVÁNO;0;bez obchodu;2015-03-16;2026-09-28;0 obchodů – graf 2015-03-16 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+282;718.png;ZPRACOVÁNO;1;GUESSED;2015-03-16;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+283;719.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 718.png);2015-03-16;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+284;721.png;ZPRACOVÁNO;0;bez obchodu;2015-03-17;2026-09-28;0 obchodů – graf 2015-03-17 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+285;723.png;ZPRACOVÁNO;2;GUESSED;2015-03-17;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+286;724.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 723.png, 723.png);2015-03-17;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+287;725.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 723.png, 723.png);2015-03-18;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 723.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+288;726.png;ZPRACOVÁNO;1;GUESSED;2015-03-18;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+289;727.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 726.png);2015-03-18;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+290;729.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 726.png);2015-03-19;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 726.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+291;731.png;ZPRACOVÁNO;2;GUESSED;2015-03-19;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+292;732.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 731.png, 731.png);2015-03-19;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+293;733.png;ZPRACOVÁNO;0;bez obchodu;2015-03-23;2026-09-28;0 obchodů – graf 2015-03-23 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+294;734.png;ZPRACOVÁNO;2;GUESSED;2015-03-23;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+295;735.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 734.png, 734.png);2015-03-23;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+296;736.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 734.png, 734.png);2015-03-24;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 734.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+297;737.png;ZPRACOVÁNO;1;GUESSED;2015-03-24;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+298;739.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 737.png);2015-03-25;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 737.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+299;740.png;ZPRACOVÁNO;1;GUESSED;2015-03-25;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+300;742.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 740.png);2015-03-25;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; příznaky: #1:bezTL, #1:bezZony"
+301;744.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 740.png);2015-03-26;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 740.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+302;746.png;ZPRACOVÁNO;1;GUESSED;2015-03-26;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+303;747.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 746.png);2015-03-26;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+304;749.png;ZPRACOVÁNO;1;GUESSED;2015-03-30;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+305;751.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 749.png);2015-03-30;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+306;752.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 749.png);2015-03-31;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 749.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+307;753.png;ZPRACOVÁNO;2;GUESSED;2015-03-31;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+308;756.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 753.png, 753.png);2015-03-31;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+309;757.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 753.png, 753.png);2015-04-01;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 753.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+310;758.png;ZPRACOVÁNO;2;GUESSED;2015-04-01;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+311;759.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 758.png, 758.png);2015-04-01;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+312;761.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 758.png, 758.png);2015-04-02;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 758.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+313;762.png;ZPRACOVÁNO;0;bez obchodu;2015-04-07;2026-09-28;0 obchodů – graf 2015-04-07 (s ránem dalšího dne) bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+314;763.png;ZPRACOVÁNO;1;GUESSED;2015-04-07;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+315;764.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 763.png);2015-04-07;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+316;765.png;ZPRACOVÁNO;0;bez obchodu;2015-04-08;2026-09-28;0 obchodů – graf 2015-04-08 (s ránem dalšího dne) bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+317;766.png;ZPRACOVÁNO;2;GUESSED;2015-04-08;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+318;767.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 766.png, 766.png);2015-04-08;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+319;768.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 766.png, 766.png);2015-04-09;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 766.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+320;769.png;ZPRACOVÁNO;1;GUESSED;2015-04-09;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+321;771.png;ZPRACOVÁNO;0;bez obchodu;2015-04-20;2026-09-28;0 obchodů – graf 2015-04-20 (s ránem dalšího dne) bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+322;772.png;ZPRACOVÁNO;1;GUESSED;2015-04-20;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+323;773.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 772.png);2015-04-20;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+324;774.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 772.png);2015-04-21;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 772.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+325;775.png;ZPRACOVÁNO;1;GUESSED;2015-04-21;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená červená"
+326;776.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 775.png);2015-04-21;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+327;777.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 775.png);2015-04-22;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 775.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+328;778.png;ZPRACOVÁNO;1;GUESSED;2015-04-22;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+329;779.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 778.png);2015-04-22;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+330;780.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 778.png);2015-04-23;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 778.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+331;781.png;ZPRACOVÁNO;1;GUESSED;2015-04-23;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:nesedí"
+332;782.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 781.png);2015-04-23;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; příznaky: #1:nesedí"
+333;783.png;ZPRACOVÁNO;0;bez obchodu;2015-04-27;2026-09-28;0 obchodů – graf 2015-04-27 (s ránem dalšího dne) bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+334;784.png;ZPRACOVÁNO;2;GUESSED;2015-04-27;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+335;785.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 784.png, 784.png);2015-04-27;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+336;786.png;ZPRACOVÁNO;2;GUESSED;2015-04-28;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+337;787.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 786.png, 786.png);2015-04-28;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+338;788.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 786.png, 786.png);2015-04-29;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 786.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+339;789.png;ZPRACOVÁNO;1;GUESSED;2015-04-29;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+340;790.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 789.png);2015-04-29;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+341;791.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 789.png);2015-04-30;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 789.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+342;792.png;ZPRACOVÁNO;1;GUESSED;2015-04-30;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená červená"
+343;793.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 792.png);2015-04-30;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+344;794.png;ZPRACOVÁNO;0;bez obchodu;2015-05-04;2026-09-28;0 obchodů – graf 2015-05-04 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+345;795.png;ZPRACOVÁNO;0;bez obchodu;2015-05-05;2026-09-28;0 obchodů – graf 2015-05-05 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+346;796.png;ZPRACOVÁNO;0;bez obchodu;2015-05-18;2026-09-28;0 obchodů – graf 2015-05-18 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+347;797.png;ZPRACOVÁNO;1;GUESSED;2015-05-18;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+348;798.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 797.png);2015-05-18;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+349;799.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 797.png);2015-05-19;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 797.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+350;800.png;ZPRACOVÁNO;2;GUESSED;2015-05-19;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+351;801.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 800.png, 800.png);2015-05-19;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:nesedí"
+352;802.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 800.png, 800.png);2015-05-20;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 800.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+353;803.png;ZPRACOVÁNO;1;GUESSED;2015-05-20;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+354;804.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 803.png);2015-05-20;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+355;805.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 803.png);2015-05-21;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 803.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+356;806.png;ZPRACOVÁNO;1;GUESSED;2015-05-21;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+357;807.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 806.png);2015-05-21;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+358;809.png;ZPRACOVÁNO;0;bez obchodu;2015-05-26;2026-09-28;0 obchodů – graf 2015-05-26 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+359;810.png;ZPRACOVÁNO;1;GUESSED;2015-05-26;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+360;811.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 810.png);2015-05-26;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+361;812.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 810.png);2015-05-27;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 810.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+362;813.png;ZPRACOVÁNO;0;bez obchodu;2015-05-27;2026-09-28;0 obchodů – graf 2015-05-27 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+363;814.png;ZPRACOVÁNO;0;bez obchodu;2015-05-28;2026-09-28;0 obchodů – graf 2015-05-28 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+364;815.png;ZPRACOVÁNO;2;GUESSED;2015-05-28;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+365;816.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 815.png, 815.png);2015-05-28;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+366;817.png;ZPRACOVÁNO;0;bez obchodu;2015-06-01;2026-09-28;0 obchodů – graf 2015-06-01 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+367;818.png;ZPRACOVÁNO;1;GUESSED;2015-06-01;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+368;819.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 818.png);2015-06-01;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+369;820.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 818.png);2015-06-02;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 818.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+370;821.png;ZPRACOVÁNO;1;GUESSED;2015-06-02;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+371;822.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 821.png);2015-06-02;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+372;823.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 821.png);2015-06-03;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 821.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+373;824.png;ZPRACOVÁNO;2;GUESSED;2015-06-03;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+374;825.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 824.png, 824.png);2015-06-03;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+375;826.png;ZPRACOVÁNO;0;bez obchodu;2015-06-08;2026-09-28;0 obchodů – graf 2015-06-08 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+376;827.png;ZPRACOVÁNO;0;bez obchodu;2015-06-08;2026-09-28;0 obchodů – graf 2015-06-08 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+377;828.png;ZPRACOVÁNO;0;bez obchodu;2015-06-09;2026-09-28;0 obchodů – graf 2015-06-09 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+378;829.png;ZPRACOVÁNO;1;GUESSED;2015-06-09;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+379;830.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 829.png);2015-06-09;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+380;832.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 829.png);2015-06-10;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 829.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+381;833.png;ZPRACOVÁNO;2;GUESSED;2015-06-10;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+382;834.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 833.png, 833.png);2015-06-10;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+383;835.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 833.png, 833.png);2015-06-11;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 833.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+384;836.png;ZPRACOVÁNO;2;GUESSED;2015-06-11;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+385;837.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 836.png, 836.png);2015-06-11;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+386;838.png;ZPRACOVÁNO;0;bez obchodu;2015-06-15;2026-09-28;0 obchodů – graf 2015-06-15 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+387;839.png;ZPRACOVÁNO;1;GUESSED;2015-06-15;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+388;840.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 839.png);2015-06-15;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+389;841.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 839.png);2015-06-16;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 839.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+390;842.png;ZPRACOVÁNO;2;GUESSED;2015-06-16;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+391;843.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 842.png, 842.png);2015-06-16;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+392;844.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 842.png, 842.png);2015-06-17;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 842.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+393;845.png;ZPRACOVÁNO;1;GUESSED;2015-06-17;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+394;846.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 845.png);2015-06-17;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+395;847.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 845.png);2015-06-18;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 845.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+396;848.png;ZPRACOVÁNO;1;GUESSED;2015-06-18;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+397;849.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 848.png);2015-06-18;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+398;851.png;ZPRACOVÁNO;2;GUESSED;2015-06-22;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+399;852.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 851.png, 851.png);2015-06-22;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+400;853.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 851.png, 851.png);2015-06-23;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 851.png (bílé šipky na stejném místě)"
+401;856.png;ZPRACOVÁNO;2;GUESSED;2015-06-23;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+402;857.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 856.png, 856.png);2015-06-24;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 856.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+403;858.png;ZPRACOVÁNO;1;GUESSED;2015-06-24;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+404;859.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 858.png);2015-06-24;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+405;860.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 858.png);2015-06-25;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 858.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+406;862.png;ZPRACOVÁNO;0;bez obchodu;2015-06-29;2026-09-28;0 obchodů – graf 2015-06-29 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+407;863.png;ZPRACOVÁNO;1;GUESSED;2015-06-29;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+408;864.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 863.png);2015-06-29;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+409;865.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 863.png);2015-06-30;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 863.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+410;866.png;ZPRACOVÁNO;2;GUESSED;2015-06-30;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+411;867.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 866.png, 866.png);2015-06-30;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+412;868.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 866.png, 866.png);2015-07-01;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 866.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+413;869.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 870.png, 870.png);2015-07-01;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 870.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+414;870.png;ZPRACOVÁNO;2;GUESSED;2015-07-01;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+415;871.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 870.png, 870.png);2015-07-02;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 870.png (bílé šipky na stejném místě)"
+416;872.png;ZPRACOVÁNO;2;GUESSED;2015-07-02;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+417;873.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 872.png, 872.png);2015-07-02;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+418;874.png;ZPRACOVÁNO;0;bez obchodu;2015-07-06;2026-09-28;0 obchodů – graf 2015-07-06 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+419;875.png;ZPRACOVÁNO;0;bez obchodu;2015-07-27;2026-09-28;0 obchodů – graf 2015-07-27 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+420;876.png;ZPRACOVÁNO;1;GUESSED;2015-07-27;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+421;877.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 876.png);2015-07-27;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+422;878.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 876.png);2015-07-28;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 876.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+423;879.png;ZPRACOVÁNO;1;GUESSED;2015-07-28;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:bezZony"
+424;880.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 879.png);2015-07-28;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+425;881.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 879.png);2015-07-29;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 879.png (bílé šipky na stejném místě), graf pokračuje dalším dnem"
+426;882.png;ZPRACOVÁNO;2;GUESSED;2015-07-29;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+427;883.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 882.png, 882.png);2015-07-29;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+428;884.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 882.png, 882.png);2015-07-30;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 882.png (bílé šipky na stejném místě)"
+429;885.png;ZPRACOVÁNO;1;GUESSED;2015-07-30;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+430;886.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 885.png);2015-07-30;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; příznaky: #1:bezTL, #1:bezZony"
+431;887.png;ZPRACOVÁNO;0;bez obchodu;2015-08-03;2026-09-28;0 obchodů – graf 2015-08-03 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+432;888.png;ZPRACOVÁNO;1;GUESSED;2015-08-03;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+433;889.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 888.png);2015-08-03;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+434;890.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 888.png);2015-08-04;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 888.png (bílé šipky na stejném místě)"
+435;891.png;ZPRACOVÁNO;2;GUESSED;2015-08-04;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+436;892.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 891.png, 891.png);2015-08-04;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; příznaky: #1:bezTL, #1:bezZony"
+437;893.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 891.png, 891.png);2015-08-05;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 891.png (bílé šipky na stejném místě)"
+438;894.png;ZPRACOVÁNO;2;GUESSED;2015-08-05;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+439;895.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 894.png, 894.png);2015-08-05;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+440;896.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 894.png, 894.png);2015-08-06;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 894.png (bílé šipky na stejném místě)"
+441;897.png;ZPRACOVÁNO;2;GUESSED;2015-08-06;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:nesouhlasí, #2:nesouhlasí"
+442;898.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 897.png, 897.png);2015-08-06;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; příznaky: #1:nesouhlasí, #2:nesouhlasí"
+443;899.png;ZPRACOVÁNO;0;bez obchodu;2015-08-10;2026-09-28;0 obchodů – graf 2015-08-10 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+444;900.png;ZPRACOVÁNO;1;GUESSED;2015-08-10;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:RRR"
+445;901.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 900.png);2015-08-10;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; příznaky: #1:RRR"
+446;902.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 900.png);2015-08-11;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 900.png (bílé šipky na stejném místě)"
+447;903.png;ZPRACOVÁNO;1;GUESSED;2015-08-11;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:nesouhlasí"
+448;904.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 903.png);2015-08-11;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; příznaky: #1:nesouhlasí"
+449;905.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 903.png);2015-08-12;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 903.png (bílé šipky na stejném místě)"
+450;907.png;ZPRACOVÁNO;2;GUESSED;2015-08-12;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+451;908.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 907.png, 907.png);2015-08-12;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; příznaky: #1:bezTL, #1:bezZony"
+452;910.png;ZPRACOVÁNO;1;GUESSED;2015-08-13;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+453;911.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 910.png);2015-08-13;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+454;912.png;ZPRACOVÁNO;0;bez obchodu;2015-08-17;2026-09-28;0 obchodů – graf 2015-08-17 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+455;913.png;ZPRACOVÁNO;1;GUESSED;2015-08-17;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+456;914.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 913.png);2015-08-17;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+457;915.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 913.png);2015-08-18;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 913.png (bílé šipky na stejném místě)"
+458;916.png;ZPRACOVÁNO;1;GUESSED;2015-08-18;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+459;917.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 916.png);2015-08-18;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+460;918.png;ZPRACOVÁNO;0;bez obchodu;2015-08-25;2026-09-28;0 obchodů – graf 2015-08-25 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+461;919.png;ZPRACOVÁNO;2;GUESSED;2015-08-25;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:bezZony"
+462;920.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 919.png, 919.png);2015-08-25;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+463;921.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 919.png, 919.png);2015-08-26;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 919.png (bílé šipky na stejném místě)"
+464;922.png;ZPRACOVÁNO;1;GUESSED;2015-08-26;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+465;923.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 922.png);2015-08-26;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; příznaky: #1:bezZony"
+466;924.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 922.png);2015-08-27;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 922.png (bílé šipky na stejném místě)"
+467;925.png;ZPRACOVÁNO;2;GUESSED;2015-08-27;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+468;926.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 925.png, 925.png);2015-08-27;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:bezTL, #2:bezZony"
+469;927.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 925.png, 925.png);2015-08-28;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 925.png (bílé šipky na stejném místě)"
+470;929.png;ZPRACOVÁNO;0;bez obchodu;2015-09-08;2026-09-28;0 obchodů – graf 2015-09-08 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+471;930.png;ZPRACOVÁNO;2;GUESSED;2015-09-08;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:RRR"
+472;931.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 930.png, 930.png);2015-09-08;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; příznaky: #1:RRR"
+473;932.png;ZPRACOVÁNO;0;bez obchodu;2015-09-09;2026-09-28;0 obchodů – graf 2015-09-09 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+474;933.png;ZPRACOVÁNO;1;GUESSED;2015-09-09;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:nesouhlasí"
+475;934.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 933.png);2015-09-09;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; příznaky: #1:nesouhlasí"
+476;935.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 933.png);2015-09-10;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 933.png (bílé šipky na stejném místě)"
+477;936.png;ZPRACOVÁNO;1;GUESSED;2015-09-10;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+478;937.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 936.png);2015-09-10;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; příznaky: #1:bezTL, #1:bezZony"
+479;938.png;ZPRACOVÁNO;0;bez obchodu;2015-09-14;2026-09-28;0 obchodů – graf 2015-09-14 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+480;939.png;ZPRACOVÁNO;0;bez obchodu;2015-09-14;2026-09-28;0 obchodů – graf 2015-09-14 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+481;940.png;ZPRACOVÁNO;0;bez obchodu;2015-09-15;2026-09-28;0 obchodů – graf 2015-09-15 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+482;941.png;ZPRACOVÁNO;1;GUESSED;2015-09-15;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+483;942.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 941.png);2015-09-15;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+484;943.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 941.png);2015-09-16;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 941.png (bílé šipky na stejném místě)"
+485;944.png;ZPRACOVÁNO;2;GUESSED;2015-09-16;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+486;945.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 944.png, 944.png);2015-09-16;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+487;946.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 944.png, 944.png);2015-09-17;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 944.png (bílé šipky na stejném místě)"
+488;947.png;ZPRACOVÁNO;1;GUESSED;2015-09-17;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+489;948.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 947.png);2015-09-17;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+490;949.png;ZPRACOVÁNO;0;bez obchodu;2015-09-21;2026-09-28;0 obchodů – graf 2015-09-21 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+491;950.png;ZPRACOVÁNO;2;GUESSED;2015-09-21;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+492;951.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 950.png, 950.png);2015-09-21;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+493;952.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 950.png, 950.png);2015-09-22;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 950.png (bílé šipky na stejném místě)"
+494;953.png;ZPRACOVÁNO;2;GUESSED;2015-09-22;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+495;954.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 953.png, 953.png);2015-09-22;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+496;955.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 953.png, 953.png);2015-09-23;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 953.png (bílé šipky na stejném místě)"
+497;956.png;ZPRACOVÁNO;2;GUESSED;2015-09-23;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+498;957.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 956.png, 956.png);2015-09-23;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+499;958.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 956.png, 956.png);2015-09-24;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 956.png (bílé šipky na stejném místě)"
+500;959.png;ZPRACOVÁNO;1;GUESSED;2015-09-24;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+501;960.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 959.png);2015-09-24;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+502;965.png;ZPRACOVÁNO;0;bez obchodu;2015-10-05;2026-09-28;0 obchodů – graf 2015-10-05 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+503;968.png;ZPRACOVÁNO;1;GUESSED;2015-10-05;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+504;969.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 968.png);2015-10-05;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+505;970.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 968.png);2015-10-06;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 968.png (bílé šipky na stejném místě)"
+506;973.png;ZPRACOVÁNO;2;GUESSED;2015-10-06;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+507;974.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 973.png, 973.png);2015-10-06;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+508;975.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 973.png, 973.png);2015-10-07;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 973.png (bílé šipky na stejném místě)"
+509;978.png;ZPRACOVÁNO;3;GUESSED;2015-10-07;2026-09-28;"3 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+510;979.png;ZPRACOVÁNO;3;GUESSED (duplicitní s 978.png, 978.png, 978.png);2015-10-07;2026-09-28;"3 obchody; GUESSED – graf po konci deníku"
+511;980.png;ZPRACOVÁNO;3;GUESSED (duplicitní s 978.png, 978.png, 978.png);2015-10-08;2026-09-28;"3 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 978.png (bílé šipky na stejném místě)"
+512;981.png;ZPRACOVÁNO;2;GUESSED;2015-10-08;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #2:bezZony"
+513;982.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 981.png, 981.png);2015-10-08;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; příznaky: #1:bezTL, #1:bezZony, #2:bezZony"
+514;983.png;ZPRACOVÁNO;0;bez obchodu;2015-10-12;2026-09-28;0 obchodů – graf 2015-10-12 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+515;984.png;ZPRACOVÁNO;2;GUESSED;2015-10-12;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+516;985.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 984.png, 984.png);2015-10-12;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+517;986.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 984.png, 984.png);2015-10-13;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 984.png (bílé šipky na stejném místě)"
+518;987.png;ZPRACOVÁNO;1;GUESSED;2015-10-13;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+519;988.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 987.png);2015-10-13;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; příznaky: #1:bezTL, #1:bezZony"
+520;989.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 987.png);2015-10-14;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 987.png (bílé šipky na stejném místě)"
+521;990.png;ZPRACOVÁNO;2;GUESSED;2015-10-14;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:nesouhlasí, #2:nesouhlasí"
+522;991.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 990.png, 990.png);2015-10-14;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; příznaky: #1:nesouhlasí, #2:nesouhlasí"
+523;992.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 990.png, 990.png);2015-10-15;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 990.png (bílé šipky na stejném místě)"
+524;993.png;ZPRACOVÁNO;1;GUESSED;2015-10-15;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+525;994.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 993.png);2015-10-15;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+526;995.png;ZPRACOVÁNO;0;bez obchodu;2015-10-19;2026-09-28;0 obchodů – graf 2015-10-19 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+527;996.png;ZPRACOVÁNO;1;GUESSED;2015-10-19;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+528;997.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 996.png);2015-10-19;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+529;998.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 996.png);2015-10-20;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 996.png (bílé šipky na stejném místě)"
+530;1000.png;ZPRACOVÁNO;2;GUESSED;2015-10-20;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+531;1001.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1000.png, 1000.png);2015-10-20;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+532;1002.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1000.png, 1000.png);2015-10-21;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1000.png (bílé šipky na stejném místě)"
+533;1003.png;ZPRACOVÁNO;0;bez obchodu;2015-10-21;2026-09-28;0 obchodů – graf 2015-10-21 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+534;1004.png;ZPRACOVÁNO;0;bez obchodu;2015-10-22;2026-09-28;0 obchodů – graf 2015-10-22 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+535;1005.png;ZPRACOVÁNO;1;GUESSED;2015-10-22;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+536;1006.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1005.png);2015-10-22;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+537;1007.png;ZPRACOVÁNO;0;bez obchodu;2015-10-26;2026-09-28;0 obchodů – graf 2015-10-26 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+538;1008.png;ZPRACOVÁNO;0;bez obchodu;2015-10-26;2026-09-28;0 obchodů – graf 2015-10-26 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+539;1010.png;ZPRACOVÁNO;0;bez obchodu;2015-10-27;2026-09-28;0 obchodů – graf 2015-10-27 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+540;1011.png;ZPRACOVÁNO;1;GUESSED;2015-10-27;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+541;1012.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1011.png);2015-10-27;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+542;1013.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1011.png);2015-10-28;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1011.png (bílé šipky na stejném místě)"
+543;1014.png;ZPRACOVÁNO;2;GUESSED;2015-10-28;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+544;1015.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1014.png, 1014.png);2015-10-28;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:bezTL, #2:bezZony"
+545;1016.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1014.png, 1014.png);2015-10-29;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1014.png (bílé šipky na stejném místě)"
+546;1017.png;ZPRACOVÁNO;2;GUESSED;2015-10-29;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+547;1018.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1017.png, 1017.png);2015-10-29;2026-09-28;"2 obchody; GUESSED – graf po konci deníku"
+548;1019.png;ZPRACOVÁNO;0;bez obchodu;2015-11-02;2026-09-28;0 obchodů – graf 2015-11-02 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+549;1020.png;ZPRACOVÁNO;1;GUESSED;2015-11-02;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+550;1021.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1020.png);2015-11-02;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+551;1022.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1020.png);2015-11-03;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1020.png (bílé šipky na stejném místě)"
+552;1023.png;ZPRACOVÁNO;1;GUESSED;2015-11-03;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+553;1024.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1023.png);2015-11-03;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+554;1025.png;ZPRACOVÁNO;0;bez obchodu;2015-11-16;2026-09-28;0 obchodů – graf 2015-11-16 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+555;1026.png;ZPRACOVÁNO;2;GUESSED;2015-11-16;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+556;1027.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1026.png, 1026.png);2015-11-16;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; příznaky: #1:bezZony"
+557;1029.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1026.png, 1026.png);2015-11-17;2026-09-28;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1026.png (bílé šipky na stejném místě)"
+558;1030.png;ZPRACOVÁNO;0;bez obchodu;2015-11-17;2026-09-28;0 obchodů – graf 2015-11-17 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+559;1031.png;ZPRACOVÁNO;0;bez obchodu;2015-11-18;2026-09-28;0 obchodů – graf 2015-11-18 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+560;1032.png;ZPRACOVÁNO;1;GUESSED;2015-11-18;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+561;1033.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1032.png);2015-11-18;2026-09-28;"1 obchod; GUESSED – graf po konci deníku"
+562;1034.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1032.png);2015-11-19;2026-09-28;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1032.png (bílé šipky na stejném místě)"
+563;1036.png;ZPRACOVÁNO;0;bez obchodu;2016-01-19;2026-09-28;0 obchodů – graf 2016-01-19 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+564;1037.png;ZPRACOVÁNO;1;GUESSED;2016-01-19;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+565;1038.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1037.png);2016-01-19;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+566;1040.png;ZPRACOVÁNO;2;GUESSED;2016-01-20;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:bezZony"
+567;1042.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1040.png, 1040.png);2016-01-20;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; příznaky: #1:bezTL, #1:bezZony, #2:bezTL, #2:bezZony"
+568;1043.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1040.png, 1040.png);2016-01-21;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1040.png (bílé šipky na stejném místě)"
+569;1044.png;ZPRACOVÁNO;3;GUESSED;2016-01-21;2026-09-29;"3 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #2:bezZony"
+570;1045.png;ZPRACOVÁNO;3;GUESSED (duplicitní s 1044.png, 1044.png, 1044.png);2016-01-21;2026-09-29;"3 obchody; GUESSED – graf po konci deníku; příznaky: #2:bezZony"
+571;1046.png;ZPRACOVÁNO;0;bez obchodu;2016-01-25;2026-09-29;0 obchodů – graf 2016-01-25 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+572;1047.png;ZPRACOVÁNO;2;GUESSED;2016-01-25;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+573;1048.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1047.png, 1047.png);2016-01-25;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+574;1049.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1047.png, 1047.png);2016-01-26;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1047.png (bílé šipky na stejném místě)"
+575;1050.png;ZPRACOVÁNO;1;GUESSED;2016-01-26;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+576;1051.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1050.png);2016-01-26;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+577;1053.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1050.png);2016-01-27;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1050.png (bílé šipky na stejném místě)"
+578;1054.png;ZPRACOVÁNO;1;GUESSED;2016-01-27;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+579;1055.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1054.png);2016-01-27;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+580;1056.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1054.png);2016-01-28;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1054.png (bílé šipky na stejném místě)"
+581;1057.png;ZPRACOVÁNO;0;bez obchodu;2016-02-01;2026-09-29;0 obchodů – graf 2016-02-01 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+582;1058.png;ZPRACOVÁNO;1;GUESSED;2016-02-01;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+583;1059.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1058.png);2016-02-01;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; příznaky: #1:bezZony"
+584;1060.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1058.png);2016-02-02;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1058.png (bílé šipky na stejném místě)"
+585;1062.png;ZPRACOVÁNO;0;bez obchodu;2016-02-02;2026-09-29;0 obchodů – graf 2016-02-02 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+586;1063.png;ZPRACOVÁNO;0;bez obchodu;2016-02-03;2026-09-29;0 obchodů – graf 2016-02-03 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+587;1064.png;ZPRACOVÁNO;2;GUESSED;2016-02-03;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #2:bezZony"
+588;1065.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1064.png, 1064.png);2016-02-03;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:bezTL, #2:bezZony"
+589;1066.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1064.png, 1064.png);2016-02-04;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1064.png (bílé šipky na stejném místě)"
+590;1067.png;ZPRACOVÁNO;3;GUESSED;2016-02-04;2026-09-29;"3 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+591;1069.png;ZPRACOVÁNO;3;GUESSED (duplicitní s 1067.png, 1067.png, 1067.png);2016-02-04;2026-09-29;"3 obchody; GUESSED – graf po konci deníku"
+592;1070.png;ZPRACOVÁNO;0;bez obchodu;2016-02-08;2026-09-29;0 obchodů – graf 2016-02-08 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+593;1071.png;ZPRACOVÁNO;0;bez obchodu;2016-02-09;2026-09-29;0 obchodů – graf 2016-02-09 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+594;1073.png;ZPRACOVÁNO;0;bez obchodu;2016-02-09;2026-09-29;0 obchodů – graf 2016-02-09 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+595;1074.png;ZPRACOVÁNO;1;GUESSED;2016-02-09;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+596;1076.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1074.png);2016-02-09;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+597;1077.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1074.png);2016-02-10;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1074.png (bílé šipky na stejném místě)"
+598;1078.png;ZPRACOVÁNO;1;GUESSED;2016-02-10;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+599;1079.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1078.png);2016-02-10;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; příznaky: #1:bezTL, #1:bezZony"
+600;1080.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1078.png);2016-02-11;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1078.png (bílé šipky na stejném místě)"
+601;1081.png;ZPRACOVÁNO;0;bez obchodu;2016-02-11;2026-09-29;0 obchodů – graf 2016-02-11 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+602;1083.png;ZPRACOVÁNO;0;bez obchodu;2016-02-16;2026-09-29;0 obchodů – graf 2016-02-16 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+603;1084.png;ZPRACOVÁNO;2;GUESSED;2016-02-16;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+604;1085.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1084.png, 1084.png);2016-02-16;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+605;1086.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1084.png, 1084.png);2016-02-17;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; bez infoboxu – stejné obchody jako 1084.png (bílé šipky na stejném místě)"
+606;1087.png;ZPRACOVÁNO;0;bez obchodu;2016-02-22;2026-09-29;0 obchodů – graf 2016-02-22 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+607;1088.png;ZPRACOVÁNO;2;GUESSED;2016-08-04;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+608;1089.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1088.png, 1088.png);2016-08-04;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+609;1090.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+610;1091.png;ZPRACOVÁNO;1;GUESSED;2016-08-05;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+611;1092.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1091.png);2016-08-05;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+612;1093.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+613;1094.png;ZPRACOVÁNO;2;GUESSED;2016-08-11;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+614;1095.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1094.png, 1094.png);2016-08-11;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+615;1096.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+616;1097.png;ZPRACOVÁNO;2;GUESSED;2016-08-12;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+617;1098.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1097.png, 1097.png);2016-08-12;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+618;1099.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+619;1101.png;ZPRACOVÁNO;2;GUESSED;2016-08-18;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:bezTL, #2:bezZony"
+620;1102.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+621;1103.png;ZPRACOVÁNO;1;GUESSED;2016-08-19;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+622;1104.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1103.png);2016-08-19;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+623;1105.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+624;1106.png;ZPRACOVÁNO;1;GUESSED;2016-09-15;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+625;1107.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1106.png);2016-09-15;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+626;1108.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+627;1109.png;ZPRACOVÁNO;2;GUESSED;2016-09-16;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+628;1110.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1109.png, 1109.png);2016-09-16;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+629;1111.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+630;1112.png;ZPRACOVÁNO;2;GUESSED;2016-09-22;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #2:nesouhlasí"
+631;1113.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1112.png, 1112.png);2016-09-22;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:nesouhlasí"
+632;1114.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+633;1115.png;ZPRACOVÁNO;1;GUESSED;2016-09-23;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+634;1116.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1115.png);2016-09-23;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+635;1117.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+636;1118.png;ZPRACOVÁNO;2;GUESSED;2016-09-29;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+637;1119.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1118.png, 1118.png);2016-09-29;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:bezTL, #2:bezZony"
+638;1120.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+639;1121.png;ZPRACOVÁNO;2;GUESSED;2016-09-30;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+640;1123.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1121.png, 1121.png);2016-09-30;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+641;1124.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+642;1125.png;ZPRACOVÁNO;1;GUESSED;2016-10-06;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+643;1126.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1125.png);2016-10-06;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; příznaky: #1:bezZony"
+644;1128.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+645;1129.png;ZPRACOVÁNO;0;bez obchodu;2016-10-07;2026-09-29;0 obchodů – graf 2016-10-07 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+646;1130.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+647;1131.png;ZPRACOVÁNO;1;GUESSED;2016-10-13;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+648;1132.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1131.png);2016-10-13;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+649;1134.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+650;1135.png;ZPRACOVÁNO;2;GUESSED;2016-10-14;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+651;1136.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1135.png, 1135.png);2016-10-14;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+652;1138.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+653;1139.png;ZPRACOVÁNO;1;GUESSED;2016-10-20;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+654;1140.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1139.png);2016-10-20;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+655;1141.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+656;1142.png;ZPRACOVÁNO;3;GUESSED;2016-10-21;2026-09-29;"3 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; datum 2016-10-21 odvozeno – screenshot bez hlavičky, v pořadí mezi grafy 2016-10-20 a 2016-10-27 (obchodní dny čt/pá)"
+657;1143.png;ZPRACOVÁNO;3;GUESSED (duplicitní s 1142.png, 1142.png, 1142.png);2016-10-21;2026-09-29;"3 obchody; GUESSED – graf po konci deníku; datum 2016-10-21 odvozeno – screenshot bez hlavičky, v pořadí mezi grafy 2016-10-20 a 2016-10-27 (obchodní dny čt/pá)"
+658;1144.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+659;1145.png;ZPRACOVÁNO;2;GUESSED;2016-10-27;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+660;1146.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1145.png, 1145.png);2016-10-27;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+661;1147.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+662;1148.png;ZPRACOVÁNO;1;GUESSED;2016-10-28;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+663;1149.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1148.png);2016-10-28;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+664;1150.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+665;1152.png;ZPRACOVÁNO;1;GUESSED;2016-11-03;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+666;1153.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1152.png);2016-11-03;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+667;1154.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+668;1155.png;ZPRACOVÁNO;2;GUESSED;2016-11-04;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #2:nesouhlasí"
+669;1156.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1155.png, 1155.png);2016-11-04;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:nesouhlasí"
+670;1157.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+671;1158.png;ZPRACOVÁNO;1;GUESSED;2016-11-17;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+672;1159.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1158.png);2016-11-17;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+673;1160.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+674;1161.png;ZPRACOVÁNO;0;bez obchodu;2016-11-18;2026-09-29;0 obchodů – graf 2016-11-18 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+675;1162.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+676;1163.png;ZPRACOVÁNO;0;bez obchodu;2016-11-25;2026-09-29;0 obchodů – graf 2016-11-25 bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+677;1164.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+678;1165.png;ZPRACOVÁNO;1;GUESSED;2016-11-25;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+679;1166.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1165.png);2016-11-25;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+680;1167.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+681;1168.png;ZPRACOVÁNO;2;GUESSED;2016-12-01;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+682;1169.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1168.png, 1168.png);2016-12-01;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+683;1171.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+684;1172.png;ZPRACOVÁNO;2;GUESSED;2016-12-02;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #2:nesedí"
+685;1173.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1172.png, 1172.png);2016-12-02;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+686;1174.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+687;1175.png;ZPRACOVÁNO;1;GUESSED;2016-12-08;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+688;1179.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1175.png);2016-12-08;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+689;1180.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+690;1181.png;ZPRACOVÁNO;1;GUESSED;2016-12-09;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+691;1184.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1181.png);2016-12-09;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+692;1185.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+693;1187.png;ZPRACOVÁNO;1;GUESSED;2016-12-15;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+694;1189.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1187.png);2016-12-15;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+695;1191.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+696;1192.png;ZPRACOVÁNO;2;GUESSED;2016-12-16;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #2:nesedí"
+697;1193.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1192.png, 1192.png);2016-12-16;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:nesedí"
+698;1194.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+699;1195.png;ZPRACOVÁNO;1;GUESSED;2016-12-22;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+700;1197.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1195.png);2016-12-22;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+701;1200.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+702;1201.png;ZPRACOVÁNO;1;GUESSED;2016-12-29;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+703;1203.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1201.png);2016-12-29;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+704;1208.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+705;1210.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+706;1211.png;ZPRACOVÁNO;2;GUESSED;2017-01-05;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+707;1213.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1211.png, 1211.png);2017-01-05;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+708;1215.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+709;1217.png;ZPRACOVÁNO;1;GUESSED;2017-01-11;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+710;1218.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1217.png);2017-01-11;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+711;1226.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+712;1227.png;ZPRACOVÁNO;2;GUESSED;2017-01-12;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+713;1228.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1227.png, 1227.png);2017-01-12;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+714;1229.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+715;1232.png;ZPRACOVÁNO;2;GUESSED;2017-01-13;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #1:nesedí"
+716;1233.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1232.png, 1232.png);2017-01-13;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; příznaky: #1:nesedí"
+717;1234.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+718;1235.png;ZPRACOVÁNO;2;GUESSED;2017-01-18;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+719;1236.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1235.png, 1235.png);2017-01-18;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+720;1238.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+721;1239.png;ZPRACOVÁNO;2;GUESSED;2017-01-19;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #2:nesouhlasí, #2:RRR"
+722;1241.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1239.png, 1239.png);2017-01-19;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:nesouhlasí, #2:RRR"
+723;1243.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+724;1245.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+725;1246.png;ZPRACOVÁNO;2;GUESSED;2017-02-02;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+726;1248.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1246.png, 1246.png);2017-02-02;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+727;1249.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+728;1250.png;ZPRACOVÁNO;2;GUESSED;2017-02-03;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá; příznaky: #2:RRR"
+729;1251.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1250.png, 1250.png);2017-02-03;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; příznaky: #2:RRR"
+730;1252.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+731;1256.png;ZPRACOVÁNO;1;GUESSED;2017-02-10;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+732;1257.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1256.png);2017-02-10;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+733;1258.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+734;1261.png;ZPRACOVÁNO;2;GUESSED;2017-02-10;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+735;1263.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1261.png, 1261.png);2017-02-10;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+736;1265.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+737;1267.png;ZPRACOVÁNO;1;GUESSED;2017-02-16;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+738;1268.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1267.png);2017-02-16;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+739;1270.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+740;1272.png;ZPRACOVÁNO;1;GUESSED;2017-02-17;2026-09-29;"1 obchod; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+741;1273.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 1272.png);2017-02-17;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+742;1278.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+743;1281.png;ZPRACOVÁNO;2;GUESSED;2017-02-23;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+744;1282.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1281.png, 1281.png);2017-02-23;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+745;1284.png;ZPRACOVÁNO;0;bez obchodu;;2026-09-29;0 obchodů – ranní graf (cca 0:30–13:30, hlavička bez data) jen s úrovněmi S/R a OHLC, bez vstupu (bez bílé šipky a infoboxu), vizuálně ověřeno
+746;1285.png;ZPRACOVÁNO;2;GUESSED;2017-02-24;2026-09-29;"2 obchody; GUESSED – graf po konci deníku; TL zakreslená žlutá"
+747;1286.png;ZPRACOVÁNO;2;GUESSED (duplicitní s 1285.png, 1285.png);2017-02-24;2026-09-29;"2 obchody; GUESSED – graf po konci deníku"
+748;9991.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 23.png);2014-12-03;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+749;9992.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 18.png);2014-11-25;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+750;9993.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 17.png);2014-11-24;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+751;9994.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 15.png);2014-11-18;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+752;9995.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 11.png);2014-11-10;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+753;9996.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 10.png);2014-11-05;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+754;9997.png;ZPRACOVÁNO;1;GUESSED (duplicitní s 9.png);2014-11-03;2026-09-29;"1 obchod; GUESSED – graf po konci deníku"
+755;9999.png;ZPRACOVÁNO;1;REAL;2014-02-06;2026-09-29;"1 obchod; REAL – deník obchod 476; TL zakreslená žlutá"

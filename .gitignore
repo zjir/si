@@ -1,6 +1,4 @@
-# data
-*.csv
-PAT/
+PAT/obrazky-obchodu
 # agent loop (local only)
 .loop.lock
 .loop-logs/
