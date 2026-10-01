@@ -16,14 +16,14 @@ Když v tomto chatu už existuje `/home/claude/si` s remote s tokenem, jen ho ak
 1. Token: nainstalovaná kopie skillu obsahuje vedle SKILL.md soubor `github_token` (fine-grained token jen pro `zjir/si`, Contents: Read and write). Načti ho:
 
    ```bash
-   TF=$(find /mnt/skills -name github_token -path '*agent-loop*' 2>/dev/null | head -1); T=$(tr -d ' \r\n' < "$TF")
+   TF=$(find /mnt/skills -name github_token -path '*agent-loop*' | head -1); T=$(cat "$TF" | tr -d ' \r\n')
    ```
 
    Když soubor chybí (kopie v repozitáři ho nemá a mít nesmí, repozitář je veřejný) nebo push vrátí 401/403 (token vypršel), požádej uživatele o nový token a řekni mu, ať ho zapíše do `github_token` v nainstalovaném skillu.
 2. Klon (token nikdy nevypisuj, ani v popisu příkazu, ani v odpovědi; výstupy gitu filtruj přes `sed "s/$T/***/g"`):
 
    ```bash
-   cd /home/claude && git clone -q "https://x-access-token:$T@github.com/zjir/si.git" si 2>&1 | sed "s/$T/***/g"; cd si && git log -1 --oneline
+   cd /home/claude && T="$T" bash -c 'git clone -q "https://x-access-token:$T@github.com/zjir/si.git" si |& sed "s/$T/***/g"'; cd si && git log -1 --oneline
    ```
 
 3. Ověř `agent-loop/skill/round.py`, `agent-loop/config.json`, `tasks/`. Když chybí, řekni co a skonči.
@@ -37,7 +37,7 @@ Všechny další příkazy běží v `/home/claude/si`. Git identitu bere `round
 2. Doptání přes `ask_user_input_v0` (nejvýš 3 otázky na volání, 2–4 volby, víc kol podle potřeby). Údaje z požadavku jen potvrď. Pole a návrhy:
    - `mode`: `spec` (recenzent zadání) / `code` (implementace),
    - `scope_allow`: soubory ze `zadani/` nebo glob; nesmí obsahovat `agent-loop/`, `tasks/`, `runs/`, `.github/`, `PAT/`,
-   - `title`; `goal` (návrh pro spec: „Zreviduj <soubor> v roli recenzenta (agent-loop/review-loop/review.md): zapracuj sekci Dodatky k zapracování, vyplň všechna prázdná místa, vše v kontextu systému P.A.T.“); `done_when` (návrh: „Dodatky jsou zapracované a sekce odstraněná; průchod celým dokumentem nenajde žádný blokující ani střední nález.“),
+   - `title`; `goal` (návrh pro spec: „Zreviduj {soubor} v roli recenzenta (agent-loop/review-loop/review.md): zapracuj sekci Dodatky k zapracování, vyplň všechna prázdná místa, vše v kontextu systému P.A.T.“); `done_when` (návrh: „Dodatky jsou zapracované a sekce odstraněná; průchod celým dokumentem nenajde žádný blokující ani střední nález.“),
    - `inputs` (např. `PAT/Popis OS P.A.T.pdf`, související `zadani/*.md`), `scope_deny`,
    - `max_rounds`, `max_minutes`, `priority`, `notes`.
    Upozorni na duplicitu stejného `title` nebo `scope_allow` v inbox/active.
