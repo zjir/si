@@ -393,8 +393,17 @@ function Get-NextTaskId {
     return ('TASK-{0:D4}' -f ($max + 1))
 }
 
+function Test-SkillClaim([string]$Id) {
+    # A round claimed by the chat skill (agent-loop/skill/round.py): runner skips the task until claim_until.
+    $s = Read-TaskState $Id
+    if ($null -eq $s -or [string](Get-Prop $s 'runner' '') -ne 'skill') { return $false }
+    $u = Get-Prop $s 'claim_until' $null
+    if (-not $u) { return $false }
+    try { return ([DateTimeOffset]::Parse([string]$u) -gt [DateTimeOffset]::Now) } catch { return $false }
+}
+
 function Select-NextTask {
-    $all = @(Get-AllTasks)
+    $all = @(Get-AllTasks | Where-Object { -not (Test-SkillClaim ([IO.Path]::GetFileNameWithoutExtension($_.Name))) })
     foreach ($folder in @('active', 'inbox')) {
         $c = @($all | Where-Object { $_.Folder -eq $folder })
         if ($c.Count -eq 0) { continue }
@@ -1032,6 +1041,7 @@ function Repair-Interrupted {
         $F = Resolve-TaskFields $e.Task
         $s = Read-TaskState $F.id
         if ($null -eq $s) { continue }
+        if (Test-SkillClaim $F.id) { continue }   # round runs in the chat skill
         $phase = [string](Get-Prop $s 'phase' '')
         if ($phase -notin @('running', 'retry_wait')) { continue }
         $cur = [int](Get-Prop $s 'current_round' ([int](Get-Prop $s 'round' 0) + 1))

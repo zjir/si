@@ -76,6 +76,24 @@ Formát úkolu:
 
 Smyčka nezačne kolo, když má pracovní strom necommitnuté změny (kromě nových souborů v `tasks/inbox/`); počká, až je commitneš nebo vrátíš.
 
+## Jedno kolo ve skillu (bez runneru)
+
+Skill `agent-loop-run-task` (Cowork) odehraje jedno kolo úkolu v chatu místo `claude -p`. Pravidla bere z `prompts/common.md`, role a `context.template.md` stejně jako runner; mechaniku runneru dělá `skill/round.py` (`status`, `prepare`, `finalize`, `abort`). Kopie skillu je `skill/SKILL.md`.
+
+- Smyčka nesmí běžet (`.loop.lock` s čerstvým heartbeatem = odmítnuto) a strom musí být čistý.
+- Během kola existuje `STOP` s textem `SKILL <id> rNN`; smyčka se mezitím nespustí. `finalize` / `abort` ho smaže.
+- `meta.json` má `runner: "skill"` a `skill_model`; tokeny, cena a effort jsou `null` (A1: `COST_UNKNOWN`, `EFFORT_UNVERIFIED`). Kontrola `model_expect` se na kola skillu neuplatňuje.
+- Commit `TASK-0007 r03 [spec] model=<model chatu> effort=- runner=skill status=...`; skill nepushuje.
+
+## Úkoly a kola v chatu (skill)
+
+Skill `agent-loop-chat` (claude.ai, kopie v `skill/SKILL.md`) zakládá úkoly a odehraje jedno kolo v chatu místo `claude -p`, nad klonem z GitHubu s tokenem. Pravidla bere z `prompts/common.md`, role a `context.template.md` stejně jako runner; mechaniku dělá `skill/round.py` (`new`, `status`, `prepare`, `finalize`, `abort`, volba `--push`).
+
+- `prepare` zapíše do `runs/<id>/state.json` claim (`runner: "skill"`, `claim_until`) a pushne ho. Runner úkol s platným claimem přeskakuje (`Test-SkillClaim`); po vypršení ho `Repair-Interrupted` uzavře jako přerušené kolo.
+- `prepare` odmítne úkol, který podle `state.json` právě zpracovává runner (čerstvý heartbeat). Runner mezi koly jednoho úkolu nepulluje, takže souběh na stejném úkolu se projeví až konfliktem při push; skill pak vydá patch, nic nepřepisuje.
+- `meta.json` má `runner: "skill"` a `skill_model`; tokeny, cena a effort jsou `null` (A1: `COST_UNKNOWN`, `EFFORT_UNVERIFIED`). Kontrola `model_expect` se na kola skillu neuplatňuje.
+- `PAT/` a data nejsou na GitHubu; do chatu se nahrávají ručně a necommitují se.
+
 ## A1
 
 Otevři `agent-loop/a1/index.html` (funguje z disku i z GitHub Pages). Seznam úkolů se stavem, spotřebou a varováními; klik na úkol ukáže zadání, stav, odkazy na commity a kroky. Kroky jsou sbalené a rozbalují se po jednom (shrnutí, další krok, požadavky, změněné soubory, metadata, poznámky, výstup, diff). Data se obnovují každé 2 minuty nebo tlačítkem.
