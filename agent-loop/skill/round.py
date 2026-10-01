@@ -7,6 +7,7 @@ podle agent-loop/prompts/common.md + role z config.json + runs/<id>/round-NN/con
   python3 agent-loop/skill/round.py new      --json <soubor s úkolem> [--push]
   python3 agent-loop/skill/round.py status   [--id TASK-0007 | --latest]
   python3 agent-loop/skill/round.py prepare  [--id TASK-0007 | --latest] --model <id modelu chatu> [--push] [--takeover] [--force]
+  python3 agent-loop/skill/round.py checkpoint --id TASK-0007 [--push]
   python3 agent-loop/skill/round.py finalize --id TASK-0007 --model <id modelu chatu> [--push]
   python3 agent-loop/skill/round.py abort    --id TASK-0007 [--push]
 
@@ -474,12 +475,16 @@ def cmd_finalize(a):
                 os.remove(p(path))
             else:
                 git("checkout", "-q", "HEAD", "--", path, allow_fail=True)
-    work = [x[1] for x in changes() if in_scope(x[1], F, task_dir)
-            and not x[1].startswith(task_dir + "/") and x[1] != "agent-loop/a1/data.js"
-            and not re.match(r"^tasks/inbox/", x[1])]
+    work = in_scope_work(F, task_dir)
     git("add", "-A", "--", *[x for x in [task_dir, *work] if os.path.exists(p(x)) or
                               git("ls-files", "--", x, allow_fail=True).stdout.strip()])
-    d = git("diff", "--cached", "--stat", "-p", "--", ".", ":(exclude)%s/**" % rd,
+    # celé kolo včetně checkpointů: diff proti commitu claim
+    base = round_base(tid, n)
+    rng = [base] if base else []
+    work = sorted(set(work) | set(x for x in git("diff", "--cached", "--name-only", *rng, "--", ".",
+                                                   ":(exclude)%s/**" % task_dir, ":(exclude)agent-loop/a1/data.js",
+                                                   ":(exclude)tasks/**", allow_fail=True).stdout.split("\n") if x.strip()))
+    d = git("diff", "--cached", *rng, "--stat", "-p", "--", ".", ":(exclude)%s/**" % rd,
             ":(exclude)%s/state.json" % task_dir, ":(exclude)agent-loop/a1/data.js", allow_fail=True).stdout
     if d:
         mx = int(c.get("diff_max_kb", 200)) * 1024
@@ -507,7 +512,7 @@ def cmd_finalize(a):
     # skill_heartbeat == heartbeat znamená, že state.json naposledy zapsal skill, ne runner
     s.update(round=n, phase="between_rounds", heartbeat=ended, skill_heartbeat=ended, last_status=status or "NO_RESULT",
              last_summary=str((res or {}).get("summary") or ""), updated_at=ended)
-    for k in ("current_round", "runner", "skill_model", "skill_round_started_at", "claim_until"):
+    for k in ("current_round", "runner", "skill_model", "skill_round_started_at", "claim_until", "skill_checkpoints"):
         s.pop(k, None)
     paths = [task_dir, *work, *viol]
     if final:
@@ -530,6 +535,42 @@ def cmd_finalize(a):
     out(dict(ok=pushed is None or pushed["ok"], task=tid, round=n, status=st, final=final, commit=h, push=pushed, changed=sorted(work),
              scope_reverted=viol, no_result=no_result, requests=(res or {}).get("requests", []),
              next=(res or {}).get("next"), uncommitted_left=left))
+
+
+def in_scope_work(F, task_dir):
+    return [x[1] for x in changes() if in_scope(x[1], F, task_dir)
+            and not x[1].startswith(task_dir + "/") and x[1] != "agent-loop/a1/data.js"
+            and not re.match(r"^tasks/inbox/", x[1])]
+
+
+def round_base(tid, n):
+    r = git("log", "-1", "--format=%H", "--fixed-strings", "--grep", "%s r%02d claim " % (tid, n), allow_fail=True)
+    return r.stdout.strip() or None
+
+
+def cmd_checkpoint(a):
+    """Průběžné uložení rozpracovaného kola: commit změn v rozsahu + task_dir, prodloužení claimu, push.
+    Změny mimo rozsah necommituje (zůstanou pro finalize, který je vrátí)."""
+    c = cfg()
+    t = select(a.id)
+    F = fields(t["task"], c)
+    tid, task_dir = F["id"], "runs/" + F["id"]
+    s = rj(task_dir + "/state.json") or {}
+    if s.get("runner") != "skill" or s.get("phase") != "running":
+        fail("úkol nemá rozběhnuté kolo skillu (state.json runner/phase)")
+    n = int(s.get("current_round"))
+    until = datetime.datetime.fromisoformat(now()) + datetime.timedelta(minutes=F["max_minutes"] + 30)
+    s.update(heartbeat=now(), claim_until=until.isoformat(), updated_at=now())
+    s["skill_checkpoints"] = int(s.get("skill_checkpoints") or 0) + 1
+    wj(task_dir + "/state.json", s)
+    work = in_scope_work(F, task_dir)
+    outside = [x[1] for x in changes() if not in_scope(x[1], F, task_dir)]
+    res = rj(round_dir(tid, n) + "/result.json") or {}
+    h = commit("%s r%02d checkpoint %d [%s] runner=skill" % (tid, n, s["skill_checkpoints"], F["mode"]),
+               str(res.get("summary") or ""), [task_dir, *work])
+    pushed = push() if a.push else None
+    out(dict(ok=pushed is None or pushed["ok"], task=tid, round=n, checkpoint=s["skill_checkpoints"], commit=h,
+             push=pushed, committed=sorted(work), outside_scope_not_committed=outside, claim_until=until.isoformat()))
 
 
 def cmd_abort(a):
@@ -559,7 +600,7 @@ def cmd_abort(a):
     pushed = None
     if s.get("runner") == "skill":
         s["phase"] = "between_rounds"
-        for k in ("current_round", "runner", "skill_model", "skill_round_started_at", "claim_until"):
+        for k in ("current_round", "runner", "skill_model", "skill_round_started_at", "claim_until", "skill_checkpoints"):
             s.pop(k, None)
         s["updated_at"] = now()
         s["skill_heartbeat"] = s.get("heartbeat")
@@ -613,7 +654,7 @@ def cmd_new(a):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["new", "status", "prepare", "finalize", "abort"])
+    ap.add_argument("cmd", choices=["new", "status", "prepare", "checkpoint", "finalize", "abort"])
     ap.add_argument("--json")
     ap.add_argument("--push", action="store_true")
     ap.add_argument("--latest", action="store_true", help="nejnovější úkol v tasks/inbox (nejvyšší číslo)")
@@ -624,11 +665,11 @@ def main():
     a = ap.parse_args()
     if not os.path.isdir(p(".git")):
         fail("spouštěj z kořene repozitáře (chybí .git)")
-    if a.cmd in ("finalize", "abort") and not a.id:
+    if a.cmd in ("checkpoint", "finalize", "abort") and not a.id:
         fail("--id je povinné")
     if a.cmd == "new" and not a.json:
         fail("--json je povinné")
-    dict(new=cmd_new, status=cmd_status, prepare=cmd_prepare, finalize=cmd_finalize, abort=cmd_abort)[a.cmd](a)
+    dict(new=cmd_new, checkpoint=cmd_checkpoint, status=cmd_status, prepare=cmd_prepare, finalize=cmd_finalize, abort=cmd_abort)[a.cmd](a)
 
 
 if __name__ == "__main__":

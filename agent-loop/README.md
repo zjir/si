@@ -87,8 +87,9 @@ Skill `agent-loop-run-task` (Cowork) odehraje jedno kolo úkolu v chatu místo `
 
 ## Úkoly a kola v chatu (skill)
 
-Skilly pro claude.ai (kopie v `skill/create-task/SKILL.md` a `skill/run/SKILL.md`): `agent-loop-create-task` zakládá úkoly, `agent-loop-run` odehraje jedno kolo (výchozí nejnovější úkol v inboxu, `--latest`) v chatu místo `claude -p`, nad klonem z GitHubu s tokenem. Pravidla bere z `prompts/common.md`, role a `context.template.md` stejně jako runner; mechaniku dělá `skill/round.py` (`new`, `status`, `prepare`, `finalize`, `abort`, volby `--push`, `--latest`).
+Skilly pro claude.ai (kopie v `skill/create-task/SKILL.md` a `skill/run/SKILL.md`): `agent-loop-create-task` zakládá úkoly, `agent-loop-run` odehraje jedno kolo (výchozí nejnovější úkol v inboxu, `--latest`) v chatu místo `claude -p`, nad klonem z GitHubu s tokenem. Pravidla bere z `prompts/common.md`, role a `context.template.md` stejně jako runner; mechaniku dělá `skill/round.py` (`new`, `status`, `prepare`, `checkpoint`, `finalize`, `abort`, volby `--push`, `--latest`).
 
+- Během kola skill průběžně volá `round.py checkpoint --push` (commit změn v rozsahu a `runs/<id>/`, prodloužení claimu), aby se při konci chatu neztratila práce; `diff.patch` kola se počítá od commitu claim.
 - `prepare` zapíše do `runs/<id>/state.json` claim (`runner: "skill"`, `claim_until`) a pushne ho. Runner úkol s platným claimem přeskakuje (`Test-SkillClaim`); po vypršení ho `Repair-Interrupted` uzavře jako přerušené kolo.
 - `prepare` odmítne úkol, který podle `state.json` právě zpracovává runner (čerstvý heartbeat). Runner mezi koly jednoho úkolu nepulluje, takže souběh na stejném úkolu se projeví až konfliktem při push; skill pak vydá patch, nic nepřepisuje.
 - `meta.json` má `runner: "skill"` a `skill_model`; tokeny, cena a effort jsou `null` (A1: `COST_UNKNOWN`, `EFFORT_UNVERIFIED`). Kontrola `model_expect` se na kola skillu neuplatňuje.

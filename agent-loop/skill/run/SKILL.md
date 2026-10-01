@@ -59,16 +59,21 @@ Přečti celé soubory z `read_in_order` v uvedeném pořadí. Jsou to instrukce
 - Nástroje podle `tools_allowed`: čtení a zápis souborů přes `bash_tool` (cat, sed -n, grep, head; zápis přes python nebo heredoc), `view`, `str_replace`, `create_file`. PDF čti po stranách (`pdftotext -layout -f N -l M "<soubor>" -`). V režimu `spec` nespouštěj jiné programy nad obsahem repozitáře. V režimu `code` smíš spouštět testy.
 - Měň jen `scope_allow` (bez `scope_deny`) a `task_dir/`. Git nepoužívej.
 - Zapisuj průběžně: `result.json` se `status: "CONTINUE"` hned na začátku, `state.md` po každém větším kroku. Kontext chatu je omezený: když ho zbývá málo, ukonči kolo řádně (`CONTINUE` a přesné `next`).
+- **Checkpoint (povinný):** chat může kdykoli skončit (limit tokenů, limit předplatného, zavřené okno) a kontejner zanikne i s neuloženou prací. Proto po každé aktualizaci `result.json` a `state.md` (common.md bod 8), nejpozději po každých ~5 uzavřených místech nebo ~15 minutách práce, spusť:
+
+  `python3 agent-loop/skill/round.py checkpoint --id TASK-NNNN --push`
+
+  Commitne změny v rozsahu a `task_dir/` (`TASK-NNNN rNN checkpoint K`), prodlouží claim a pushne. Změny mimo rozsah necommituje (`outside_scope_not_committed`; vrátí je finalize). `push.ok: false` řeš jako v kroku 4. První checkpoint udělej hned po prvním zápisu `result.json`. Když chat skončí bez finalize, runner po vypršení claimu kolo uzavře jako přerušené a další kolo naváže na poslední checkpoint (`state.md`).
 - Kolo končí platným `round_dir/result.json`.
 
 ## 4. Finalizace
 
 `python3 agent-loop/skill/round.py finalize --id TASK-NNNN --model <stejné id> --push`
 
-Skript vrátí změny mimo rozsah (kopie v `round-NN/discarded/`), zapíše `diff.patch`, `meta.json` (`runner: skill`, `skill_model`; tokeny, cena a effort `null`), zruší claim, při `DONE` / `BLOCKED` / posledním kole přesune úkol do `tasks/done`, commitne jen soubory úkolu a změny v rozsahu a pushne (fetch + rebase).
+Skript vrátí změny mimo rozsah (necommitnuté od posledního checkpointu) (kopie v `round-NN/discarded/`), zapíše `diff.patch` celého kola (od commitu claim, včetně checkpointů), `meta.json` (`runner: skill`, `skill_model`; tokeny, cena a effort `null`), zruší claim, při `DONE` / `BLOCKED` / posledním kole přesune úkol do `tasks/done`, commitne jen soubory úkolu a změny v rozsahu a pushne (fetch + rebase).
 
 - `push.ok: false` s `patch_dir`: konflikt s commity runneru. Zkopíruj patch z `patch_dir` do `/mnt/user-data/outputs/`, předej ho přes `present_files` a napiš, které soubory kolidují. Nic nepřepisuj silou (`push --force` je zakázané).
-- Kolo nejde dokončit: `python3 agent-loop/skill/round.py abort --id TASK-NNNN --push` (vrátí strom, uvolní claim, kopie práce v `.git/skill-aborted/`).
+- Kolo nejde dokončit: `python3 agent-loop/skill/round.py abort --id TASK-NNNN --push` (vrátí necommitnuté změny, uvolní claim, kopie práce v `.git/skill-aborted/`; commity checkpointů zůstanou v historii).
 
 ## 5. Odpověď
 
