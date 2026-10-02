@@ -3,7 +3,7 @@
 - Úkol: TASK-0005 — review 3
 - Režim: spec
 - Kolo: 3 (strop tohoto běhu: kolo 4)
-- Datum: 2026-10-02T11:52:06+02:00
+- Datum: 2026-10-02T12:02:16+02:00
 - Pracovní složka: kořen repozitáře; všechny cesty jsou relativní k ní.
 
 ## Cíl
