@@ -2,13 +2,15 @@
   "task": "TASK-0005",
   "round": 3,
   "status": "CONTINUE",
-  "summary": "Kolo 3 začalo (převzato z přerušeného chatu): druhý průchod nad textem kola 5 a zapracování dodatku zadavatele (nezávislý zpětný test polohy trendů v sekci 13).",
+  "summary": "Dodatek zadavatele zapracován: sekce 13.15 (nezávislá pravda polohy trendů optimální segmentací close, shoda po barech κ a po úsecích, reference posunu, brány, D-80), 13.11 (a) přepnuto na κ, odkazy a R8; běží kontrolní průchod nad novým textem.",
   "findings": {
     "blocking": 0,
-    "medium": 0,
-    "minor": 0
+    "medium": 1,
+    "minor": 4
   },
-  "changed": [],
-  "next": "Dokončit druhý průchod a dodatek testů; nenajde-li se nic blokujícího ani středního, DONE.",
+  "changed": [
+    "zadani/komponenta-trend.md"
+  ],
+  "next": "Dokončit kontrolní průchod nad 13.15 a zbytkem textu kola 5; bez nálezu DONE.",
   "requests": []
 }
