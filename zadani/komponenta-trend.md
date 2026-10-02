@@ -1279,7 +1279,7 @@ Kontroly 13.4 měří, zda každý odhad komponenty obstál v budoucnosti, ale �
 
 #### 13.15.1 Pravda: optimální segmentace cesty close
 
-**Princip.** Trend je úsek, který by obchodník znalý celé budoucnosti držel: pravda = posloupnost pozic `UP` / `DOWN` / `NONE` nad close barů, která maximalizuje součet pohybu ve směru pozice minus pevnou cenu `c` za každý vstup do pozice (cena v násobcích ATR). Úsek pravdy tak má čistý pohyb > `c` a žádný protipohyb uvnitř úseku není větší než `c` (jinak by optimum úsek rozdělilo). Je to globální optimum (dynamické programování), ne kauzální pravidlo s potvrzením; proto nesdílí s komponentou žádnou definici kromě barů. Jediný parametr pravdy je měřítko `c`; nekalibruje se, neodvozuje se z `theta` ani z jiných `TrendParams` a kalibrace komponenty ho nemění (jinak by se test posouval spolu s komponentou).
+**Princip.** Trend je úsek, který by obchodník znalý celé budoucnosti držel: pravda = posloupnost pozic `UP` / `DOWN` / `NONE` nad close barů, která maximalizuje součet pohybu ve směru pozice minus pevnou cenu `c` za každý vstup do pozice (cena v násobcích ATR). Úsek pravdy tak má čistý pohyb > `c` a žádný protipohyb uvnitř úseku není větší než `c` (jinak by optimum úsek rozdělilo). Je to globální optimum (dynamické programování), ne kauzální pravidlo s potvrzením; proto nesdílí s komponentou žádnou definici kromě barů. „Zisk“ je zde jen způsob, jak definovat štítek polohy trendu; obchodní výsledek systému (14) se tím nehodnotí. Jediný parametr pravdy je měřítko `c`; nekalibruje se, neodvozuje se z `theta` ani z jiných `TrendParams` a kalibrace komponenty ho nemění (jinak by se test posouval spolu s komponentou).
 
 **Vstup.** Všechny bary, které komponenta zpracovala (`states` logu 13.3 spojené s bary podle `bar_index`; bary `BAR_SKIPPED` v řadě nejsou), tj. bary v rozsahu `session_scope` včetně warmupu a včetně `outside_session`. Pořadí = `bar_index`. Použité hodnoty: `close`, `high`, `low`, `trading_date`, `tick_size`.
 
@@ -1287,7 +1287,7 @@ Kontroly 13.4 měří, zda každý odhad komponenty obstál v budoucnosti, ale �
 
 ```
 pravda_poloha_trendu(bars, c):
-  1. A(t) = průměr TR(x) přes všechny bary x téhož trading_date (celý den, pohled do budoucnosti),
+  1. A(t) = průměr TR(x) přes všechny bary vstupu x téhož trading_date (celý den, pohled do budoucnosti),
      TR(x) = max(high_x − low_x, |high_x − close_{x−1}|, |low_x − close_{x−1}|), první bar řady a první bar
      session TR = high − low (jako 4.1; vzorec TR je obecný, ne definice komponenty);
      podlaha A(t) = max(A(t), 2 × tick_size)
@@ -1299,13 +1299,14 @@ pravda_poloha_trendu(bars, c):
         V_t(s) = max over s' in S of (V_{t−1}(s') − cost(s' → s)) + g(s, t)
         back_t(s) = s' s maximem; remíza (rozdíl ≤ 1e-9) → nejdřív s' = s, pak NONE, UP, DOWN
   6. s_{n−1} = argmax_s V_{n−1}(s) (remíza → NONE, UP, DOWN); s_{t−1} = back_t(s_t) pro t = n−1 … 1
-  7. úsek pravdy směru d ∈ {UP, DOWN} = maximální běh po sobě jdoucích t s s_t = d, t ∈ [a, b];
+  7. P_t = Σ_{x=1..t} r_x, P_0 = 0                                 # kumulativní normalizovaná cesta (jednotka A)
+     úsek pravdy směru d ∈ {UP, DOWN} = maximální běh po sobě jdoucích t s s_t = d, t ∈ [a, b];
      t_start = a − 1 (bar, jehož close je začátek úseku), t_end = b, bary úseku = [a, b],
-     gain = Σ_{t=a..b} r_t (> c), move_pts = close_b − close_{a−1}
+     sgn(UP) = 1, sgn(DOWN) = −1, gain = sgn(d) × (P_b − P_{a−1}) (> c), move_pts = close_b − close_{a−1}
   8. štítek baru T_t = s_t (t ≥ 1); T_0 = NONE
 ```
 
-Složitost `O(n)` (3 stavy, 9 přechodů na bar), paměť `n × 3` zpětných ukazatelů; běh přes 5,4 mil. barů NQ trvá řádově minuty. Z optimality plyne: `close_{a−1} = min close` a `close_b = max close` úseku `UP` (zrcadlově `DOWN`), tj. `t_start` a `t_end` jsou bary skutečného dna a vrcholu. Hranice session a mezery se neošetřují: skok ceny je výnos jako každý jiný (stejně jako v 5.6 pokračuje zigzag přes session); bar `t_end` jednoho úseku může být `t_start` následujícího úseku opačného směru, štítek nese směr prvního z nich (krok 8).
+Složitost `O(n)` (3 stavy, 9 přechodů na bar), paměť `n × 3` zpětných ukazatelů; běh přes 5,4 mil. barů NQ trvá řádově minuty. Z optimality plyne: `P_{a−1} = min P` a `P_b = max P` na `[a−1, b]` u úseku `UP` (zrcadlově `DOWN`), tj. `t_start` a `t_end` jsou dno a vrchol normalizované cesty; uvnitř jednoho obchodního dne (konstantní `A`) jsou to bary nejnižšího a nejvyššího `close`. Všechny vzdálenosti v 13.15.4 se měří na `P` (jednotka A), ne na surových `close`, aby přechod mezi dny s různým `A` nedával hodnoty mimo rozsah. Hranice session a mezery se neošetřují: skok ceny je výnos jako každý jiný (stejně jako v 5.6 pokračuje zigzag přes session); bar `t_end` jednoho úseku může být `t_start` následujícího úseku opačného směru, štítek nese směr prvního z nich (krok 8).
 
 **Měřítko.** Primární `c = 6` (= dva prahy `theta` výchozí hodnoty: trend v P.A.T. má aspoň impuls a pullback, tj. úsek musí „vydělat“ víc než dvě θ, aby se počítal; pullback hlubší než 6 ATR optimum rozdělí). Citlivost: `c ∈ {3, 4,5, 6, 9, 12}`; pro každé `c` se spočítá κ (13.15.3) a `c*` = `argmax κ` se hlásí jako **efektivní měřítko komponenty** (jen report; brány 13.15.6 platí pro `c = 6`). Hodnoty jsou předpoklad (D-80): změna primárního měřítka jen zápisem do logu s rozborem κ(c), nikdy podle výsledku komponenty.
 
@@ -1329,7 +1330,7 @@ Složitost `O(n)` (3 stavy, 9 přechodů na bar), paměť `n × 3` zpětných uk
 | přesnost podle `phase` | `precision` pro IMPULSE a PULLBACK zvlášť |
 | binární varianta | totéž pro `in_trend_t` proti `T_t ≠ NONE` (κ₂) |
 
-Intervaly: 95% blokovým bootstrapem po týdnech (13.6). Členění: po trzích, obdobích, letech, RTH / mimo RTH, kvintilech `atr1`, s modulem SR / bez úrovní (13.9).
+Intervaly: 95% blokovým bootstrapem po týdnech (13.6). Členění: po trzích, obdobích, letech, RTH / mimo RTH, kvintilech `atr1` (hranice z vývojového období, 12.2 bod 1), s modulem SR / bez úrovní (13.9).
 
 #### 13.15.4 Shoda po úsecích
 
@@ -1339,17 +1340,17 @@ Intervaly: 95% blokovým bootstrapem po týdnech (13.6). Členění: po trzích,
 |---|---|---|
 | `first_hit` | první bar `t ∈ [t_start, t_end]` s `direction_t = d` | null → úsek **nezachycen** |
 | `delay_start_bars`, `delay_start_min` | `first_hit − t_start`; `ts_close(first_hit) − ts_open(t_start)` v minutách | null |
-| `move_left` | `(close_{t_end} − close_{first_hit}) / (close_{t_end} − close_{t_start})` (UP; DOWN zrcadlově): podíl čistého pohybu úseku, který zbýval v okamžiku zachycení (1 = zachyceno na dně, 0 = na vrcholu, záporné = close v `first_hit` nad vrcholem nemůže nastat, protože `close_{t_end}` je maximum úseku) | null |
+| `move_left` | `sgn(d) × (P_{t_end} − P_{first_hit}) / gain`: podíl čistého pohybu úseku, který zbýval v okamžiku zachycení; vždy v `[0, 1]` (1 = zachyceno na dně, 0 = na vrcholu; `P_{t_start}` je minimum a `P_{t_end}` maximum úseku) | null |
 | `captured` | `first_hit ≠ null ∧ move_left ≥ 1/3` (trend zachycen, dokud zbývala aspoň třetina pohybu) | false |
 | `cover` | podíl barů `[first_hit, t_end]` s `direction = d` (přerušení fází `TL_BROKEN`, `NONE` nebo opačným směrem snižují) | null |
-| `t_last` | je-li `direction_{t_end} = d`: poslední bar běhu komponenty obsahujícího `t_end` (běh pokračuje za konec úseku); jinak poslední bar `≤ t_end` s `direction = d` | null při `first_hit = null` |
+| `t_last` | je-li `direction_{t_end} = d`: poslední bar běhu komponenty obsahujícího `t_end` (běh pokračuje za konec úseku); jinak poslední bar `∈ [first_hit, t_end]` s `direction = d` | null při `first_hit = null` |
 | `delay_end_bars` | `t_last − t_end` (> 0 přesah za vrchol, < 0 předčasný konec) | null |
-| `overrun_atr` | `(close_{t_end} − min_{x ∈ (t_end, t_last]} close_x) / A(t_end)` při `delay_end_bars > 0`, jinak 0 (UP; DOWN zrcadlově): kolik protipohybu komponenta ještě hlásila jako trend | null |
+| `overrun_atr` | `max(0, max_{x ∈ (t_end, t_last]} sgn(d) × (P_{t_end} − P_x))` při `delay_end_bars > 0`, jinak 0: kolik protipohybu (v násobcích A) komponenta ještě hlásila jako trend | null |
 | `size_bin` | `gain` v intervalech `[c, 2c)`, `[2c, 4c)`, `≥ 4c`; délka `t_end − t_start` v barech do 30, 31–120, 121–480, > 480 | — |
 
 Metriky (každá s intervalem 13.6): podíl zachycených úseků (`first_hit ≠ null`) a podíl `captured`, obojí celkem a podle `size_bin` (krátké úseky komponenta zachytit nemůže: trend vyžaduje dva potvrzené swingy; proto je **hlavní číslo** podíl `captured` mezi úseky s `gain ≥ 2c`); rozdělení `delay_start_bars`, `delay_start_min`, `move_left` (medián, 10. a 90. percentil); rozdělení `cover`; rozdělení `delay_end_bars` a `overrun_atr`; podíl úseků, jejichž konec komponenta hlásila dřív, než nastal (`delay_end_bars < 0`); podíl úseků, u kterých `TREND_END` nebo `TL_BREAK(MAIN)` strany d nastal v `[t_end, t_last]` (konec zachycen událostí).
 
-**Běhy komponenty (falešné trendy).** Pro každý běh `R` směru d: `overlap = |{t ∈ R : T_t = d}| / |R|`; běh je **falešný**, pokud `overlap < 0,5`. Falešný běh se třídí podle převažujícího štítku pravdy v jeho barech: `NONE` (trend v měřítku `c` nebyl) nebo opačný směr (chyba směru). U každého běhu se uvede `net_move = (close_{last} − close_{first}) / A(first)` ve směru d (falešný běh, který přesto vydělal, je úsek pod měřítkem `c`; běh se záporným `net_move` je chyba). Metriky: počet a podíl falešných běhů (celkem, podle třídy), podíl barů ve falešných bězích mezi bary `direction ≠ NONE`, medián délky a `net_move` falešných běhů, členění podle `strength_class` v prvním baru běhu.
+**Běhy komponenty (falešné trendy).** Pro každý běh `R` směru d: `overlap = |{t ∈ R : T_t = d}| / |R|`; běh je **falešný**, pokud `overlap < 0,5`. Falešný běh se třídí podle převažujícího štítku pravdy v jeho barech: `NONE` (trend v měřítku `c` nebyl) nebo opačný směr (chyba směru). U každého běhu (`first`, `last` = první a poslední bar běhu) se uvede `net_move = sgn(d) × (P_{last} − P_{first})` (násobky A; pozice od close prvního baru běhu) (falešný běh, který přesto vydělal, je úsek pod měřítkem `c`; běh se záporným `net_move` je chyba). Metriky: počet a podíl falešných běhů (celkem, podle třídy), podíl barů ve falešných bězích mezi bary `direction ≠ NONE`, medián délky a `net_move` falešných běhů, členění podle `strength_class` v prvním baru běhu.
 
 #### 13.15.5 Reference náhody a triviální detektor
 
@@ -1366,7 +1367,7 @@ Brány (pass / fail; při nesplnění se historické metriky komponenty nepřijm
 
 | # | Brána | Pass |
 |---|---|---|
-| 1 | **kontrola pravdy na syntetice** (generátor 13.2.5, `c = 6`, `A(t)` z barů scénáře ≈ A): S1, S3, S4, S8 → jediný úsek `UP` `t_start = 0`, `t_end = 230` (`H₈`), jinak `NONE`; S9 → totéž s `t_end = 170` (60 barů chybí, osa x je bez nich); S2 → `UP` 0 → 140 (`H₅`), `DOWN` 140 → 180; S5 → žádný úsek; S6 → střídavě `UP` 0 → 30, `DOWN` 30 → 60, `UP` 60 → 90, … (každý úsek cesty 30 barů, |pohyb| ≥ 8A > c); S7 → jediný `UP` 0 → 110 (`H₄`), pokles −5A/+4A/−3,5A je pod měřítkem → `NONE`; S10 → zrcadlo; S11a i S11b → jediný `UP` 0 → 50 (`H₂ = L₀ + 8A`), vzestup na `L₀ + 5A` a trojúhelník → `NONE`; indexy jsou bary po warmupu | hranice úseků se shodují s tolerancí ±1 bar (šum těl ≤ 0,2A posouvá extrém close), počet a směr úseků přesně; `gain` každého úseku > c |
+| 1 | **kontrola pravdy na syntetice** (generátor 13.2.5, `c = 6`, `A(t)` z barů scénáře ≈ A): S1, S3, S4, S8 → jediný úsek `UP` `t_start = 0`, `t_end = 230` (`H₈`), jinak `NONE`; S9 → totéž s `t_end = 170` (60 barů chybí, osa x je bez nich); S2 → `UP` 0 → 140 (`H₅`), `DOWN` 140 → 180; S5 → žádný úsek; S6 → střídavě `UP` 0 → 30, `DOWN` 30 → 60, `UP` 60 → 90, … (každý úsek cesty 30 barů, velikost pohybu ≥ 8A > c); S7 → jediný `UP` 0 → 110 (`H₄`), pokles −5A/+4A/−3,5A je pod měřítkem → `NONE`; S10 → zrcadlo; S11a i S11b → jediný `UP` 0 → 50 (`H₂ = L₀ + 8A`), vzestup na `L₀ + 5A` a trojúhelník → `NONE`; indexy jsou bary po warmupu | hranice úseků se shodují s tolerancí ±1 bar (šum těl ≤ 0,2A posouvá extrém close), počet a směr úseků přesně; `gain` každého úseku > c |
 | 2 | **lepší než náhoda po barech** (`c = 6`; každý trh × období, v obou variantách 13.9) | dolní mez 95% intervalu κ > 0 a κ > κ každého posunu `k = 1 … 20` |
 | 3 | **lepší než náhoda po úsecích** (`c = 6`; každý trh × období, obě varianty 13.9) | podíl `captured` mezi úseky s `gain ≥ 2c` > maximum přes posuny `k`; podíl barů ve falešných bězích < minimum přes posuny `k` |
 | 4 | **podezření na únik budoucnosti** (doplňuje 13.10) | medián `move_left` zachycených úseků > 0,9, nebo κ > 0,8, nebo podíl zachycených úseků s `delay_start_bars ≤ 1` > 10 % → zopakovat brány 13.2.1 a 13.2.2 na dotčeném období, než se výsledek přijme (kauzální detektor nemůže znát dno v okamžiku, kdy vzniká) |

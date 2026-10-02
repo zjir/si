@@ -1,4 +1,4 @@
-# TASK-0005 — stav v kole 3 (2026-10-02), dokumentové kolo 6
+# TASK-0005 — stav po kole 3 (2026-10-02), dokumentové kolo 6 — DONE
 
 ## Hotovo v kole 3
 
@@ -6,14 +6,11 @@
 - Křížové odkazy: 13.1 (dvě pravdy), 13.3 (log nese bary), 13.4 (vlastní struktura = jen zpoždění), 13.5, 13.6, 13.9 (sada včetně 13.15), 13.10 (brány, únik), 13.11 (a) = κ proti 13.15 (střední nález: dřívější metrika byla shoda s vlastní strukturou); R8 (testy.md), hlavička verze, historie řádek 6.
 - Nálezy kola před zapracováním: 0 B / 1 S (13.11 a) / 4 D (13.1, 13.3, 13.5, 13.9 odkazy).
 
-## Rozpracováno
+## Kontrolní průchod kola 3
 
-- Kontrolní průchod nad novým textem 13.15 (nové rozhodnutí vytváří nové otázky: remízy DP, warmup, hranice období, S9 indexy) a zbytek druhého průchodu textu kola 5 (13.2.5, 7.4, 6.1.1 krok 2, 12.2 krok 3, 15.5, D-78 — přečteno, bez nálezu).
-
-## Zbývá
-
-1. Dočíst 13.15 v dokumentu po vložení a opravit nesrovnalosti.
-2. Bez blokujícího ani středního nálezu → `DONE`.
+- Druhý průchod nad textem kola 5 (13.2.5 generátor a S1–S11, SR1, 7.4 restart, 6.1.1 krok 2, 12.2 krok 3, 15.5, D-78): bez nálezu.
+- Průchod nad novým 13.15: vzdálenosti (`move_left`, `overrun_atr`, `net_move`) přepsány na kumulativní normalizovanou cestu `P` (surové close dávaly hodnoty mimo rozsah při přechodu mezi dny s různým `A`); `t_last` omezen na `[first_hit, t_end]`; svislítka absolutní hodnoty v buňce tabulky nahrazena slovy; věta o rozsahu (zisk oracle není obchodní výsledek, 14).
+- Výsledek: žádný blokující ani střední nález → `DONE`. Sekce „Dodatky k zapracování“ v dokumentu není.
 
 ## Otevřené požadavky (mimo dokument, nebrání DONE)
 

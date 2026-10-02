@@ -1,8 +1,8 @@
 {
   "task": "TASK-0005",
   "round": 3,
-  "status": "CONTINUE",
-  "summary": "Dodatek zadavatele zapracován: sekce 13.15 (nezávislá pravda polohy trendů optimální segmentací close, shoda po barech κ a po úsecích, reference posunu, brány, D-80), 13.11 (a) přepnuto na κ, odkazy a R8; běží kontrolní průchod nad novým textem.",
+  "status": "DONE",
+  "summary": "Dodatek zadavatele zapracován: sekce 13.15 nezávislý zpětný test polohy trendů (pravda optimální segmentací cesty close bez definic komponenty, shoda po barech κ a po úsecích, reference posunu o obchodní dny, brány 13.15.6, D-80), 13.11 (a) měří κ, odkazy v 13.1–13.10, R8; druhý průchod nad textem kola 5 bez nálezu; kontrolní průchod 13.15 opravil měření vzdáleností na normalizované cestě.",
   "findings": {
     "blocking": 0,
     "medium": 1,
@@ -11,6 +11,9 @@
   "changed": [
     "zadani/komponenta-trend.md"
   ],
-  "next": "Dokončit kontrolní průchod nad 13.15 a zbytkem textu kola 5; bez nálezu DONE.",
-  "requests": []
+  "next": "Nic v tomto dokumentu; mimo rozsah zbývají R5 (smazat komponenta-sr.md a odkazy), R7 (data/NEWS/info.md) a nový R8 (provedení testu 13.15 v zadani/testy.md).",
+  "requests": [
+    "R8: zadani/testy.md doplnit provedení testu 13.15 (modul pravdy oddělený od kódu komponenty, reference posunu o obchodní dny, formát reportu κ a úseků); mimo rozsah recenzenta tohoto dokumentu",
+    "R5 a R7 trvají (viz 3.8)"
+  ]
 }
