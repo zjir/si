@@ -1,0 +1,14 @@
+{
+  "task": "TASK-0005",
+  "round": 3,
+  "status": "CONTINUE",
+  "summary": "Kolo 3 začalo: druhý průchod nad textem kola 5 a zapracování dodatku zadavatele (nezávislý zpětný test polohy trendů v sekci 13).",
+  "findings": {
+    "blocking": 0,
+    "medium": 0,
+    "minor": 0
+  },
+  "changed": [],
+  "next": "Dokončit druhý průchod a dodatek testů; nenajde-li se nic blokujícího ani středního, DONE.",
+  "requests": []
+}
