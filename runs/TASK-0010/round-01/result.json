@@ -2,15 +2,15 @@
   "task": "TASK-0010",
   "round": 1,
   "status": "CONTINUE",
-  "summary": "Kolo 1 probíhá: 1 blokující (cand_*_fine ve stavu 5.2 a maskování snapshotu 13.2.7, D-101) zapracován; pokračuje průchod dokumentem.",
+  "summary": "Kontrolní průchod po D-99–D-100: 1 blokující (jemný čas kandidáta zigzagu z 5.4/D-100 chyběl ve stavu 5.2 a v maskování snapshotu 13.2.7, brána byla nesplnitelná; D-101), 0 středních, 3 drobné (D-102); vše zapracováno, hlavička kolo 12, historie řádek 12, odkazy D/R/I/S bez nálezu.",
   "findings": {
     "blocking": 1,
     "medium": 0,
-    "minor": 0
+    "minor": 3
   },
   "changed": [
     "zadani/komponenta-trend.md"
   ],
-  "next": "Pokračovat průchodem dokumentu od priority D-99 (5.3 (b) × 7.4 × 13.2.7) a 13.17.1 bod 4.",
+  "next": "Žádné další kolo v tomto úkolu (max_rounds 1). Případné další kontrolní kolo: druhý průchod nad novým textem D-101 (5.2 cand_*_fine × 5.4 × 10.5 snapshot × 13.2.7 maskování × 13.2.8) a D-102 (5.3 poznámka, 13.17.1 bod 4); sekce 13.18–13.20 a 15 byly v tomto kole jen prohledány na 1s data/snapshot, ne čteny celé; D-81–D-102 neotvírat bez nového argumentu.",
   "requests": []
 }
