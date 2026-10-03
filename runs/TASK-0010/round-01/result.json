@@ -2,13 +2,15 @@
   "task": "TASK-0010",
   "round": 1,
   "status": "CONTINUE",
-  "summary": "Kolo 1 zahájeno: kontrolní průchod po D-99–D-100.",
+  "summary": "Kolo 1 probíhá: 1 blokující (cand_*_fine ve stavu 5.2 a maskování snapshotu 13.2.7, D-101) zapracován; pokračuje průchod dokumentem.",
   "findings": {
-    "blocking": 0,
+    "blocking": 1,
     "medium": 0,
     "minor": 0
   },
-  "changed": [],
+  "changed": [
+    "zadani/komponenta-trend.md"
+  ],
   "next": "Pokračovat průchodem dokumentu od priority D-99 (5.3 (b) × 7.4 × 13.2.7) a 13.17.1 bod 4.",
   "requests": []
 }
