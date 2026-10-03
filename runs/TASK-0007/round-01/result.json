@@ -2,9 +2,13 @@
   "task": "TASK-0007",
   "round": 1,
   "status": "CONTINUE",
-  "summary": "Kolo 1 zahájeno: kontrolní průchod celým dokumentem po sloučení SR a testů.",
-  "findings": {"blocking": 0, "medium": 0, "minor": 0},
+  "summary": "Kolo 1: přečten celý dokument (sekce 0–17, log); nálezy 1 blokující (13.2.7 nesplnitelné kritérium kvůli pořadovým id), 3 střední (stav ve warmupu, dělení 28/12 v kalibraci, začátek horizontu v 13.4), 12 drobných; zapracování probíhá.",
+  "findings": {
+    "blocking": 1,
+    "medium": 3,
+    "minor": 12
+  },
   "changed": [],
-  "next": "Dokončit průchod sekcemi 1–17 a logem; zapracovat nálezy.",
+  "next": "Zapracovat nálezy do textu, log D-92+, historie kolo 9; pak kontrolní průchod změněných míst.",
   "requests": []
 }
