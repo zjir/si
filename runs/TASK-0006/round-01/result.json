@@ -2,9 +2,13 @@
   "task": "TASK-0006",
   "round": 1,
   "status": "CONTINUE",
-  "summary": "Kolo začalo: čtení testy.md a sekce 13 komponenta-trend.md před sloučením.",
-  "findings": {"blocking": 0, "medium": 0, "minor": 0},
+  "summary": "Přečteno testy.md a komponenta-trend.md; rozhodnuto nepřenášet zastaralé orákulum (tabulka výkladů je v dokumentu už rozhodnuta), zapracovat harness, data, referenční výpočet, fixture, report a provedení 13.15 do nových 13.16–13.20.",
+  "findings": {
+    "blocking": 0,
+    "medium": 0,
+    "minor": 0
+  },
   "changed": [],
-  "next": "Zapracovat testy.md do 13.x, smazat komponenta-sr.md a testy.md, opravit odkazy, recenzní průchod.",
+  "next": "Zapsat 13.16–13.20, opravit odkazy, smazat komponenta-sr.md a testy.md, recenzní průchod.",
   "requests": []
 }
