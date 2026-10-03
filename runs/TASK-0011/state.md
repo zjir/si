@@ -9,5 +9,7 @@
 ## Rozpracováno
 - Log D-103/D-104, hlavička (kolo 13), historie řádek 13: ještě nezapsáno.
 
+- 13.18–13.20 a 15 přečteny celé: bez nálezu (13.20.1 čte bar sloupce z logu 13.3, ne z TrendState — konzistentní; seedy S1=1…S11b=12, SR1=13…SR5=17; 15.2 n<30 jen při atr_n<30; 15.4 bin phase ∈ {IMPULSE, PULLBACK} = trend_valid 7.2).
+
 ## Zbývá
-- 13.18–13.20 a 15 celé; pak sekce 0–4, 6–8, 10–12, 13.1–13.17, 14, 16; kontrola odkazů skriptem.
+- Sekce 0–4, 6–8, 10–12, 13.1–13.17, 14, 16; kontrola odkazů skriptem; log D-103/D-104, hlavička, historie.
