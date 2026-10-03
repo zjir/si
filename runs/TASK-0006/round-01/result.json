@@ -1,0 +1,10 @@
+{
+  "task": "TASK-0006",
+  "round": 1,
+  "status": "CONTINUE",
+  "summary": "Kolo začalo: čtení testy.md a sekce 13 komponenta-trend.md před sloučením.",
+  "findings": {"blocking": 0, "medium": 0, "minor": 0},
+  "changed": [],
+  "next": "Zapracovat testy.md do 13.x, smazat komponenta-sr.md a testy.md, opravit odkazy, recenzní průchod.",
+  "requests": []
+}
