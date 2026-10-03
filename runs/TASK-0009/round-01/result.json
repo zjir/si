@@ -1,0 +1,10 @@
+{
+  "task": "TASK-0009",
+  "round": 1,
+  "status": "CONTINUE",
+  "summary": "Kolo 1 zahájeno: kontrolní průchod po D-97–D-98, zatím bez nálezu.",
+  "findings": {"blocking": 0, "medium": 0, "minor": 0},
+  "changed": [],
+  "next": "Dokončit průchod dokumentem (priorita 13.2.7 × 10.5 × 13.16.4, 13.17.3, pak zbytek).",
+  "requests": []
+}

@@ -1,0 +1,52 @@
+# Kontext úkolu
+
+- Úkol: TASK-0009 — review 7: trend — kontrolní průchod celým dokumentem po zapracování nálezů TASK-0008 (D-97–D-98)
+- Režim: spec
+- Kolo: 1 (strop tohoto běhu: kolo 1)
+- Datum: 2026-10-03T15:56:07+02:00
+- Pracovní složka: kořen repozitáře; všechny cesty jsou relativní k ní.
+
+## Cíl
+
+Zreviduj zadani/komponenta-trend.md v roli recenzenta (agent-loop/review-loop/review.md): projdi celý dokument (sekce 1–17 včetně podsekcí 13.x, rozhodovací log, historie revizí), vyplň všechna prázdná místa, odstraň rozpory a nekonzistence mezi sekcemi, zejména ty, které mohly vzniknout změnami kola 1 TASK-0008 (13.2.7 maskování snapshotu ts_ext_fine × 10.5 ořez swingů × 13.16.4 bod 6; okno rozdílu [t_a, t_e] a kritéria (a)/(b) × 3.4 × 13.17.3; 8.1 ořez logu proražení = t_keep; 10.4 BAR_SKIPPED WARNING × 13.17.3; sekce 2 swings_new/SWING_CONFIRMED × 7.x × 8.x; 13.4 začátek sledování × 13.5 × 15.4), vše v kontextu systému P.A.T. Žádné dodatky zadavatele; jde o kontrolní kolo. Nálezy zapracuj do dokumentu, zaznamenej do rozhodovacího logu a historie revizí.
+
+## Hotovo, když
+
+Průchod celým dokumentem nenajde žádný blokující ani střední nález; zapracované nálezy jsou zaznamenané v rozhodovacím logu a historii revizí; všechny křížové odkazy (sekce, D-xx, R-x, I-x, brány, scénáře) vedou na existující místa; poslední řádek je KONEC DOKUMENTU.
+
+## Vstupy (čti podle potřeby, cíleně)
+
+- `data/README.md`
+- `data/NQ/README.md`
+- `data/FDAX/README.md`
+- `runs/TASK-0008/state.md`
+- `runs/TASK-0008/round-01/result.json`
+
+## Rozsah
+
+Smíš měnit:
+
+- `zadani/komponenta-trend.md`
+- `data/README.md`
+
+Nesmíš měnit (má přednost):
+
+- (nic)
+
+Vždy smíš zapisovat do `runs/TASK-0009/` (stav úkolu a soubory tohoto kola).
+
+## Stav a minulé kolo
+
+- Stav úkolu: `runs/TASK-0009/state.md` (zatím neexistuje, jde o první kolo; vytvoř ho)
+- Výsledek minulého kola: (žádný, první kolo)
+- Diff minulého kola: (žádný)
+
+## Poznámky zadavatele
+
+Jediné kolo (max_rounds 1): výsledek kola je konečný, zapiš DONE nebo CONTINUE s přesným next. Podklady PAT/ a datové soubory data/** (kromě .md) nejsou k dispozici; nic z PAT znovu neověřuj, vycházej z textu dokumentu a data/*/README.md. Rozhodnutí vyžadující PAT podklad rozhodni jako předpoklad s kontrolou při implementaci a zapiš do requests. Rozhodovací log je závazný: D-81–D-98 neotvírej bez nového argumentu; nepřidávej zpět orákulum ani číslování G1–G11 / S01–S21; číslování sekcí 14–17 zachovej. Dokument je velký (~315 KB, ~2000 řádků): čti po částech (≤ 420 řádků), dlouhé řádky zkracuj v Pythonu, zapisuj průběžně a po každém větším kroku checkpoint. Priorita: nejdřív nový text D-97 (13.2.7 × 10.5 × 13.16.4) a 13.17.3, pak zbytek dokumentu.
+
+## Výstupy tohoto kola
+
+- `runs/TASK-0009/state.md` — přepiš aktuálním stavem.
+- `runs/TASK-0009/round-01/result.json` — povinné; `"task": "TASK-0009"`, `"round": 1`.
+- `runs/TASK-0009/round-01/notes.md` — volitelné.

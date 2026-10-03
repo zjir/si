@@ -6,14 +6,15 @@
   "run_start_round": 0,
   "started_at": "2026-10-03T15:56:07+02:00",
   "ended_at": null,
-  "heartbeat": "2026-10-03T15:56:07+02:00",
+  "heartbeat": "2026-10-03T15:56:23+02:00",
   "last_status": null,
   "last_summary": null,
   "push_failed": false,
   "runner": "skill",
-  "claim_until": "2026-10-03T18:26:07+02:00",
-  "updated_at": "2026-10-03T15:56:07+02:00",
+  "claim_until": "2026-10-03T18:26:23+02:00",
+  "updated_at": "2026-10-03T15:56:23+02:00",
   "current_round": 1,
   "skill_model": "claude-fable-5-1",
-  "skill_round_started_at": "2026-10-03T15:56:07+02:00"
+  "skill_round_started_at": "2026-10-03T15:56:07+02:00",
+  "skill_checkpoints": 1
 }
