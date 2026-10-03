@@ -1,0 +1,16 @@
+{
+  "task": "TASK-0006",
+  "status": "running",
+  "phase": "queued",
+  "round": 0,
+  "run_start_round": 0,
+  "started_at": "2026-10-03T13:33:18+02:00",
+  "ended_at": null,
+  "heartbeat": "2026-10-03T13:33:18+02:00",
+  "last_status": null,
+  "last_summary": null,
+  "push_failed": false,
+  "runner": "skill",
+  "claim_until": "2026-10-03T16:03:18+02:00",
+  "updated_at": "2026-10-03T13:33:18+02:00"
+}
