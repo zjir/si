@@ -2,13 +2,15 @@
   "task": "TASK-0007",
   "round": 1,
   "status": "CONTINUE",
-  "summary": "Kolo 1: přečten celý dokument (sekce 0–17, log); nálezy 1 blokující (13.2.7 nesplnitelné kritérium kvůli pořadovým id), 3 střední (stav ve warmupu, dělení 28/12 v kalibraci, začátek horizontu v 13.4), 12 drobných; zapracování probíhá.",
+  "summary": "Kontrolní průchod celým dokumentem: 1 blokující (brána 13.2.7 nesplnitelná kvůli pořadovým id → maskování id, okna rozdílu podle snapshot(), ořez swingů v 10.5; D-92), 3 střední (stav ve warmupu a fázi NONE 10.3 D-93, dělení kalibračního vzorku 28/12 D-94, začátek horizontu kontrol 13.4 D-95), 12 drobných (D-96); vše zapracováno, log D-92–D-96, historie kolo 9.",
   "findings": {
     "blocking": 1,
     "medium": 3,
     "minor": 12
   },
-  "changed": [],
-  "next": "Zapracovat nálezy do textu, log D-92+, historie kolo 9; pak kontrolní průchod změněných míst.",
+  "changed": [
+    "zadani/komponenta-trend.md"
+  ],
+  "next": "Kolo 2: kontrolní průchod celého dokumentu po změnách kola 1 (zejména 10.3 odstavec warmupu, 10.5 ořez swingů, 13.2.7, 13.4 začátek sledování, 12.2 dělení 28/12, 11.4 BAR_SKIPPED); nic z PAT neověřovat; DONE, pokud průchod nenajde blokující ani střední nález.",
   "requests": []
 }

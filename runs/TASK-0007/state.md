@@ -1,17 +1,13 @@
-# TASK-0007 — stav (kolo 1 rozpracováno)
+# TASK-0007 — stav po kole 1 (2026-10-03)
 
-## Hotovo
-- Přečten celý dokument zadani/komponenta-trend.md (0–17 včetně logu) + křížové kontroly (identifikátory událostí, odkazy sekcí, D-čísla).
+## Hotovo (kolo 1)
+- Celý dokument přečten (0–17, log, historie); křížové kontroly identifikátorů událostí, odkazů sekcí, D-čísel, počtu sloupců tabulek.
+- Blokující (1): brána 13.2.7 „rozdíl jen do nejbližšího TREND_END“ byla nesplnitelná (pořadová id `swing_id`, `event_id`, `pb_id` se liší do konce běhu) → nové kritérium: maskování id, okna rozdílu od baru `intrabar_ambiguous` do shody `snapshot()`; obsah snapshotu zpevněn ořezem seznamu swingů (10.5); 13.16.4 doplněno (D-92).
+- Střední (3): odstavec „Stav ve warmupu a ve fázi NONE“ v 10.3 + odkazy z 4.1, 13.16.5 bod 3, I-1 (D-93); 12.2 dělení 40 dnů na 28/12 (`i mod 10 ∈ {3,6,9}`, D-94); 13.4 „Začátek sledování“ od baru t+1, TREND_END v baru TL_BREAK = SKUTEČNÉ (D-95).
+- Drobné (12, D-96): 3.10.2 bod 2; 3.5 `meta` klíče; 6.1.1 krok 3; I-4; 15.4 odkaz; 3.1 delta; 13.2.2 náhodná procházka; 13.2.8 výběr bodů; 13.18.3 "start"/"end"; S10 doji; 11.4 + 13.17.3 `BAR_SKIPPED`; 7.4 `dist_to_tl_atr_*`.
+- Hlavička kolo 9; historie řádek 9; poslední řádek KONEC DOKUMENTU; tabulky mají shodný počet sloupců.
 
-## Nálezy (před zapracováním)
-- B1: 13.2.7 kritérium „výstupy se smí lišit jen od prvního baru intrabar_ambiguous po nejbližší TREND_END“ je nesplnitelné: po rozdílném počtu potvrzených swingů se trvale liší pořadová id (`swing_id`, `event_id`, `pb_id`) ve všech dalších stavech → přepsat kritérium (maskování id, okna rozdílu podle `snapshot()`).
-- S1: stav ve warmupu: 4.1 „všechna ostatní pole null“ × 3.5 (`levels_missing`, `n_levels_active` se plní) × 13.16.5 bod 3 × I-1; `bar_index`, `session_id` atd. nemohou být null → přesná tabulka hodnot ve warmupu / fázi NONE.
-- S2: 12.2 krok 3–4: dělení 40 dnů na 28 ladicích / 12 ověřovacích není definováno.
-- S3: 13.4: od kterého baru se posuzuje horizont (bar t+1), remíza TREND_END v témže baru u TL_BREAK.
-- D: 3.10.2 bod 2 formulace („odvodí“ vs. zůstává); 3.5 `meta` klíče (3.10.3, chybí `n_touches_window`); 6.1.1 krok 3 `t_ext ≥ t_L₀` vs `swing_id`; I-4 `n_anchors` při `L0 = null`; 15.4 odkaz „13.16.3 krok 6“ → 5a; 3.1 delta „od prvního baru session“ vs 9; 13.2.2 náhodná procházka nedefinována; 13.2.8 výběr 100 bodů; 13.18.3 `from = "start"`; S10 doji asymetrie heuristiky; 11.4 „jednou za běh“ vs `BAR_SKIPPED` po barech (13.17.3); 7.4 `dist_to_tl_atr_*` = `*.dist_close_atr`.
-
-## Rozpracováno
-- Zapracování nálezů do textu + log D-92… + historie kolo 9.
-
-## Pro příští kolo
-- Pokud kolo 1 skončí před finalizací: dokončit zápis podle seznamu výše, pak kontrolní průchod změněných míst.
+## Zbývá (kolo 2)
+- Kontrolní průchod celého dokumentu po změnách (nová rozhodnutí mohou vytvořit nové otázky): zejména 10.3 warmup × 3.5 × 15.2 × 15.6; 10.5 ořez swingů × 8.2 PW1 × 7.4 `n_inner_swings` × 13.2.8 snapshot; 13.2.7 × 13.16.4; 13.4 × 13.5 × 15.4 (k, h); 12.2 × 12.3; 11.4 × 10.4 × 13.17.3.
+- Neotvírat D-81–D-96 bez nového argumentu; nic z PAT neověřovat; data/README.md nebylo třeba měnit.
+- Očekávání: žádný blokující nález; pokud průchod nenajde ani střední, zapsat DONE.

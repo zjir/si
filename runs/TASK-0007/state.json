@@ -1,20 +1,15 @@
 {
   "task": "TASK-0007",
   "status": "running",
-  "phase": "running",
-  "round": 0,
+  "phase": "between_rounds",
+  "round": 1,
   "run_start_round": 0,
   "started_at": "2026-10-03T15:09:18+02:00",
   "ended_at": null,
-  "heartbeat": "2026-10-03T15:24:40+02:00",
-  "last_status": null,
-  "last_summary": null,
+  "heartbeat": "2026-10-03T15:25:22+02:00",
+  "last_status": "CONTINUE",
+  "last_summary": "Kontrolní průchod celým dokumentem: 1 blokující (brána 13.2.7 nesplnitelná kvůli pořadovým id → maskování id, okna rozdílu podle snapshot(), ořez swingů v 10.5; D-92), 3 střední (stav ve warmupu a fázi NONE 10.3 D-93, dělení kalibračního vzorku 28/12 D-94, začátek horizontu kontrol 13.4 D-95), 12 drobných (D-96); vše zapracováno, log D-92–D-96, historie kolo 9.",
   "push_failed": false,
-  "runner": "skill",
-  "claim_until": "2026-10-03T17:54:40+02:00",
-  "updated_at": "2026-10-03T15:24:40+02:00",
-  "current_round": 1,
-  "skill_model": "claude-fable-5-1",
-  "skill_round_started_at": "2026-10-03T15:09:18+02:00",
-  "skill_checkpoints": 4
+  "updated_at": "2026-10-03T15:25:22+02:00",
+  "skill_heartbeat": "2026-10-03T15:25:22+02:00"
 }
