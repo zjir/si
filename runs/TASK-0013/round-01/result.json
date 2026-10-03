@@ -2,9 +2,15 @@
   "task": "TASK-0013",
   "round": 1,
   "status": "CONTINUE",
-  "summary": "Kolo 1 rozpracováno: kontrola nového textu D-105/D-106 a úplné čtení sekcí dosud jen prohledaných.",
-  "findings": {"blocking": 0, "medium": 0, "minor": 0},
-  "changed": [],
-  "next": "Pokračovat kontrolou D-105/D-106, pak celé čtení 2, 3.5–3.10, 5, 6–9, 10.3–10.5, 13.2 syntetika, 13.16.3, 13.17–13.20, 15, log D-1–D-102.",
+  "summary": "Kolo 1 rozpracováno: D-105/D-106 ověřeno (2 drobné: příklad pw3_max W=45 → 11, bin denní doby je v 15.5 ne 15.4); čtení 2, 3.5–3.10 bez nálezu; pokračuje 5–9.",
+  "findings": {
+    "blocking": 0,
+    "medium": 0,
+    "minor": 2
+  },
+  "changed": [
+    "zadani/komponenta-trend.md"
+  ],
+  "next": "Pokračovat čtením 5, 6–9, 10.3–10.5, 13.2 syntetika, 13.16.3, 13.17–13.19, 15, log D-1–D-102; pak log/historie.",
   "requests": []
 }
