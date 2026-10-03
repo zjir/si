@@ -2,15 +2,15 @@
   "task": "TASK-0008",
   "round": 1,
   "status": "CONTINUE",
-  "summary": "Průchod oblastí z TASK-0007: blokující 13.2.7 (snapshoty bez maskování ts_ext_fine se nikdy neshodnou) a střední (konec okna rozdílu včetně t_e) zapracovány (D-97); průchod pokračuje.",
+  "summary": "Kontrolní průchod celým dokumentem po D-92–D-96: 1 blokující (brána 13.2.7 nesplnitelná: snapshoty bez maskování ts_ext_fine se nikdy neshodnou, INTRABAR_MISMATCH jen v běhu auto; D-97), 1 střední (konec okna rozdílu včetně t_e, D-97), 7 drobných (D-98); vše zapracováno, hlavička kolo 10, historie řádek 10.",
   "findings": {
     "blocking": 1,
     "medium": 1,
-    "minor": 0
+    "minor": 7
   },
   "changed": [
     "zadani/komponenta-trend.md"
   ],
-  "next": "Dokončit průchod dokumentem (začít oblastmi změněnými v TASK-0007 r01).",
+  "next": "Žádné další kolo není v tomto úkolu (max_rounds 1). Případné další kontrolní kolo: druhý průchod nad textem D-97 (13.2.7 × 10.5 × 13.16.4) a nad 13.17.3.",
   "requests": []
 }
