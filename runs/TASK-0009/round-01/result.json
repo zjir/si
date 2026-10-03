@@ -2,9 +2,9 @@
   "task": "TASK-0009",
   "round": 1,
   "status": "CONTINUE",
-  "summary": "Kontrolní průchod po D-97–D-98: 0 blokujících, 2 střední (intrabar_ambiguous nepokrývalo začátek pullbacku při θ_pb < θ; otevřené okno 13.2.7 bez t_e), 3 drobné; zapracováno D-99, D-100, kolo 11; zbývá automatická kontrola odkazů a finalize.",
+  "summary": "Kontrolní průchod celým dokumentem po D-97–D-98: 0 blokujících, 2 střední (5.3 intrabar_ambiguous nepokrývalo začátek pullbacku v baru nového maxima při θ_pb < θ, takže brána 13.2.7 selhávala mimo okno; otevřené okno 13.2.7 bez t_e nedefinováno; D-99), 3 drobné (D-100); vše zapracováno, hlavička kolo 11, historie řádek 11, kontrola odkazů bez nálezu.",
   "findings": {"blocking": 0, "medium": 2, "minor": 3},
   "changed": ["zadani/komponenta-trend.md"],
-  "next": "Dokončit kontrolu křížových odkazů (D-xx, sekce, I-x, R-x) a uzavřít kolo.",
+  "next": "Žádné další kolo v tomto úkolu (max_rounds 1). Případné další kontrolní kolo: druhý průchod nad novým textem 5.3 podmínka (b) × 7.4 × 13.2.7 (D-99) a nad 13.17.1 bod 4 (referenční výpočet musí počítat intrabar_ambiguous včetně (b)); D-81–D-100 neotvírat bez nového argumentu.",
   "requests": []
 }
