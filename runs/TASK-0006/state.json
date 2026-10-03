@@ -1,15 +1,20 @@
 {
   "task": "TASK-0006",
   "status": "running",
-  "phase": "between_rounds",
+  "phase": "running",
   "round": 1,
   "run_start_round": 0,
   "started_at": "2026-10-03T13:33:18+02:00",
   "ended_at": null,
-  "heartbeat": "2026-10-03T14:27:49+02:00",
+  "heartbeat": "2026-10-03T14:43:21+02:00",
   "last_status": "CONTINUE",
   "last_summary": "Sloučeno: komponenta-sr.md a testy.md smazány, postup testů přepsán do 13.16–13.20 a 13.14.4 (harness, referenční výpočet a nové brány, data a syntetika, report, provedení 13.15), R5 a R8 uzavřeny, D-81–D-91; zbývá úplný průchod sekcemi 4–6, 9, 11, 15 proti novému textu.",
   "push_failed": false,
-  "updated_at": "2026-10-03T14:27:49+02:00",
-  "skill_heartbeat": "2026-10-03T14:27:49+02:00"
+  "updated_at": "2026-10-03T14:43:21+02:00",
+  "skill_heartbeat": "2026-10-03T14:27:49+02:00",
+  "current_round": 2,
+  "runner": "skill",
+  "skill_model": "claude-fable-5-1",
+  "skill_round_started_at": "2026-10-03T14:43:21+02:00",
+  "claim_until": "2026-10-03T17:13:21+02:00"
 }
