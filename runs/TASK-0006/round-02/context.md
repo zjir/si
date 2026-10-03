@@ -1,0 +1,55 @@
+# Kontext úkolu
+
+- Úkol: TASK-0006 — review 4: trend — sloučení SR a testů do jednoho zadání, smazání komponenta-sr.md a testy.md
+- Režim: spec
+- Kolo: 2 (strop tohoto běhu: kolo 2)
+- Datum: 2026-10-03T14:43:21+02:00
+- Pracovní složka: kořen repozitáře; všechny cesty jsou relativní k ní.
+
+## Cíl
+
+Zreviduj zadani/komponenta-trend.md v roli recenzenta (agent-loop/review-loop/review.md): projdi celý dokument, vyplň všechna prázdná místa, vše v kontextu systému P.A.T. Dodatky zadavatele (kolo 4): (1) Smaž zadani/komponenta-sr.md — zadání SR je od kola 2 součástí tohoto dokumentu (modul SR, 3.10, D-55); každý odkaz na smazaný soubor (3.8 požadavek R5, data/README.md sekce 10) nahraď odkazem na 3.10 tohoto dokumentu a R5 uzavři. (2) Přečti celý zadani/testy.md, jeho obsah zapracuj a rozveď do tohoto dokumentu (sekce 13 nebo nové podsekce 13.x): konvence a jednotky testů, kontrakt rozhraní pro testy (konstrukce, StateRecord, EventRecord, serializace a hash), fixture mechanických úrovní, kalendář session, data rollu, co komponenta nesmí, syntetická data a generátor (principy, segmenty, generování barů, šum, pravda, podmínky odstupu), reálná data (zdroje, validace DATA_ERROR, období, absence referenčních situací), orákulum (tabulka výkladů, základní řady, zigzag, stavový automat, trendline, metriky kvality, filtry PW-SW, směr, sestavení záznamu, modul delta), harness a formát reportu. Co v testy.md chybí, doplň: zejména provedení nezávislého zpětného testu 13.15 (požadavek R8: modul pravdy oddělený od kódu komponenty, reference posunu o obchodní dny, formát reportu κ a úseků) a testy modulu SR (3.10), které testy.md výslovně vylučoval. Překryvy mezi testy.md a stávající sekcí 13 sjednoť (jedna definice, jedno číslování bran a scénářů); rozpory rozhodni a zapiš do rozhodovacího logu. Pak zadani/testy.md smaž a všechny odkazy na něj v tomto dokumentu (sekce 1, 3.8 R5 a R8, 13 úvod, 13.14, 14, 15, D-3 a další) a v data/README.md nahraď odkazem na příslušnou podsekci tohoto dokumentu. (3) Po zapracování proveď jedno kolo recenze celého výsledného dokumentu (grilování AI implementátor / AI tester, kontrolní seznam role) a nálezy zapracuj.
+
+## Hotovo, když
+
+Soubory zadani/komponenta-sr.md a zadani/testy.md neexistují a v zadani/komponenta-trend.md ani v data/README.md na ně nevede žádný odkaz. Návrh testů komponenty včetně modulu SR je úplný v zadani/komponenta-trend.md (kontrakt rozhraní pro testy, testovací data syntetická i reálná, orákulum, harness, formát reportu, provedení testu 13.15); požadavky R5 a R8 v 3.8 jsou uzavřené. Průchod celým dokumentem nenajde žádný blokující ani střední nález; sloučení je zaznamenané v rozhodovacím logu a historii revizí; poslední řádek je KONEC DOKUMENTU.
+
+## Vstupy (čti podle potřeby, cíleně)
+
+- `zadani/testy.md`
+- `zadani/komponenta-sr.md`
+- `data/README.md`
+- `data/NQ/README.md`
+- `data/FDAX/README.md`
+- `runs/TASK-0005/state.md`
+
+## Rozsah
+
+Smíš měnit:
+
+- `zadani/komponenta-trend.md`
+- `zadani/komponenta-sr.md`
+- `zadani/testy.md`
+- `data/README.md`
+
+Nesmíš měnit (má přednost):
+
+- (nic)
+
+Vždy smíš zapisovat do `runs/TASK-0006/` (stav úkolu a soubory tohoto kola).
+
+## Stav a minulé kolo
+
+- Stav úkolu: `runs/TASK-0006/state.md` 
+- Výsledek minulého kola: `runs/TASK-0006/round-01/result.json`
+- Diff minulého kola: `runs/TASK-0006/round-01/diff.patch`
+
+## Poznámky zadavatele
+
+Podklady PAT/ (popis OS, deník, CSV obchodů) a datové soubory data/** (kromě .md) nejsou v tomto kole k dispozici; dokument už prošel 6 dokumentovými koly recenze proti nim. Nic z PAT znovu neověřuj; vycházej z textu dokumentu, data/README.md a data/<SYMBOL>/README.md. Pokud nějaké rozhodnutí vyžaduje PAT podklad, rozhodni výchozí chování jako předpoklad s kontrolou při implementaci a zapiš to do requests. testy.md je zdroj obsahu, ne závazný text: při sloučení platí definice z komponenta-trend.md (jeho rozhodovací log je závazný), testy.md upravuj tam, kde je s dokumentem v rozporu nebo zastaralý (vznikl před koly 2–6: modul SR 3.10, 13.15, generátor 13.2.5 a scénáře S1–S11). Číslování sekcí 14–17 zachovej (nové podsekce dávej do 13.x), ať zůstanou platné křížové odkazy. Dokument je velký (~245 KB): čti po částech (≤ 420 řádků), dlouhé řádky zkracuj v Pythonu, zapisuj průběžně a po každém větším kroku checkpoint.
+
+## Výstupy tohoto kola
+
+- `runs/TASK-0006/state.md` — přepiš aktuálním stavem.
+- `runs/TASK-0006/round-02/result.json` — povinné; `"task": "TASK-0006"`, `"round": 2`.
+- `runs/TASK-0006/round-02/notes.md` — volitelné.
