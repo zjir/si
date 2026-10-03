@@ -1,0 +1,10 @@
+{
+  "task": "TASK-0012",
+  "round": 1,
+  "status": "CONTINUE",
+  "summary": "Kolo 1 rozpracováno: kontrolní průchod po D-103/D-104 zahájen.",
+  "findings": {"blocking": 0, "medium": 0, "minor": 0},
+  "changed": [],
+  "next": "Pokračovat kontrolním průchodem: D-103/I-17 text, pak sekce 10.1–10.2, 11, 12, 13.1, 13.4–13.15, 13.16.x, 14, pak zbytek.",
+  "requests": []
+}
