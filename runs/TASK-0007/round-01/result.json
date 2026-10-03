@@ -1,0 +1,10 @@
+{
+  "task": "TASK-0007",
+  "round": 1,
+  "status": "CONTINUE",
+  "summary": "Kolo 1 zahájeno: kontrolní průchod celým dokumentem po sloučení SR a testů.",
+  "findings": {"blocking": 0, "medium": 0, "minor": 0},
+  "changed": [],
+  "next": "Dokončit průchod sekcemi 1–17 a logem; zapracovat nálezy.",
+  "requests": []
+}

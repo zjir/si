@@ -1,0 +1,52 @@
+# Kontext úkolu
+
+- Úkol: TASK-0007 — review 5: trend — kontrolní průchod celým dokumentem po sloučení SR a testů (TASK-0006)
+- Režim: spec
+- Kolo: 1 (strop tohoto běhu: kolo 2)
+- Datum: 2026-10-03T15:09:18+02:00
+- Pracovní složka: kořen repozitáře; všechny cesty jsou relativní k ní.
+
+## Cíl
+
+Zreviduj zadani/komponenta-trend.md v roli recenzenta (agent-loop/review-loop/review.md): projdi celý dokument (sekce 1–17 včetně podsekcí 13.x, rozhodovací log, historie revizí), vyplň všechna prázdná místa, odstraň rozpory a nekonzistence mezi sekcemi (zejména mezi 3.10 modul SR, 13.16–13.20 testy a zbytkem dokumentu po sloučení v TASK-0006), vše v kontextu systému P.A.T. Žádné dodatky zadavatele; jde o kontrolní kolo. Nálezy zapracuj do dokumentu, zaznamenej do rozhodovacího logu a historie revizí.
+
+## Hotovo, když
+
+Průchod celým dokumentem nenajde žádný blokující ani střední nález; zapracované nálezy jsou zaznamenané v rozhodovacím logu a historii revizí; všechny křížové odkazy (sekce, D-xx, R-x, I-x, brány, scénáře) vedou na existující místa; poslední řádek je KONEC DOKUMENTU.
+
+## Vstupy (čti podle potřeby, cíleně)
+
+- `data/README.md`
+- `data/NQ/README.md`
+- `data/FDAX/README.md`
+- `runs/TASK-0006/state.md`
+- `runs/TASK-0006/round-02/result.json`
+
+## Rozsah
+
+Smíš měnit:
+
+- `zadani/komponenta-trend.md`
+- `data/README.md`
+
+Nesmíš měnit (má přednost):
+
+- (nic)
+
+Vždy smíš zapisovat do `runs/TASK-0007/` (stav úkolu a soubory tohoto kola).
+
+## Stav a minulé kolo
+
+- Stav úkolu: `runs/TASK-0007/state.md` (zatím neexistuje, jde o první kolo; vytvoř ho)
+- Výsledek minulého kola: (žádný, první kolo)
+- Diff minulého kola: (žádný)
+
+## Poznámky zadavatele
+
+Podklady PAT/ a datové soubory data/** (kromě .md) nejsou k dispozici; nic z PAT znovu neověřuj, vycházej z textu dokumentu a data/*/README.md. Rozhodnutí vyžadující PAT podklad rozhodni jako předpoklad s kontrolou při implementaci a zapiš do requests. Rozhodovací log je závazný: D-81–D-91 neotvírej bez nového argumentu; nepřidávej zpět orákulum ani číslování G1–G11 / S01–S21; číslování sekcí 14–17 zachovej. Dokument je velký (~312 KB, ~2000 řádků): čti po částech (≤ 420 řádků), dlouhé řádky zkracuj v Pythonu, zapisuj průběžně a po každém větším kroku checkpoint. Kolo 1: sekce 1–8 a 10–12; kolo 2: sekce 9, 13–17 a log, pokud kolo 1 nestihne vše.
+
+## Výstupy tohoto kola
+
+- `runs/TASK-0007/state.md` — přepiš aktuálním stavem.
+- `runs/TASK-0007/round-01/result.json` — povinné; `"task": "TASK-0007"`, `"round": 1`.
+- `runs/TASK-0007/round-01/notes.md` — volitelné.
