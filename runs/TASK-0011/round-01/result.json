@@ -1,10 +1,10 @@
 {
   "task": "TASK-0011",
   "round": 1,
-  "status": "CONTINUE",
-  "summary": "Průchod probíhá: 1 střední (intrabar_order SINGLE vs UNKNOWN v režimu close při heuristice, 5.3 × 3.4 × 13.17.1 × 13.17.3; D-103), 1 drobný (5.4 pseudokód cand_*_lvl/fine); D-101–D-102 ověřeny.",
-  "findings": {"blocking": 0, "medium": 1, "minor": 1},
+  "status": "DONE",
+  "summary": "Kontrolní průchod po D-101–D-102: 0 blokujících, 1 střední (intrabar_order v režimu close při heuristice: 5.3 UNKNOWN × 13.17.1 SINGLE, 13.17.3 pole porovnává → SINGLE vždy po warmupu, I-17; D-103), 2 drobné (D-104); vše zapracováno, hlavička kolo 13, historie řádek 13, odkazy D/R/I/S bez nálezu.",
+  "findings": {"blocking": 0, "medium": 1, "minor": 2},
   "changed": ["zadani/komponenta-trend.md"],
-  "next": "Pokračovat: 13.18–13.20 a 15 celé, pak zbytek dokumentu; log D-103/D-104, hlavička, historie.",
+  "next": "Žádné další kolo (max_rounds 1, DONE). Případné další kontrolní kolo: druhý průchod nad novým textem D-103 (5.3 × 3.4 × 13.17.1 × I-17) a D-104; sekce 10.1–10.2, 11, 12, 13.1, 13.4–13.15, 13.16.1–13.16.2, 13.16.4–13.16.6, 14 byly v tomto kole jen cíleně prohledány (grep na intrabar_*, cand_*_fine, ts_ext_fine, θ_pb, trading_date), ne čteny celé; D-81–D-104 neotvírat bez nového argumentu.",
   "requests": []
 }
