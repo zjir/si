@@ -1,10 +1,16 @@
 {
   "task": "TASK-0014",
   "round": 1,
-  "status": "CONTINUE",
-  "summary": "Kolo zahájeno: kontrolní průchod po D-107.",
-  "findings": {"blocking": 0, "medium": 0, "minor": 0},
-  "changed": [],
-  "next": "Pokračovat čtením dokumentu od D-107 (12.3, 13.6, D-106, historie), pak sekce nečtené v TASK-0013.",
+  "status": "DONE",
+  "summary": "Kontrolní průchod po D-107: 0 blokujících, 0 středních, 0 drobných nálezů; sekce nečtené v TASK-0013 přečteny celé, zbytek a všechny křížové odkazy a názvy ověřeny skriptem; změna jen hlavička kolo 16 a historie řádek 16.",
+  "findings": {
+    "blocking": 0,
+    "medium": 0,
+    "minor": 0
+  },
+  "changed": [
+    "zadani/komponenta-trend.md"
+  ],
+  "next": "Žádné další kolo (max_rounds 1, DONE). Dokument je dva po sobě jdoucí kontrolní průchody bez blokujícího a středního nálezu (kola 15 a 16); další kontrolní kolo bez dodatků zadavatele nepřinese nic; další krok = implementace (režim code) nebo nové dodatky zadavatele.",
   "requests": []
 }
