@@ -1,7 +1,7 @@
 {
   "task": "TASK-0013",
   "status": "running",
-  "phase": "queued",
+  "phase": "running",
   "round": 0,
   "run_start_round": 0,
   "started_at": "2026-10-03T16:43:30+02:00",
@@ -12,5 +12,8 @@
   "push_failed": false,
   "runner": "skill",
   "claim_until": "2026-10-03T19:13:30+02:00",
-  "updated_at": "2026-10-03T16:43:30+02:00"
+  "updated_at": "2026-10-03T16:43:30+02:00",
+  "current_round": 1,
+  "skill_model": "claude-fable-5-1",
+  "skill_round_started_at": "2026-10-03T16:43:30+02:00"
 }
