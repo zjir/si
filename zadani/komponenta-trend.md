@@ -1181,6 +1181,7 @@ P.A.T. je vizuální systém; číselná kontrola nezachytí vše.
 - Graf: 300 barů před a 300 po události; TL **tak, jak byla známa v čase události** (ne pozdější překreslení), swingy komponenty a swingy určené zpětně nad celými daty, aktivní úrovně.
 - Uživatel u každého označí: souhlasím / nesouhlasím s tím, že šlo o trend a pullback podle P.A.T., a důvod nesouhlasu.
 - Výstup: míra souhlasu a typy chyb.
+- **Zlatý vzorek (kolo 7; D-89):** každé označení uživatele se uloží do `tests/golden/<market>.json` jako `{event_id, type, side, ts_known, direction, verdict ∈ {AGREE, DISAGREE}, reason, version, params_hash, auditor, date}` (u úseků pravdy a falešných běhů 13.15.6 místo `event_id` `t_start`, `t_end`; u úrovní SR `level_id`, 13.14.4). Vzorek roste s každým auditem a je regresní sada: každá další verze se nad týmiž situacemi (podle `ts_known` a strany; událost, která ve verzi už nevzniká do ±5 barů, se počítá jako nesouhlas) vyhodnotí a report uvede míru souhlasu proti baseline. Do nasbírání 150 označení trendů je to jen report; od 150 označení **měkká brána** (`WARN`, 13.16.3): pokles míry souhlasu o > 10 p.b. proti baseline. Vzorek se nikdy nepoužívá ke kalibraci parametrů (3.6, 11.3).
 
 ### 13.9 Běh s úrovněmi a bez nich
 
@@ -1272,6 +1273,21 @@ Pro každý obchod z `PAT/PAT_obchody_z_obrazku.csv` s vyplněným sloupcem `OHL
 - **úroveň vstupní zóny:** podíl obchodů, u nichž je `Úroveň vstupní zóny` pokryta.
 
 Bez cílové hodnoty; slouží k rozboru ve vizuálním auditu 13.8 (do jeho vzorku se přidá 30 publikací `SR` s grafem 300 barů před a po publikaci). Parametry 12.4 se podle toho nemění.
+
+#### 13.14.4 Provedení testů modulu SR (kolo 7; D-89)
+
+Zrušené `zadani/testy.md` modul SR z testů vylučovalo; od kola 7 jsou jeho testy součást sady (13.16.3) a provádějí se takto:
+
+1. **Referenční výpočet SR** (`tests/reference/sr.py`, 13.17.1 bod 6): nezávislá implementace 3.10.1–3.10.4 (vlastní zigzag podle 5 s `theta_sr`, `anchor_mode_sr`, `atr_n_sr`; dotyky, shluky, okno a stáří, skóre, kvalifikace, stažení, sloučení, publikace, náhrada; mechanické úrovně 3.10.2 — pro ně se použije fixture 13.18.4 převedená na okamžiky, s posunem `SESSION_OPEN` o bar podle 3.10.2 bod 9). Výstup `levels_df`, `level_events_df` ve schématu 13.16.6.
+2. **Shoda s referenčním výpočtem** (brány 13.14.1 bod 5 na syntetice; na reálných datech jako součást 13.17.3): `records_equal(tolerant)` nad `levels_df` (po řádcích v pořadí `valid_from`, `level_id`: `kind`, `price`, `valid_from`, `valid_to`, `strength_at_pub`, `meta_at_pub`) a nad `level_events_df` (`t_known`, `type`, `level_id`, `payload`); u SR1–SR5 navíc bodové podmínky tabulky 13.14.1 (bar publikace, cena do 1 ticku, `n_touches_window`, `AGED_OUT`, `REPLACED`, počet publikovaných).
+3. **Kauzalita** (13.14.1 bod 1): provedení jako 13.2.1–13.2.2 nad proudem modulu (všechny bary obchodního dne): pro bod t porovnání `levels_at(ts_open(x))` pro všechna `x ≤ t` mezi během do t a plným během; zkrácený běh ze `snapshot()` ≥ 10 session před t, každý 50. bod od začátku dat; změna budoucnosti: bary po t nahrazeny náhodnou procházkou (semínko t) na 10 session — žádná publikace s `valid_from ≤ ts_open(t)` ani její `strength`/`meta` v barech ≤ t se nezmění.
+4. **Replay, determinismus, snapshot** (13.14.1 bod 2): `sr.run(df)` vs. postupné `sr.update()` bitově; dva procesy s různým `PYTHONHASHSEED` → stejný hash 13.16.6; přerušení ve 100 bodech a `from_snapshot`.
+5. **Skládání s detektory** (13.14.1 bod 3): streaming v pořadí D-60 (`sr.update` → `engine.update`) vs. `engine.run(df, levels_df = sr.run(df_all)[0], levels_provider_hash = sr_params_hash)` bitově; negativní test: obrácené pořadí volání musí dát rozdíl, který brána 13.2.3 odhalí (`FAIL` testu, pokud rozdíl nevznikne, protože by test nic nekryl).
+6. **Mechanické úrovně vs. fixture** (13.14.1 bod 4): postup 13.18.4 (množiny aktivních barů), na NQ `pd_scope = RTH`, `premarket_enabled = true`, celé vývojové období; sada `quick` jen bloky `sample_20d`.
+7. **Okrajové případy a výkon** (13.14.1 body 6–7): případy 13.2.6 nad proudem modulu; výkon v jednom běhu s detektory (13.2.9).
+8. **Vyhodnocení 13.14.2** (sada `full`): testy úrovní se hledají nad logem (`sr_levels.parquet` + bary) pro každou publikaci; výsledek HOLD / BREAK / NEVYŘEŠENO podle definic 13.14.2 s remízou přes 1s data (jsou-li) nebo heuristiku 5.3; reference posunuté úrovně `± 1,0 × atr_ref(valid_from)`; členění a bootstrap 13.6; varianty `premarket_enabled` a `pd_scope` jako samostatné běhy modulu (detektory se pro vyhodnocení SR nespouštějí); výstup `sr_level_tests.parquet` (`level_id`, `kind`, `origin`, `side_mix`, `strength_tercile`, `t_test`, `direction_of_approach`, `outcome`, `outcome_same_day`, `bars_to_outcome`) a metriky do `metrics.json` (`section = 13.14.2`).
+9. **Shoda s čarami autora** (13.14.3) jen s CSV obchodů; jinak `SKIP`.
+10. **Zlatý vzorek SR:** 30 publikací `SR` v auditu 13.8 s označením souhlasím / nesouhlasím ukládané do `tests/golden/<market>_sr.json` stejně jako u trendů (13.8).
 
 ### 13.15 Nezávislý zpětný test polohy trendů (dodatek zadavatele, kolo 6; D-80)
 
@@ -1373,6 +1389,365 @@ Brány (pass / fail; při nesplnění se historické metriky komponenty nepřijm
 | 4 | **podezření na únik budoucnosti** (doplňuje 13.10) | medián `move_left` zachycených úseků > 0,9, nebo κ > 0,8, nebo podíl zachycených úseků s `delay_start_bars ≤ 1` > 10 % → zopakovat brány 13.2.1 a 13.2.2 na dotčeném období, než se výsledek přijme (kauzální detektor nemůže znát dno v okamžiku, kdy vzniká) |
 
 Ostatní hodnoty (13.15.3–13.15.5 včetně B0 a κ(c)) jsou report bez pevných cílů (13.10): první běh na vývojovém období stanoví referenci, každá další verze se porovná proti ní; zhoršení κ nebo podílu `captured` o > 0,05 proti referenci se hlásí jako regrese. Rozbor rozdílů mezi pravdou a komponentou (např. úseky pravdy, které komponenta hlásí jako dva trendy, nebo falešné běhy s kladným `net_move`) jde do vizuálního auditu 13.8: do jeho vzorku se přidá 30 nezachycených úseků pravdy s `gain ≥ 2c` a 30 falešných běhů, graf 300 barů před a po, s úsekem pravdy zakresleným.
+
+### 13.16 Testovací balík a harness (sloučeno ze zrušeného `zadani/testy.md`, kolo 7; D-81, D-86)
+
+Sekce 13.1–13.15 říkají, **co** se testuje a kdy je výsledek přijat. Sekce 13.16–13.20 říkají, **jak** se testy provádějí: balík, běh, data, referenční výpočet, report. Jediný zdroj obou částí je tento dokument; dřívější samostatné zadání testů (`zadani/testy.md`) je zrušeno a jeho obsah je zde přepsán podle definic kol 2–6 (jeho tabulka výkladů se nepřenáší, D-82). Čísla bran a scénářů jsou jen ta z tohoto dokumentu (13.2.1–13.2.10, S1–S11b, 13.14.1 body 1–7, SR1–SR5, 13.15.6 body 1–4, 13.17.3, 13.17.4, 13.16.6); dřívější číslování G1–G11 a S01–S21 neplatí.
+
+#### 13.16.1 Vrstvy testů a mapování Ø1
+
+| Vrstva | Otázka | Zdroj pravdy | Brány a kontroly |
+|---|---|---|---|
+| A. Shoda s definicí | Dělá komponenta přesně to, co 4–9 a 3.10 říkají? | referenční výpočet (13.17) nad syntetikou se známou konstrukcí (13.2.5, 13.18.3) a nad reálnými daty (13.17.3); návrhová pravda scénářů | 13.2.5, 13.14.1 bod 5, 13.17.3, 13.17.4 |
+| B. Vlastnosti | Nevidí do budoucnosti, replay, determinismus, snapshot, okrajové případy, výkon (11) | matematické vlastnosti výstupů, bez referenčních dat | 13.2.1–13.2.4, 13.2.6–13.2.10, 13.14.1 body 1–3, 6–7, 13.16.6 |
+| C. Užitečnost pro P.A.T. | Jsou stavy komponenty na reálných datech pravdivé, lepší než náhoda, robustní a přijatelné pro oko tradera? | pohled do budoucnosti (13.4), nezávislá pravda (13.15), reference náhody (13.5, 13.15.5), vizuální audit (13.8) | 13.11, 13.15.6 (brány); 13.3–13.9, 13.12–13.13, 13.14.2–13.14.3 (metriky) |
+
+Mapování otázky Ø1 (1.1) na výstupy a kontroly:
+
+| Otázka Ø1 | Výstup komponenty | Kontroly |
+|---|---|---|
+| Jsem v trendu, jak silném? | `answer.in_trend`, `answer.direction` (= `direction`, 7.3), `answer.strength`, `answer.strength_class`, `up`/`down`: `trend_valid`, `phase`, `quality` (8.1), `main_tl.slope_norm` | S1–S7, S10, 13.4 (trend po barech, pokračování), 13.15 (κ, úseky), 13.7 (monotonie síly), 13.17.4 |
+| Začíná pullback? | `PULLBACK_START`, `phase = PULLBACK`, `pullback` (7.4), `answer.pullback_starting`, `answer.pullback_active`, `answer.pullback_age_bars` | S1–S4, S7, S8, 13.4 (OBNOVENÍ / OBRAT), 13.5 (`p₀`, simulace), 13.9 |
+| Bude trend pokračovat? | `trend_valid`, PW-SW (`pw1_trend_side`, `pw1_counter_side`, `pw2`, `pw3`, `reversal_hint`), `answer.continuation_score` (15.4–15.5) | S11a/b, 13.4 (pokračování), 13.6 (Brier), 13.7, 13.11 |
+| Detaily pro P.A.T. | `swings_new`, `main_tl`, `curr_tl` (`value_at`, `dist_close_atr`), `pullback.stopped_at_level`, `dist_to_level_atr`, úrovně 3.5 z modulu SR | S3, S4, S8, 13.13, 13.14 |
+
+#### 13.16.2 Struktura balíku a nezávislost modulů
+
+Knihovna komponenty je balík **`pat_trend`** (10.1; `pat_trend.engine.TrendEngine`, `pat_trend.sr.SRModule`, datové třídy 10.3–10.4, 3.2, 3.5; D-86). Testovací balík je adresář `tests/` v kořeni repozitáře, Python ≥ 3.11, závislosti `numpy`, `pandas`, `pyarrow` (parquet), `pytest` (spouštěč); nic jiného:
+
+| Cesta | Obsah | Smí importovat |
+|---|---|---|
+| `tests/harness/` | spouštěč, konfigurace, běh bran a metrik, report, baseline (13.16.3, 13.19) | vše |
+| `tests/reference/` | referenční výpočet 5–9 a 3.10 (13.17) | stdlib, `numpy`, `pandas`, `tests.synthetic`, `tests.fixtures`; **nikdy `pat_trend`** |
+| `tests/truth/` | pravda 13.15 a reference posunu (13.20) | jen stdlib, `numpy`, `pandas`; **nikdy `pat_trend`, `tests.reference`, `tests.harness`** |
+| `tests/synthetic/` | generátor 13.2.5 (D-74), scénáře S1–S11b, SR1–SR5, návrhová pravda (13.18.3) | stdlib, `numpy`, `pandas` |
+| `tests/fixtures/` | fixture `MechanicalLevels`, testovací `LevelProvider`, kalendář syntetiky (13.18.4) | stdlib, `numpy`, `pandas`, `pat_trend` jen pro datové třídy 3.2 a 3.5 |
+| `tests/data/` | napojení na datovou vrstvu (`data/README.md` 10), validace, `data_report.json` (13.18.1) | datová vrstva, stdlib, `numpy`, `pandas` |
+| `tests/schemas/` | `states_v1.json`, `events_v1.json`, `sr_levels_v1.json`, `sr_events_v1.json` (13.16.6) | — |
+| `tests/config/` | `harness.json`, `sample_days.json`, `params_frozen.json` (13.18.1) | — |
+| `tests/baseline/` | referenční reporty (13.19.3) | — |
+| `tests/golden/` | zlatý vzorek auditu (13.8) | — |
+
+Nezávislost se vynucuje dvakrát při každém běhu harnessu (výsledek ERROR zastaví běh):
+
+1. **Statická kontrola:** harness projde `ast` všech souborů `tests/reference/**/*.py` a `tests/truth/**/*.py` a ověří, že žádný `import` / `from … import` nezačíná zakázaným jménem podle tabulky výše (včetně relativních importů mimo vlastní balík).
+2. **Běhová kontrola:** v samostatném procesu (`python -c`) se importuje `tests.truth` a poté `tests.reference`; po importu nesmí `sys.modules` obsahovat žádný klíč začínající `pat_trend`.
+
+Důvod: shoda komponenty s referenčním výpočtem dokazuje jen tolik, kolik je obě strany nezávislé; pravda 13.15 navíc nesmí sdílet s komponentou ani definice (13.15.1).
+
+#### 13.16.3 Běh harnessu
+
+Konfigurace `tests/config/harness.json`: `markets` (seznam symbolů; výchozí `["NQ", "FDAX"]`), `suite ∈ {quick, full}`, `params` (přepis `TrendParams`, výchozí prázdný = 12.1), `sr_params` (12.4), `level_variants` (výchozí `["sr", "none"]`, 13.9), `report_dir`, `n_jobs` (paralelizace přes trhy a varianty; uvnitř běhu komponenty jedno jádro), `seed` (výchozí 20260925; všechny generátory v 13 ho odvozují, viz jednotlivé sekce).
+
+Sady:
+
+| Sada | Obsah | Účel |
+|---|---|---|
+| `quick` | kontrola nezávislosti (13.16.2), schémata (13.16.6), syntetika celá (13.2.5, 13.14.1 bod 5, 13.15.6 bod 1, 13.17.4 na syntetice), 13.2.3–13.2.4, 13.2.6, 13.2.8, 13.14.1 body 2–3 a 6 na syntetice, 13.17.3 a 13.17.4 na blocích `sample_20d` (13.18.1) | běží do 15 min; při každé změně kódu |
+| `full` | vše z `quick` a dále: validace dat (13.18.1), 13.2.1–13.2.2, 13.2.7, 13.2.9–13.2.10, 13.14.1 body 1 a 4 a 7, 13.17.3 na celém vývojovém období, historický běh 13.3 (log), metriky 13.4–13.7, 13.9, 13.12–13.15, brány 13.11 a 13.15.6, vyhodnocení 13.14.2–13.14.3, podklady auditu 13.8, report a baseline (13.19) | před přijetím verze; řádově hodiny (13.2.9 limituje jen komponentu) |
+
+Pořadí v sadě `full` (každý krok jen po úspěchu předchozího; 13.2 úvod: bez splnění bran se historické metriky nevyhodnocují):
+
+1. nezávislost (13.16.2) → ERROR zastaví vše;
+2. načtení a validace dat každého trhu (13.18.1) → `DATA_ERROR` vyřadí trh ze všech dalších kroků;
+3. syntetické brány (13.2.5, 13.14.1 bod 5, 13.15.6 bod 1, 13.17.4);
+4. brány vlastností a shody na reálných datech (13.2.1–13.2.4, 13.2.6–13.2.10, 13.14.1 body 1–4, 6–7, 13.16.6, 13.17.3, 13.17.4), pro každý trh a každou variantu úrovní;
+5. historický běh 13.3 (obě varianty 13.9, oba trhy; log do `report_dir/log/<market>/<variant>/states.parquet`, `events.parquet`, `sr_levels.parquet`, `sr_events.parquet`);
+6. pravda 13.15 (13.20) a metriky 13.4–13.7, 13.12–13.15, 13.14.2–13.14.3; brány 13.11 a 13.15.6;
+7. report, porovnání s baseline, podklady auditu (13.19).
+
+Každá brána a každý scénář má v reportu identifikátor = číslo své sekce (např. `13.2.1`, `13.2.5/S7`, `13.14.1.5/SR2`, `13.15.6.2`, `13.17.3`), trh, variantu úrovní a výsledek:
+
+| Výsledek | Význam |
+|---|---|
+| `PASS` | kritérium splněno |
+| `FAIL` | kritérium nesplněno (chyba komponenty nebo modulu SR); detail = první neshodný bar, pole, očekávaná a skutečná hodnota |
+| `WARN` | měkká brána nesplněna (13.8 zlatý vzorek, 13.10 podezření na únik, 13.15.6 bod 4, regrese proti baseline 13.19.3); běh pokračuje, výsledek verze se nepřijme bez zápisu do logu 16 |
+| `SKIP` | chybí volitelný vstup (1s data → 13.2.7; ES/YM → část 13.11; deník nebo CSV obchodů → 13.13, 13.14.3; `data/NEWS` → 13.2.10) s uvedeným důvodem; nikdy pro chybu |
+| `ERROR` | chyba testovací sady (neplatný scénář 13.18.3, referenční výpočet nesplnil návrhovou pravdu, nezávislost 13.16.2, výjimka v harnessu); nikdy PASS komponenty |
+| `DATA_ERROR` | validace dat trhu selhala (13.18.1); trh se vynechá |
+
+Verze je **přijata**, když v sadě `full` nemá žádná brána `FAIL`, `ERROR` ani `DATA_ERROR` (u povinných trhů NQ a FDAX), všechna `SKIP` mají uvedený důvod, `WARN` jsou rozebrána v logu 16 a report je uložen (13.19).
+
+#### 13.16.4 Porovnání záznamů (`records_equal`)
+
+Všechna porovnání výstupů v 13 používají jednu funkci `records_equal(a, b, mode)` nad `state.to_dict()` (10.5), záznamy událostí (10.4), řádky `levels_df` a `level_events_df` (3.10.4):
+
+```
+records_equal(a, b, mode):
+  1. klíče: stejná množina a stejné pořadí (10.5); jinak neshoda
+  2. int, bool, str, enum, timestamp, null: rovnost přesná (null == null; null ≠ cokoli jiného)
+  3. float: mode = bitwise → rovnost bitová (a == b, nebo oba NaN; NaN se ve výstupu nesmí objevit, 13.2.6)
+            mode = tolerant → |a − b| ≤ 1e-9 × max(1, |a|, |b|)
+  4. seznamy (swingy, kotvy, pseudokotvy, `swings_new`): stejná délka, po prvcích podle 1–3
+  5. vnořené dict (`up`, `down`, `answer`, `quality`, `pullback`, `main_tl`, `payload`, `meta`): rekurzivně
+  6. události se porovnávají jako seznam seřazený podle `event_id` (modul SR podle `t_known`, `level_id`),
+     celé záznamy včetně `payload`; jiný počet událostí = neshoda
+```
+
+- `bitwise` platí pro brány 13.2.1–13.2.4, 13.2.8, 13.14.1 body 1–3 a 13.16.6: obě strany jsou tatáž knihovna, rozdíl v posledním bitu je chyba (jiné pořadí sčítání mezi dávkou a streamingem není povoleno, 11.1; D-83).
+- `tolerant` platí pro porovnání s referenčním výpočtem (13.2.5, 13.14.1 bod 5, 13.17.3) a pro zrcadlo S10, kde jde o dvě různé implementace, resp. o jiné pořadí operací se znaménkem. U referenčního výpočtu se bary událostí a všechna celočíselná pole porovnávají přesně; tolerance se týká jen float polí.
+- Determinismus (13.2.4) se neměří funkcí, ale hashem 13.16.6.
+
+#### 13.16.5 Kontrakt komponenty pro testy
+
+Vedle rozhraní 10 a 3.10.4 harness spoléhá na tato pravidla (jsou požadavky na komponentu; porušení = `FAIL` příslušné brány):
+
+1. Konstrukce: neznámé pole `TrendParams` / `SRParams` nebo hodnota mimo rozsah 12 → `ValueError` (10.1); hranice rozsahu jsou povolené. `params.tick_size ≠ market.tick_size` → `ValueError`. Test: 13.2.6 (každý parametr 12.1 a 12.4 s hodnotou těsně pod a nad hranicí rozsahu, neznámý klíč).
+2. Vstup: `bar` je dict nebo objekt s poli 3.1; `df` má tytéž sloupce, index se ignoruje, pořadí řádků = pořadí barů. Validace a `on_invalid_bar` podle 3.1 (výjimka `InvalidBarError` nese `bar_index`, `ts` a důvod).
+3. Warmup (4.1): `update` vrací stav s `warmup = true`, `atr1 = null`, `atr_ref = null`, obě strany `phase = NONE`, `direction = NONE`, `answer.in_trend = false`; v těchto barech vznikají jen události `BAR_SKIPPED` a varování (10.4).
+4. `run(df)` vrací přesně to, co by vrátila posloupnost `update` (13.2.3); `engine.reset()` vrací engine do stavu po konstrukci; `from_snapshot` navazuje bitově (13.2.8).
+5. Komponenta **nesmí**: číst z `df` nic za aktuálním barem (13.2.1–13.2.2 to odhalí jako změnu výstupu), měnit již vrácené stavy nebo události (harness drží kopii každého vráceného záznamu z `update` a po běhu ji porovná bitově s řádkem `run`; interní přepis provizorních hodnot se smí projevit jen v pozdějších záznamech), používat systémový čas, náhodná čísla, pořadí iterace neseřazených množin ani síť (13.2.4 spouští dva běhy ve dvou procesech s různým `PYTHONHASHSEED` a porovná hashe).
+6. Každý stav nese `version` a `params_hash` (10.1); `levels_provider_hash` je část `params_hash`.
+7. Kalendář session, data rollu, úrovně, 1s data a zprávy dostává komponenta jen jako vstupy (3.2–3.5, 3.9); harness je bere z datové vrstvy (13.18.1–13.18.2) nebo z fixture (13.18.4).
+
+#### 13.16.6 Serializace, schémata a hash běhu
+
+- **Log** (13.3): `states` a `events` z `run` (10.1) jako parquet; `levels_df`, `level_events_df` modulu SR rovněž. Schémata `tests/schemas/*_v1.json` (seznam sloupců v pořadí, typ parquet: `int64`, `float64`, `bool`, `string`, `timestamp[ns, tz]`; seznamy a vnořené struktury jako JSON řetězec) jsou součást testovacího balíku. **Brána 13.16.6 (schéma):** sloupce a typy logu se shodují se schématem; chybějící nebo přebývající sloupec = `FAIL`.
+- **Kanonický JSON** (hash 13.2.4): jeden řádek na záznam, `state.to_dict()` v pevném pořadí klíčů (10.5), `json.dumps(..., ensure_ascii=False, separators=(",", ":"), allow_nan=False)`, float jako nejkratší round-trip `repr` (výchozí chování `json`), null jako `null`, časy ISO 8601 s posunem pásma vstupu; řádky v pořadí `bar_index`, pak události v pořadí `event_id` (modul SR: `levels_df` v pořadí `valid_from`, `level_id`; `level_events_df` v pořadí `t_known`, `level_id`, `type`). **Hash běhu** = SHA-256 nad všemi řádky spojenými `\n` (bez koncového). Hash se zapisuje do reportu u každého běhu; `records_equal(bitwise)` dvou běhů ⇔ stejný hash.
+- Hash dat = SHA-256 obsahu CSV souborů (13.18.1); metriky reportu jsou vázány na hash dat a `params_hash`.
+
+### 13.17 Referenční výpočet a brány shody (D-40, D-82, D-87)
+
+#### 13.17.1 Zásady
+
+Referenční výpočet (`tests/reference/`) je druhá, nezávislá implementace definic 4–9 a 3.10 psaná pro čitelnost, ne pro rychlost:
+
+1. Implementuje přesně text 4.1–4.5, 5.1–5.6, 6.1–6.7, 7.1–7.5, 8.1–8.3, 9 a 3.10.1–3.10.4 v pořadí kroků, které dokument uvádí; každá funkce nese v docstringu číslo sekce a kroku, který implementuje, a je proti němu čitelná řádek po řádku.
+2. Nesdílí s `pat_trend` žádný kód (13.16.2); smí být pomalá (čistý Python, `O(n)` s velkými konstantami; `numpy` jen pro okna ATR a ER), bez optimalizací, které mění pořadí operací.
+3. **Nemá vlastní výklady.** Kde by implementátor referenčního výpočtu našel dvě čtení dokumentu, nerozhoduje sám: zapíše nález (střední, prázdné místo) a běh označí `ERROR`, dokud dokument čtení neurčí. Tabulka výkladů zrušeného `zadani/testy.md` (P-01–P-42) se nepřenáší: všechna její místa jsou v tomto dokumentu rozhodnuta (warmup 4.1, pořadí v baru 5.3 a 6.7, korekce a `prev_major_low` 6.1, životní cyklus 6.1.1, hlavní a aktuální TL 6.2–6.3, prolomení 6.5, fáze 7.1, `trend_valid` 7.2, `direction` 7.3, pullback 7.4, metriky 8.1, filtry 8.2, delta 9; D-82).
+4. Vstupy jsou tytéž jako u komponenty: bary, `MarketSpec`, kalendář session, data rollu, poskytovatel úrovní (fixture nebo `levels_df` modulu SR), 1s data (13.2.7: referenční výpočet používá jen heuristiku 5.3; proto se porovnává s během `intrabar_mode = heuristic`, a běh `auto` jen přes bránu 13.2.7), tabulka pokračování (ne: `answer.continuation_*` se v referenčním výpočtu nepočítá a z porovnání se vynechává, viz 13.17.3).
+5. Výstup má totéž schéma jako log komponenty (13.16.6), aby se porovnával funkcí `records_equal(tolerant)`.
+6. Referenční výpočet modulu SR (`tests/reference/sr.py`) implementuje 3.10 nad všemi bary obchodního dne a vrací `levels_df`, `level_events_df` v témže schématu (13.14.4).
+7. Referenční výpočet není pravda 13.15: ta nesmí definice komponenty znát vůbec (13.20).
+
+#### 13.17.2 Shoda na syntetice
+
+Brána 13.2.5 (S1–S11b) a 13.14.1 bod 5 (SR1–SR5): komponenta vs. referenční výpočet nad vygenerovanými bary, `records_equal(tolerant)` po barech, události podle 13.16.4 bod 6. Čísla v tabulkách scénářů jsou orientační (13.2.5); závazná je shoda s referenčním výpočtem a splnění návrhové pravdy scénáře (13.18.3) oběma stranami. Referenční výpočet, který návrhovou pravdu nesplní, je `ERROR` (chyba referenčního výpočtu nebo scénáře), nikdy `PASS` komponenty.
+
+#### 13.17.3 Brána shody s referenčním výpočtem na reálných datech
+
+Důvod: syntetické scénáře pokrývají situace, které návrhář vymyslel; reálná data obsahují i ty ostatní (remízy, extrémní knoty, díry, dny bez hlavní seance, rolly). Brána (pass / fail, patří k branám 13.2 ve smyslu 13.10):
+
+- **Data:** sada `quick`: bloky `sample_20d` (13.18.1); sada `full`: celé vývojové období obou trhů (13.3). Obě varianty úrovní 13.9 (s modulem SR: `levels_df` z komponenty i z referenčního výpočtu SR musí být shodné podle 13.14.4 bod 2; detektory obou stran pak dostanou tentýž `levels_df`, aby se chyby neskládaly).
+- **Běh:** komponenta `run(df, levels_df, levels_provider_hash)` s `intrabar_mode = heuristic` (13.17.1 bod 4), bez tabulky pokračování, `detectors = ("A",)` (detektor B a C se v referenčním výpočtu neimplementují; jejich správnost kryjí 13.2.3–13.2.4, 13.6 Brier a 13.11); referenční výpočet se stejnými vstupy.
+- **Porovnání:** `records_equal(tolerant)` nad `states` bez polí `answer.continuation_*`, `stat`, `extra`, `news` a nad `events` bez varovných událostí posledního řádku 10.4 (ty referenční výpočet nevydává; jejich počty se porovnají zvlášť: `BAR_SKIPPED`, `NON_TICK_PRICE`, `ROLL_GAP`, `BARS_OUTSIDE_SESSION` musí mít stejný počet a tytéž `t_known`).
+- **Kritérium:** žádná neshoda. Při neshodě report uvede první bar a pole (po `bar_index`, pak v pořadí klíčů), hodnotu obou stran a 20 barů kontextu; u událostí první odlišnou událost. Neshoda se řeší nálezem: buď chyba komponenty (`FAIL`), nebo chyba referenčního výpočtu (oprava referenčního výpočtu se zapíše do reportu jako `reference_fix` s číslem sekce), nebo dvojí čtení dokumentu (střední nález, 13.17.1 bod 3).
+- **Čas:** referenční výpočet nad celou historií smí trvat řádově hodiny; limit 11.5 platí jen pro komponentu. Harness ho pouští paralelně po trzích a variantách (`n_jobs`).
+
+#### 13.17.4 Brána invariantů
+
+Pro každý bar každého běhu (syntetika i reálná data, obě varianty úrovní; vyhodnocuje se nad logem 13.3 a nad výstupy syntetiky, bez referenčního výpočtu) platí; porušení = `FAIL` s prvním barem a invariantem:
+
+| # | Invariant | Sekce |
+|---|---|---|
+| I-1 | `warmup = true` ⇔ `atr1 = null` ⇔ `atr_ref = null`; při `warmup` obě strany `phase = NONE`, `direction = NONE`, `answer.in_trend = false`, žádná událost strany | 4.1, 13.16.5 bod 3 |
+| I-2 | `bar_index` roste o 1 od 0 bez mezer; `ts_open` ostře roste; `ts_close = ts_open + tf_minutes`; `gap_before_min = ts_open(t) − ts_close(t−1)` v minutách (0 u prvního baru) | 3.1, 10.3 |
+| I-3 | každá událost má `t_known = bar_index` baru, ve kterém byla vrácena; `ts_known = ts_close(t_known)`; `event_id` roste o 1 od 0 bez mezer; `t_ref ≤ t_known` | 10.4 |
+| I-4 | strana: `trend_valid = (phase ∈ {IMPULSE, PULLBACK}) ∧ slope_ok_main`; `phase = ENDED` právě v baru `TREND_END` strany; mimo bar `ENDED`: `phase = NONE` ⇔ `L0 = null`, `phase = CANDIDATE` ⇔ `L0 ≠ null ∧ n_anchors = 1`; `n_anchors = 1 + len(anchors)`; `main_tl = null` ⇔ `n_anchors < 2`; `phase = TL_BROKEN` ⇒ `main_tl.broken` | 6.1, 7.1, 7.2, 10.3 |
+| I-5 | `phase = PULLBACK` ⇔ `pullback ≠ null`; `pullback.stopped_at_level` a `dist_to_level_atr` null při `levels_missing`; `levels_missing` ⇔ `n_levels_active = 0`; `quality.dist_to_next_level_atr` null při `levels_missing` | 3.5, 7.4, 8.1 |
+| I-6 | `direction` podle 7.3 z `up.trend_valid`, `down.trend_valid` a `t_ext(L₀)` obou stran; `direction_phase` = `phase` strany `direction` (null při `NONE`); `answer.in_trend = (direction ≠ NONE)`; `answer.direction = direction`; `answer.phase = direction_phase`; `answer.pullback_active = (direction_phase = PULLBACK)`; `answer.pullback_starting ⇒ answer.pullback_active ∧ pullback_age_bars ≤ pb_start_window`; při `direction = NONE` jsou `pullback_*` false / null | 1.1, 7.3, 7.4 |
+| I-7 | `answer.strength = null` ⇔ (`direction = NONE` ∨ všechny složky 8.3 null); jinak `strength ∈ [0, 1]`; `strength_class` null ⇔ `strength` null; `STRONG` ⇒ `strength ≥ strength_strong ∧ reversal_hint ≠ true`; `WEAK` ⇔ `strength < strength_weak ∨ reversal_hint = true` (při `strength ≠ null`) | 8.3 |
+| I-8 | `curr_is_main` ⇒ `curr_tl` je totožná s `main_tl` (všechna pole kromě `kind`); `curr_tl ≠ null` ⇒ `main_tl ≠ null`; `quality.slope_ratio = 1` při `curr_is_main` | 6.3, 8.1 |
+| I-9 | `L0.t_ext < anchors[0].t_ext < … < anchors[−1].t_ext`; `main_tl.anchor1 = (L0.t_ext, L0.price)`; `¬ main_tl.broken` ⇒ `main_tl.slope > 0` ve směrově zarovnaných souřadnicích | 6.1, 6.2, 6.5, D-69 |
+| I-10 | `swings_new` v baru t: každý swing má `t_conf = t`, `t_ext < t`; v celém běhu se typy potvrzených swingů (HIGH/LOW) střídají a `t_ext` neklesá; `SWING_CONFIRMED` v baru t ⇔ odpovídající prvek `swings_new` (týž `t_ext`, typ, cena) | 5.1, 5.4, 5.5 |
+| I-11 | `quality ≠ null` ⇔ `L0 ≠ null`; `quality.duration_bars = t − L0.t_ext`; `n_hl = n_anchors − 1`; `n_swings = n_hl + n_hh`; `er ∈ [0, 1]` (0 při `t = t₀`); `r2 ∈ [0, 1]` nebo null (null ⇔ `n_anchors < 3`); pole závislá na TL null ⇔ `n_anchors < 2` | 8.1 |
+| I-12 | `reversal_hint = null` ⇔ všechny z `pw1_trend_side`, `pw1_counter_side`, `pw2`, `pw3` null; jinak `reversal_hint = ¬(pw1_trend_side ∧ pw1_counter_side ∧ pw2 ∧ pw3)` s null jako `true`; `pw2 = pw2_curr`; `pw2_*` null ⇔ bez TL; `chop_bars ∈ [0, pw3_window]` | 8.2 |
+| I-13 | události strany v jednom baru v pořadí 6.7; nejvýš jeden `PULLBACK_START` a jeden `PULLBACK_END_*` na stranu a bar; `PULLBACK_END_*` jen po dřívějším `PULLBACK_START` téhož `pb_id`; po `TREND_END` strany je v témže baru `phase = ENDED` a v dalším baru `NONE` nebo nový `L0` | 6.7, 7.1, 7.4, 7.5 |
+| I-14 | `TREND_START` strany ⇒ v témže baru `n_anchors = 2` a `main_tl ≠ null`; `TL_UPDATE` ⇒ `main_tl.updated_at = t`; `CURR_TL_NEW` ⇒ `curr_is_main = false` v tomto baru; `TL_BREAK(MAIN)` ⇒ `main_tl.broken` a `phase ∈ {TL_BROKEN, ENDED}` | 6.1.1, 6.2, 6.3, 6.5, 7.5 |
+| I-15 | `delta_tl_agrees`, `delta_divergence` null při `delta_enabled = false`, bez sloupce `delta` a v session rollu | 3.3, 9 |
+| I-16 | modul SR (`levels_df`, `levels_at`): `price` násobek `tick_size`; `valid_from ≤ valid_to` (je-li `valid_to`); `level_id` jedinečný v běhu; v každém baru nejvýš `sr_max_levels` aktivních `SR` a nejvýš 4 PD* + 2 `PREMARKET_*` + 1 `SESSION_OPEN`; `levels_at(ts_open(t))` nikdy nevrátí `valid_from > ts_open(t)`; `strength ∈ [0, 1]` u `SR`, null u mechanických | 3.5, 3.10 |
+
+Invarianty odvozené z 4–9 nepopisují celé chování (to dělá referenční výpočet 13.17.3), ale běží na každém baru každého běhu včetně těch, pro které se referenční výpočet nespouští (testovací období, varianty 13.11, časové rámce 13.12).
+
+### 13.18 Testovací data (D-84, D-85, D-90)
+
+#### 13.18.1 Reálná data
+
+Jediný zdroj tržních dat je adresář `data/` přes datovou vrstvu (`data/README.md` 10; 3.1–3.4). Harness nemá vlastní loader formátů: volá datovou vrstvu, která vrátí bary spojité řady, kalendář session, dny rollu, 1s bary a report exportu.
+
+| Vstup | Soubor | Povinný | Použití |
+|---|---|---|---|
+| NQ 1min | `data/NQ/NQ-1-min.csv` | ano | všechny brány a metriky |
+| NQ rolly | `data/NQ/NQ-rolls.csv` | ano (bez něj nelze sestavit spojitou řadu, `data/README.md` 7.3) | `roll_dates`, `adj(d)` |
+| NQ 1s | `data/NQ/NQ-1-sec.csv` | ne | 13.2.7, remízy 13.4 a 13.14.2, audit 13.8 |
+| FDAX 1min, rolly, 1s | `data/FDAX/FDAX-1-min.csv`, `FDAX-rolls.csv`, `FDAX-1-sec.csv` | 1min a rolly ano, 1s ne | jako NQ |
+| ES, YM | `data/<SYMBOL>/…` (R2) | ne | 13.11 závěrečný běh; bez nich `SKIP` s důvodem |
+| kalendář zpráv | `data/NEWS/forex-factory-1.csv`, `-2.csv` | ne | 13.2.10, členění 13.6; bez nich `SKIP` |
+| obchodní deník, CSV obchodů | `PAT/Obchodní deník.xls`, `PAT/PAT_obchody_z_obrazku.csv` | ne | 13.13, 13.14.3; bez nich `SKIP` |
+
+Chybějící povinný vstup trhu = `DATA_ERROR` pro ten trh. Hash SHA-256 obsahu každého použitého souboru se zapisuje do `data_report.json` a reportu; metriky jsou vázány na hash dat.
+
+**Validace** (`tests/data/validate.py`, před každým během sady `full`; v sadě `quick` jen nad bloky `sample_20d`). Datová vrstva už zařídila pásmo, obchodní den, vynechání barů mimo obchodní hodiny a spojitou řadu; validace to ověřuje a nic neopravuje:
+
+| # | Kontrola | Nesplnění |
+|---|---|---|
+| 1 | `ts` tz-aware v pásmu `Europe/Prague`, ostře rostoucí; žádná duplicita | `DATA_ERROR` |
+| 2 | `low ≤ min(open, close) ≤ max(open, close) ≤ high`; všechny ceny násobky `MarketSpec.tick_size` (tolerance 1e-6 ticku); `volume ≥ 0` celé; `BidVolume + AskVolume ≤ volume`, žádný NaN | `DATA_ERROR` |
+| 3 | každý bar leží v nějaké session kalendáře a uvnitř obchodních hodin burzy; bary mimo `[scope_open, scope_close)` nejsou v řadě pro detektory (jsou v řadě pro modul SR, 3.10.1 bod 6) | `DATA_ERROR` |
+| 4 | skok `\|close_t − close_{t−1}\| > 5 % × close_{t−1}` uvnitř spojité řady | `DATA_ERROR` (řada zřejmě není posunutá nebo je chybný roll) |
+| 5 | v barech rollu (3.3) se mění sloupec `Contract` a jinde ne | `DATA_ERROR` |
+| 6 | konvence timestampu objemem (3.1): pro každý obchodní den s hlavní seancí má bar s největším `volume` v okně `[rth_open − 5 min, rth_open + 5 min)` `ts_open = rth_open` v ≥ 95 % dnů trhu | `DATA_ERROR` („posun času nebo špatná konvence `ts`“) |
+| 7 | díry a vyřazené dny: `gaps`, `missing_weekdays`, `excluded_days` z reportu exportu (`data/README.md` 8–9) se převezmou do `data_report.json`; mezery ≥ `gap_min` uvnitř session se spočítají ze samotných barů a porovnají s `gaps` | jen report (nejsou chyba, 11.2); rozdíl proti `gaps` = varování |
+| 8 | pokrytí: počet obchodních dnů s bary na kalendářní rok; rok s < 200 dny (kromě prvního a posledního roku dat) | varování v reportu |
+| 9 | 1s data (jsou-li): stejné dny jako 1min; agregace 1s → 1min dává OHLC a `volume` 1min baru (`data/README.md` 9) na ≥ 99,9 % barů | varování; při < 99 % se 1s data nepoužijí (`SKIP` 13.2.7 s důvodem) |
+
+Výstup `data_report.json` na trh: `files` (cesta, hash, počet řádků), `bars`, `first_ts`, `last_ts`, `trading_days`, `days_per_year`, `rolls` (počet, seznam `roll_day`), `gaps`, `missing_weekdays`, `excluded_days`, `convention_check` (podíl dnů), `intrabar_available`, `warnings`.
+
+**Období** (D-53, 13.3): vývojové do 2021-12-31 včetně, testovací od 2022-01-01; stejné pro všechny trhy; dřívější dělení 2007/2018 ze zrušeného `zadani/testy.md` neplatí (D-84). **Zmrazení parametrů:** první běh sady `full`, který vyhodnotí testovací období, zapíše `tests/config/params_frozen.json` (`params_hash`, `sr_params_hash`, hash tabulky pokračování, hash dat, datum, verze). Každý další běh nad testovacím obdobím s jiným `params_hash` nebo `sr_params_hash` nastaví v reportu `test_period_contaminated = true` (s datem a oběma hashi) a testovací období od té chvíle označuje jako vývojové (13.3). Soubor se nemaže; nové „čisté“ testovací období by vyžadovalo nová data (R2) a zápis do logu 16.
+
+**Rychlá sada `sample_20d`** (`tests/config/sample_days.json`, součást repozitáře, nemění se): NQ 20 obchodních dnů = 4 z každého roku {2012, 2014, 2016, 2018, 2020}; FDAX 16 = 4 z každého roku {2014, 2016, 2018, 2020}; vybrané jednou generátorem `numpy.random.default_rng(20260925)` rovnoměrně bez vracení z obchodních dnů roku, které mají bary v rozsahu `session_scope` a nejsou v `excluded_days` (výběr se provede při prvním běhu a zapíše; soubor nese hash dat, z nichž vznikl). Každý vzorkový den tvoří **blok** 3 po sobě jdoucích obchodních dnů končících vzorkovým dnem (předchozí 2 dny dávají warmup, PD* a okno modulu SR; blok začíná `session_open` prvního dne); komponenta i referenční výpočet běží od začátku bloku, kontroly 13.17.3 a 13.17.4 se vyhodnocují na všech barech bloku. Bloky nejsou vzorek pro metriky 13.4–13.7 (ty jen v sadě `full`).
+
+#### 13.18.2 Kalendář session a data rollu pro testy
+
+- Kalendář session dodává datová vrstva ze `session_rule` `MarketSpec` a README symbolu (3.2); harness ho nepočítá a nemá náhradní postup (chybějící kalendář = `DATA_ERROR`). Pro syntetická data vytváří kalendář generátor (13.18.3) z `MarketSpec` NQ.
+- `roll_dates` = sloupec `roll_day` z `data/<SYMBOL>/<SYMBOL>-rolls.csv` (3.3); pro syntetiku prázdný seznam, pokud scénář neuvádí segment `ROLL` (13.18.3).
+- 1s data (`IntrabarProvider`, 3.4) dodává datová vrstva jen pro dny, které 1s soubor obsahuje; pro ostatní vrací `None` (komponenta přejde na heuristiku 5.3; podíl se hlásí).
+
+#### 13.18.3 Syntetická data: formát scénáře, návrhová pravda, platnost
+
+Generátor a scénáře S1–S11b a SR1–SR5 definuje 13.2.5 (D-74) a 13.14.1 bod 5; jednotkou je `A` (cílový ATR v bodech, výchozí 2), ne dřívější `R` ze zrušeného `zadani/testy.md` (D-85). Tato podsekce doplňuje, jak se scénář zapisuje a jak se ověřuje jeho platnost.
+
+**Soubor scénáře** `tests/synthetic/scenarios/<id>.json`:
+
+| Pole | Obsah |
+|---|---|
+| `id`, `title` | `S1` … `S11b`, `SR1` … `SR5`; text z tabulky 13.2.5 / 13.14.1 |
+| `A`, `tick_size`, `p0` | výchozí 2,0; 0,25; 15 000 (cesta `m` je relativní k `p0`, v jednotkách `A`) |
+| `seed` | `20260925 + n` (n = pořadové číslo scénáře: S1 = 1 … S11b = 12, SR1 = 13 … SR5 = 17; S10 používá semínka zrcadlených scénářů) |
+| `warmup_bars` | 30 (ploché bary, 13.2.5) |
+| `segments` | seznam: `{"kind": "LEG", "bars": 20, "dm": 6.0}` (lineární změna `m` o `dm × A` za `bars`), `{"kind": "FLAT", "bars": n}`, `{"kind": "SINE", "bars": n, "amp": 0.6, "period": 40}`, `{"kind": "TRI", "bars": n, "amp": 0.7, "period": 8}` (trojúhelník), `{"kind": "SKIP", "bars": 60}` (cesta běží dál, bary se negenerují; S9), `{"kind": "SESSION_END"}` (zbytek scénáře pokračuje v další session; S9, SR1), `{"kind": "JUMP", "dm": -4.0}` (skok `m` bez baru; SR1 mezera mezi session), `{"kind": "ROLL"}` (následující session je dnem rollu; `open` prvního baru = `close_prev + 1 × A`), `{"kind": "WICK", "side": "LOW", "n4": 0.4}` (jeden bar s pevným knotem, SR1 bar dotyku; `n1 = n2 = 0`), `{"kind": "NOISE", "body": 0.2, "wick_lo": 0.2, "wick_hi": 0.4}` (změna rozsahů šumu pro další segmenty; 13.11 varianta `body = 0.4`) |
+| `levels` | seznam `{"kind": "SR", "m": 6.0, "from": "start", "to": null, "strength": null}` (cena `p0 + m × A`; `from`/`to` = index baru po warmupu nebo `"start"` / `"end"`; `valid_from = ts_open` baru `from`, `valid_to = ts_close` baru `to`); S8, S11b |
+| `mirror` | `true` u S10 a SR5: cesta `m → −m`, úrovně `m → −m`, knoty zrcadleně (`n₃ ↔ n₄`) |
+| `sr_only` | `true` u SR1–SR5 (běží jen modul SR, 13.14.1 bod 5) |
+| `expect` | návrhová pravda (níže) |
+
+**Generování** podle 13.2.5: bary `open = m(t−1) + n₁`, `close = m(t) + n₂`, `high = max(open, close) + n₃`, `low = min(open, close) − n₄`, `n₁, n₂ ∼ U(−0,2A, 0,2A)`, `n₃, n₄ ∼ U(0,2A, 0,4A)`, pořadí odběrů pevné pro každý bar (`n₁, n₂, n₃, n₄`), zaokrouhlení na `tick_size` (monotónní, takže `high ≥ max(open, close)`, `low ≤ min(open, close)` zůstává), `volume = 100` (bar `rth_open` navíc `× 5`, aby kontrola konvence 13.18.1 bod 6 platila i na syntetice), sloupec `delta` chybí (modul 9 neaktivní; syntetika modul delta netestuje, D-74). Časová osa: `MarketSpec` NQ, kalendář CME sestavený generátorem (session 17:00–16:00 `America/Chicago`, `rth_open` 08:30, `rth_close` 15:00, žádné zkrácené dny), 1min bary od 2020-01-06 08:30 po minutách; `SESSION_END` ukončí session posledním vygenerovaným barem a další bar je první bar další session (`session_id + 1`, `gap_before_min` podle kalendáře). Výstup scénáře: `bars.parquet`, kalendář, `roll_dates`, úrovně, `truth.json`.
+
+**Návrhová pravda** (`expect` → `truth.json`; vrstva 1; vrstva 2 je referenční výpočet 13.17.2):
+
+- `events`: seznam `{type, side, t_ref, known_lo, known_hi, payload_expect}` — očekávané události s referenčním barem `t_ref` (index po warmupu) a oknem pro `t_known`; `payload_expect` jen pole, která tabulka scénáře uvádí (např. `which = MAIN`, `reason = STRUCTURE`, `ratio ≤ 0,67`, `restart = true`).
+- `phases`: pro každý bar po warmupu a stranu fáze z tabulky scénáře (`NONE / CANDIDATE / IMPULSE / PULLBACK / TL_BROKEN / ENDED / ANY`); `ANY` v přechodovém okně = sjednocení oken `[known_lo, known_hi]` událostí, které fázi strany mění.
+- `absent`: co nesmí nastat (`{type, side}` nebo `{type, side, t_from, t_to}`), např. „žádný `TREND_END` strany UP“ (S1, S3, S4, S7).
+- `fields`: bodové podmínky na pole stavu v daném baru nebo intervalu (`{t_from, t_to, path, op, value}`, např. `up.pw3 = false` v posledních 60 barech chopu S11a; `direction = DOWN` v barech souběhu S7; `stopped_at_level = true` v baru low S8).
+- `truth_13_15`: očekávané úseky pravdy 13.15 pro bránu 13.15.6 bod 1 (`direction`, `t_start`, `t_end`, tolerance ±1).
+
+**Okna pro `t_known`** počítá harness z realizovaného `atr_ref` scénáře (`atr_min`, `atr_max` = minimum a maximum `atr_ref` po warmupu, z referenčního výpočtu) a ze sklonu `s` (v A/bar) segmentu, který následuje po extrému:
+
+| Událost | `known_lo` | `known_hi` |
+|---|---|---|
+| `SWING_CONFIRMED` pro navržený extrém v `t_ref` | `t_ref + floor(θ × atr_min / (|s| × A)) − 1` | `t_ref + ceil(θ × atr_max / (|s| × A)) + 2` |
+| `TREND_CANDIDATE` | okno `SWING_CONFIRMED` pro `L₀` | totéž |
+| `TREND_START` | okno `SWING_CONFIRMED` pro první přijaté low | totéž |
+| `PULLBACK_START` (`θ_pb = θ`) | okno `SWING_CONFIRMED` pro `H_k` (`t_ref = t_H`) | totéž |
+| `PULLBACK_END_UP` | první bar, kde `m > H_k + 0,2A`, − 1 | tentýž bar + 1 |
+| `TL_BREAK(MAIN, CLOSE)` | první bar, kde `m < TL_návrh − ε × atr_max − 0,2A`, − 1 | první bar, kde `m < TL_návrh − ε × atr_min − 0,2A`, + 1 (`TL_návrh` = přímka navrženými kotvami `L₀`, `L₁`, resp. po `TL_UPDATE` novými kotvami) |
+| `TREND_END(STRUCTURE)` | první bar, kde `m < prev_major_low − 0,2A`, − 1 | tentýž bar + 1 |
+| `TL_UPDATE`, `TL_REVALIDATED`, `CURR_TL_NEW` | okno `SWING_CONFIRMED` příslušného low | totéž |
+
+**Podmínky odstupu (platnost scénáře; D-85):** harness nad vygenerovanými bary ověří, že návrh nezávisí na šumu:
+
+1. každý navržený zvrat (rozdíl `m` mezi sousedními navrženými extrémy) je `≥ 1,5 × θ × atr_max`,
+2. v každém úseku bez navrženého extrému (`FLAT`, `SINE`, `TRI` pod prahem, šum) je největší protipohyb řady `ext_high`/`ext_low` (`anchor_mode = body`: těla) `≤ 0,75 × θ × atr_min`,
+3. navržená TL není mezi kotvami podkročena těly barů o více než `0,5 × ε × atr_min`, kromě scénářů, které to záměrně dělají (S3, S6, S11a),
+4. `atr_ref` po warmupu leží v `[0,7A, 1,3A]` (jinak čísla scénáře neodpovídají, 13.2.5).
+
+Nesplnění = `scenario_valid = false`, výsledek `ERROR`; scénář se přepracuje (hloubka zvratu, šum), nikdy se neuvolňuje tolerance.
+
+**Vzájemná kontrola:** referenční výpočet (13.17) musí na každém scénáři splnit návrhovou pravdu (`events` v oknech, `phases`, `absent`, `fields`); pravda 13.15 musí splnit `truth_13_15`. Nesplnění = `ERROR` (chyba referenčního výpočtu, pravdy, nebo scénáře), nikdy `PASS` komponenty. Komponenta musí splnit návrhovou pravdu **a** shodu s referenčním výpočtem (13.17.2).
+
+**Škály:** každý scénář běží pro `A ∈ {2, 10}` jako brána (vše je v jednotkách A, výsledky až na zaokrouhlení na tick shodné; `tick_size` 0,25 zůstává) a pro `A = 1` jako report (šum těl `0,2A` = 0,8 ticku, zaokrouhlení mění geometrii; neshoda s referenčním výpočtem se hlásí, není `FAIL`). Varianta 13.11 (šum těl `0,4A`) se spouští jen při `A = 2`.
+
+#### 13.18.4 Fixture `MechanicalLevels` a testovací `LevelProvider`
+
+**`MechanicalLevels`** (`tests/fixtures/mechanical_levels.py`) je nezávislá referenční implementace mechanických úrovní 3.10.2 pro bránu 13.14.1 bod 4 a pro běhy detektorů bez modulu SR, kde scénář úrovně vyžaduje. Vstup: bary celého obchodního dne, kalendář session, `MarketSpec` (`pd_scope`, `premarket_enabled`). Výstup: seznam úrovní 3.5 s `valid_from`, `valid_to` zadanými **indexem baru proudu modulu** (první a poslední aktivní bar, inkluzivně); harness je převádí na okamžiky `ts_open(valid_from)` a `ts_close(valid_to)` (D-90).
+
+| `kind` | `price` | `valid_from` (bar) | `valid_to` (bar) |
+|---|---|---|---|
+| `PDH`, `PDL`, `PDO`, `PDC` | max `high`, min `low`, `open` prvního, `close` posledního baru `pd_scope` dne D | první bar s `ts_open ≥ pd_scope_close(D)` (`RTH`: `rth_close(D)`; `WINDOW`: `scope_close(D)`; `ETH`: `session_close(D)`) | bar před `valid_from` sady následujícího dne, který má bary v `pd_scope` (poslední sada dat: poslední bar) |
+| `PREMARKET_H`, `PREMARKET_L` | max `high` / min `low` barů dne D+1 od `session_open(D+1)` s `ts_close ≤ rth_open(D+1)` | první bar dne D+1 s `ts_open ≥ rth_open(D+1)` | poslední bar session D+1 |
+| `SESSION_OPEN` | `open` prvního baru dne D+1 s `ts_open ≥ rth_open(D+1)` | tentýž bar (o jeden bar dřív než modul, 3.10.2 bod 9; záměr) | poslední bar session D+1 |
+
+Pravidla: `strength = null`, `source = "fixture-mechanical/1"`, `meta = {"origin": "MECHANICAL", "pd_source_date": D}`, `level_id` jako 3.10.2; den bez barů v `pd_scope` → PD* z posledního dne, který je má (3.10.2 bod 2); premarket bez barů nebo `rth_open = null` → `PREMARKET_*` a `SESSION_OPEN` se nevydají (body 3–4); `premarket_enabled = false` → žádné `PREMARKET_*`; zkrácený den podle `rth_close` kalendáře (bod 5); první den dat bez PD* (bod 6). Fixture čte jen bary s indexem `< valid_from` (u `SESSION_OPEN` bar `valid_from` sám, jen jeho `open`); brána 13.14.1 bod 1 (zkrácení dat) se spouští i nad fixture. **Porovnání s modulem** (13.14.1 bod 4): pro každé `(kind, price, pd_source_date / trading_date)` množina barů proudu modulu, ve kterých je úroveň aktivní (`valid_from ≤ ts_open(x) < valid_to`), shodná s množinou barů fixture; u `SESSION_OPEN` množina modulu = množina fixture bez prvního baru.
+
+**Testovací `LevelProvider`** (`tests/fixtures/static_levels.py`): statický seznam úrovní (ze scénáře `levels`, 13.18.3, nebo zadaný testem), `levels_at(ts_open)` vrací úrovně s `valid_from ≤ ts_open < valid_to` seřazené podle ceny, `params_hash = "test-levels/" + SHA-256 kanonického JSON seznamu`. Používá se v S8, S11b a v okrajových testech 13.2.6 (`LookaheadLevelError`, `UNKNOWN_LEVEL_KIND`, duplicitní ceny 3.5).
+
+### 13.19 Report a baseline (D-86)
+
+#### 13.19.1 Soubory
+
+Každý běh harnessu zapíše do `report_dir/<datum>T<čas>_<verze>_<params_hash[:8]>/`:
+
+| Soubor | Obsah |
+|---|---|
+| `run.json` | verze knihovny, `params_hash`, `sr_params_hash`, efektivní `TrendParams` a `SRParams`, `MarketSpec` všech trhů, hash tabulky pokračování, hash dat (13.18.1), semínka, sada (`quick` / `full`), varianty úrovní, `test_period_contaminated`, čas běhu každého kroku, hash běhu 13.16.6 pro každý trh a variantu, `reference_fix` (13.17.3), výsledky kontroly nezávislosti |
+| `gates.json`, `gates.md` | tabulka všech bran a scénářů (13.16.3): id, trh, varianta, výsledek, detail neshody, čas |
+| `data_report_<market>.json` | 13.18.1 |
+| `log/<market>/<variant>/*.parquet` | log 13.3 (`states`, `events`, `sr_levels`, `sr_events`) a `truth_c<c>.parquet`, `segments_c<c>.csv` (13.20) |
+| `metrics.json` | všechny metriky 13.4–13.7, 13.9, 13.12–13.15 a 13.14.2–13.14.3 jako strom `market → variant → period → section → metric → {value, ci_lo, ci_hi, n, breakdown}` (`breakdown` = členění 13.6: rok, směr, RTH, denní doba, kvintil `atr1`, okno zpráv, `strength_class`, `phase`, `size_bin`, `kind × origin × tercil`) |
+| `report.md` | čitelný souhrn: souhrn přijetí verze (13.16.3), tabulka bran, hlavní čísla (κ a `captured` 13.15, úspěšnost pullbacků vs. `p₀` a simulace, pokračování vs. reference, Brier, hold rate a lift SR), rozdíly s úrovněmi / bez (13.9), robustnost 13.11 (tabulka kritérií), TF 13.12, porovnání s baseline (13.19.3), seznam `WARN` a `SKIP` s důvody |
+| `audit/` | podklady 13.8: `sample.json` (vybrané události a úseky se semínkem), grafy `png` (300 barů před a po, TL jak byla známa, swingy komponenty a zpětné, aktivní úrovně, úsek pravdy 13.15), 30 publikací `SR` (13.14.3), 30 nezachycených úseků a 30 falešných běhů (13.15.6) |
+
+Grafy se kreslí knihovnou `matplotlib` (jediná další závislost, jen pro `audit/`); formát a obsah grafu podle 13.8.
+
+#### 13.19.2 Formát metrik
+
+- Každá metrika má `value`, `n` (počet pozorování), `ci_lo`, `ci_hi` (95% blokový bootstrap po týdnech 13.6; null, kde se interval nepočítá, např. počty) a `reference` (`p₀`, simulace, roční podíl, posuny k, B0 — podle sekce).
+- Výsledky `PASS`/`FAIL` bran 13.11 a 13.15.6 jsou v `gates.json` i v `metrics.json` (s hodnotami, z nichž vznikly).
+- Čísla jsou float s plnou přesností v JSON; v `report.md` zaokrouhlená na 3 platné číslice, intervaly jako `[lo, hi]`.
+- Report 13.15 (R8): tabulka κ(c) pro `c ∈ {3, 4,5, 6, 9, 12}` (κ, κ₂, `p_o`, `p_e`, interval, `c*`), matice záměn pro `c = 6`, přesnost a úplnost po směrech, po `strength_class` a `phase`; tabulka úseků: podíl zachycených a `captured` celkem a po `size_bin`, percentily `delay_start_bars`, `delay_start_min`, `move_left`, `cover`, `delay_end_bars`, `overrun_atr`, podíl předčasných konců, podíl konců zachycených událostí; tabulka falešných běhů (počet, podíl, podíl barů, medián délky a `net_move`, podle třídy a `strength_class`); reference: pro každé k = 1 … 20 κ a podíl `captured`, jejich medián a rozpětí; B0 a konstantní detektory; vše pro každý trh × období × varianta úrovní.
+
+#### 13.19.3 Baseline a regrese
+
+- První běh sady `full` pro daný trh a `params_hash` uloží `metrics.json` a `gates.json` jako `tests/baseline/<market>/<params_hash>/` (13.10: první běh na vývojovém období stanoví referenci). Baseline je součást repozitáře.
+- Každý další běh se porovná s baseline téhož `params_hash` (je-li), jinak s poslední baseline trhu (změna parametrů se v reportu označí): pro každou metriku rozdíl `value − baseline.value`; rozdíl mimo interval `[ci_lo − baseline.ci_hi, ci_hi − baseline.ci_lo]` (intervaly se nepřekrývají) se označí `changed`; u κ a podílu `captured` (13.15) zhoršení o > 0,05 a u úspěšnosti pullbacků, pokračování a hold rate zhoršení o > 5 p.b. je **regrese** → `WARN` (13.16.3); zlepšení se jen hlásí.
+- Baseline se přepíše jen záměrně (volba `--set-baseline`) a se zápisem do logu 16 (číslo verze, důvod).
+- Brány se s baseline neporovnávají; jsou absolutní.
+
+### 13.20 Provedení nezávislého zpětného testu polohy trendů (13.15; požadavek R8, D-88)
+
+#### 13.20.1 Modul pravdy
+
+- Umístění `tests/truth/` (13.16.2): `segmentation.py` (pravda 13.15.1), `shift_reference.py` (posun o obchodní dny 13.15.5), `trivial.py` (B0 a konstanty), `metrics.py` (13.15.3–13.15.4), `io.py` (čtení logu). Smí importovat jen stdlib, `numpy`, `pandas`; kontrola nezávislosti 13.16.2 (statická i běhová) je součást každého běhu. Modul nečte `TrendParams`, `SRParams` ani žádné pole `states` kromě `bar_index`, `close`, `high`, `low`, `trading_date`, `warmup`, `ts_open`, `ts_close` a — až ve fázi porovnání v `metrics.py` — `direction`, `strength_class`, `direction_phase`, `atr1` (jen pro B0) a události `TREND_END`, `TL_BREAK` (jen pro „konec zachycen událostí“ 13.15.4). Oddělení se vynucuje i uvnitř modulu: `segmentation.py` dostává jen `DataFrame` se sloupci `close, high, low, trading_date, tick_size`.
+- Rozhraní:
+
+```python
+labels, segments = truth_segments(bars, c)          # bars: DataFrame (pořadí = bar_index), c: float
+# labels: Series {NONE, UP, DOWN} délky n (T_t, 13.15.1 krok 8)
+# segments: DataFrame [direction, t_start, t_end, gain, move_pts, trading_date_start]
+shifted = shift_reference(direction, trading_date, k) # direction^{(k)} podle 13.15.5
+b0 = trivial_b0(close, atr1, window=60, k=3.0)       # B0 podle 13.15.5
+m = compare(labels, segments, direction, strength_class, direction_phase, events, period_mask)  # 13.15.3–13.15.4
+```
+
+- Algoritmus 13.15.1 se implementuje doslova (kroky 1–8), v `numpy` nad poli `float64`; remízy podle kroku 5 a 6 přesně (porovnání s tolerancí 1e-9); `A(t)` s podlahou `2 × tick_size`; vstupem jsou všechny bary logu (včetně warmupu a `outside_session`), vývojové a testovací období se oddělují až v `compare` maskou `period_mask` podle `trading_date` baru (úsek patří do období podle `t_start`, 13.15.2).
+- Běh pro každý trh × `c ∈ {3, 4,5, 6, 9, 12}`; výstup `truth_c<c>.parquet` (`bar_index`, `T`, `P`) a `segments_c<c>.csv`; pravda je stejná pro obě varianty úrovní (závisí jen na barech), počítá se jednou a porovnává s oběma logy.
+
+#### 13.20.2 Reference posunu o obchodní dny
+
+```
+shift_reference(direction, trading_date, k):
+  1. dny D_0 < D_1 < … = seřazené různé hodnoty trading_date v logu (jen dny s bary v logu)
+  2. pro den D_j: bary i = 0 … n_j − 1 v pořadí bar_index
+  3. direction^{(k)}[D_j, i] = direction[D_{j+k}, i], pokud j + k existuje a i < n_{j+k}; jinak NONE
+```
+
+Všechny metriky 13.15.3–13.15.4 se spočítají pro `k = 1 … 20` nad porovnávanými bary (13.15.2; `warmup` se bere z cílového dne); reference = medián přes k, rozpětí = min–max. Běh komponenty pro posunutá `direction` se definuje stejně jako 13.15.2 nad posunutou řadou. Posun se počítá pro každou variantu úrovní zvlášť (posouvá se její `direction`).
+
+#### 13.20.3 Kappa a intervaly
+
+- `κ` podle 13.15.3 ze čtvercové matice záměn 3 × 3 (řádky `T`, sloupce `direction`), `κ₂` z matice 2 × 2 (`in_trend`); bootstrap po týdnech (13.6): týden = pondělí–neděle podle `trading_date`, 1 000 převzorkování, `default_rng(20260925)`; pro každé převzorkování se κ počítá z převzorkované matice (součet matic vybraných týdnů), interval = 2,5. a 97,5. percentil. Brána 13.15.6 bod 2 používá dolní mez tohoto intervalu a maximum κ přes k.
+- Metriky úseků (13.15.4): bootstrap po týdnech podle `trading_date` baru `t_start` úseku; falešné běhy podle `trading_date` prvního baru běhu.
+
+#### 13.20.4 Brána na syntetice (13.15.6 bod 1)
+
+Pro každý scénář S1–S11b se pravda spočítá nad vygenerovanými bary scénáře **včetně** warmupu (13.15.1 vstup; `A(t)` z barů téhož `trading_date` scénáře), `c = 6`, a porovná s `truth_13_15` scénáře (13.18.3): počet a směr úseků přesně, `t_start` a `t_end` s tolerancí ±1 bar (indexy po warmupu = `bar_index − warmup_bars`), `gain > c` u každého úseku. Scénář s `SKIP` (S9) má osu bez chybějících barů (indexy pokračují). Nesplnění = `ERROR` modulu pravdy nebo scénáře (ne komponenty).
+
+#### 13.20.5 Výstup a kontrola podezření (13.15.6 bod 4)
+
+- Výsledky 13.20 jdou do `metrics.json` (`section = 13.15`) a do `report.md` ve formátu 13.19.2.
+- Brána 13.15.6 bod 4 (`WARN`): harness při jejím spuštění automaticky naplánuje opakování bran 13.2.1 a 13.2.2 na dotčeném období (body t rovnoměrně z dotčeného období, 200 bodů) a výsledek připojí k reportu; verze se nepřijme, dokud opakování neprojde a rozbor není v logu 16.
+- Podklady auditu: 30 nezachycených úseků pravdy s `gain ≥ 2c` a 30 falešných běhů (výběr `default_rng(20260925)` rovnoměrně, rozložený přes roky), grafy do `audit/` (13.19.1).
 
 ## 14. Mimo rozsah
 

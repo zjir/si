@@ -2,9 +2,15 @@
   "task": "TASK-0006",
   "round": 1,
   "status": "CONTINUE",
-  "summary": "Kolo 1 převzato po přerušení (čtení hotovo v předchozím chatu); zapisují se podsekce 13.16–13.20, opravy odkazů, mazání komponenta-sr.md a testy.md.",
-  "findings": {"blocking": 0, "medium": 0, "minor": 0},
-  "changed": [],
-  "next": "Zapsat 13.16–13.20, opravit odkazy, smazat komponenta-sr.md a testy.md, recenzní průchod.",
+  "summary": "Zapsány 13.8 zlatý vzorek, 13.14.4 provedení SR, 13.16–13.20 (harness, referenční výpočet a brány, data, report, provedení 13.15); zbývají opravy odkazů, log, historie, smazání souborů a recenzní průchod.",
+  "findings": {
+    "blocking": 0,
+    "medium": 0,
+    "minor": 0
+  },
+  "changed": [
+    "zadani/komponenta-trend.md"
+  ],
+  "next": "Opravit odkazy (hlavička, 1.2, 1.4, 3.8, 3.10.2, 10.1, 13 úvod, 13.10, 13.14.1, 13.15.1, 14, 15.4, D-3), log D-81+, historie 7, data/README.md 10, smazat komponenta-sr.md a testy.md, recenzní průchod.",
   "requests": []
 }
