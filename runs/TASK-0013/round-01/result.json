@@ -1,8 +1,8 @@
 {
   "task": "TASK-0013",
   "round": 1,
-  "status": "CONTINUE",
-  "summary": "Kolo 1 rozpracováno: D-105/D-106 ověřeno (2 drobné: příklad pw3_max W=45 → 11, bin denní doby je v 15.5 ne 15.4); čtení 2, 3.5–3.10 bez nálezu; pokračuje 5–9.",
+  "status": "DONE",
+  "summary": "Kontrolní průchod po D-105–D-106: 0 blokujících, 0 středních, 2 drobné (D-107: příklad mřížky pw3_max pro W = 45 dával 12 místo 11; bin denní doby D-106 odkazoval na 15.4 místo 15.5 v 13.6, logu a historii); vše zapracováno, hlavička kolo 15, historie řádek 15, odkazy D/I/R/S/SR/sekce skriptem bez nálezu.",
   "findings": {
     "blocking": 0,
     "medium": 0,
@@ -11,6 +11,6 @@
   "changed": [
     "zadani/komponenta-trend.md"
   ],
-  "next": "Pokračovat čtením 5, 6–9, 10.3–10.5, 13.2 syntetika, 13.16.3, 13.17–13.19, 15, log D-1–D-102; pak log/historie.",
+  "next": "Žádné další kolo (max_rounds 1, DONE). Případné další kontrolní kolo: průchod nad D-107 (12.3, 13.6, D-106); sekce 1, 11, 12.1, 12.4, 13.1, 13.4, 13.9–13.13, 13.14.1, 13.15, 13.16.1–13.16.2, 13.16.4–13.16.6 v tomto kole nečteny (celé čteny v TASK-0012 bez nálezu); D-81–D-107 neotvírat bez nového argumentu.",
   "requests": []
 }
