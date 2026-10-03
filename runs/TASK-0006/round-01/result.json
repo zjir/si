@@ -2,11 +2,11 @@
   "task": "TASK-0006",
   "round": 1,
   "status": "CONTINUE",
-  "summary": "Sloučení hotovo: komponenta-sr.md a testy.md smazány, 13.16–13.20 a 13.14.4 zapsány, odkazy, log D-81–D-90 a historie opraveny; zbývá recenzní průchod.",
+  "summary": "Sloučeno: komponenta-sr.md a testy.md smazány, postup testů přepsán do 13.16–13.20 a 13.14.4 (harness, referenční výpočet a nové brány, data a syntetika, report, provedení 13.15), R5 a R8 uzavřeny, D-81–D-91; zbývá úplný průchod sekcemi 4–6, 9, 11, 15 proti novému textu.",
   "findings": {
     "blocking": 0,
-    "medium": 0,
-    "minor": 0
+    "medium": 11,
+    "minor": 11
   },
   "changed": [
     "zadani/komponenta-trend.md",
@@ -14,6 +14,6 @@
     "zadani/testy.md",
     "data/README.md"
   ],
-  "next": "Recenzní průchod nového textu (AI implementátor / AI tester) a sloučených míst; nálezy zapracovat; DONE/CONTINUE.",
+  "next": "Úplný recenzní průchod celým dokumentem (zejména 4–6, 9, 11, 15 a log D-4–D-65, které kolo 1 nečetlo) proti novým sekcím 13.16–13.20 a invariantům 13.17.4; nálezy zapracovat; při čistém průchodu DONE.",
   "requests": []
 }

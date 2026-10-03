@@ -1,18 +1,24 @@
-# TASK-0006 — stav v kole 1 (2026-10-03), rozpracováno (kolo převzato po přerušení chatu)
+# TASK-0006 — stav po kole 1 (2026-10-03)
 
-## Zjištění (kolo 1)
+## Hotovo (kolo 1)
 
-- `zadani/testy.md` (v0.2) má jen sekce 0–5 a dodatky; sekce 6–21 (brány G1–G11, report, audit, stabilita, log) nikdy nevznikly. Obsah je zastaralý proti kolům 2–6 komponenty (názvy událostí, parametry `theta`/`eps`/`curr_ratio_*`, čas ET, kalendář CME napevno, NinjaTrader parquet, období 2007/2018, generátor v jednotkách R). Tabulka výkladů P-01–P-42 je v komponenta-trend.md už rozhodnuta → orákulum se nepřenáší; referenční výpočet = nezávislá implementace 5–8, 3.10, 9 (D-40).
-- Z testy.md se přenáší a rozvádí: vrstvy testů a mapování Ø1, struktura balíku a nezávislost modulů, běh harnessu a stavy, porovnání záznamů, co komponenta nesmí, serializace a hash, reálná data (zdroje přes datovou vrstvu, validace, `data_report.json`, `sample_20d`, zmrazení parametrů), syntetika (formát scénáře, návrhová pravda s okny, podmínky odstupu, škály), fixture `MechanicalLevels` (odkazují 3.10.2 bod 8–9 a 13.14.1 bod 4), report a baseline, provedení 13.15 (R8), provedení testů SR, zlatý vzorek auditu.
+- Smazány `zadani/komponenta-sr.md` a `zadani/testy.md`; odkaz v `data/README.md` 10 nahrazen; v komponenta-trend.md na ně nevede žádný živý odkaz (zbývají jen zmínky „zrušen / smazán“ v 1.4, 3.8, 13 úvod, 13.14.4, 13.16, logu a historii).
+- Nové podsekce: 13.14.4 provedení testů SR; 13.16 balík a harness (vrstvy, mapování Ø1, struktura `tests/`, nezávislost importů, sady quick/full, pořadí, stavy PASS/FAIL/WARN/SKIP/ERROR/DATA_ERROR, přijetí verze, `records_equal`, kontrakt pro testy, schémata a hash); 13.17 referenční výpočet (bez výkladů; tabulka P-01–P-42 z testy.md se nepřenáší, D-82), brána shody na reálných datech 13.17.3, brána invariantů I-1–I-16 (13.17.4); 13.18 data (CSV přes datovou vrstvu, validace 9 bodů, `data_report.json`, období D-53, `params_frozen.json`, `sample_20d`, formát scénáře, návrhová pravda s okny, podmínky odstupu, škály A ∈ {2, 10}, fixture `MechanicalLevels`, statický `LevelProvider`); 13.19 report, metriky, baseline a regrese; 13.20 provedení 13.15 (R8).
+- 13.8 zlatý vzorek (měkká brána od 150 označení); 10.1 jméno balíku `pat_trend`; 12.1 a 12.4 povolený rozsah parametrů (D-91, nález kola); 13.9, 13.10 doplněny; 3.8 R5 a R8 splněny; 3.10.2 body 8–9 a 13.14.1 bod 4 odkazují na 13.18.4; 13.15.1, 14, 15.4 opraveny; D-3 Zrušeno (kolo 7); D-81–D-91; historie kolo 7 (0 / 11 / 11); hlavička.
+- Formát: escapovány `|` v kódových úsecích tabulek (7 míst), tabulky v celém dokumentu mají konzistentní počet sloupců.
 
-## Plán zápisu (pořadí)
+## Rozhodnutí kola (viz log)
 
-1. Nové podsekce 13.16 harness, 13.17 referenční výpočet a brány shody/invariantů, 13.18 testovací data, 13.19 report a baseline, 13.20 provedení 13.15; 13.14.4 provedení SR; odstavec zlatý vzorek v 13.8.
-2. Opravy odkazů: hlavička (řádek 3), 1.2, 1.4, 3.8 R5/R8, 3.10.2 bod 8–9, 10.1 (jméno balíku), 13 úvod, 13.10, 13.14.1 bod 4, 13.15.1, 14, 15.4, D-3; log D-81+; historie kolo 7; `data/README.md` 10.
-3. Smazat `zadani/komponenta-sr.md` a `zadani/testy.md`; grep na zbytkové odkazy.
-4. Recenzní průchod nového textu (implementátor / tester), nálezy zapracovat, result.json DONE/CONTINUE.
+- D-81 sloučení; D-82 orákulum se nepřenáší; D-83 bitově vs. tolerance 1e-9; D-84 data; D-85 syntetika a škály; D-86 harness; D-87 nové brány; D-88 provedení 13.15; D-89 provedení SR a zlatý vzorek; D-90 fixture; D-91 povolený rozsah.
 
-## Hotovo
+## Co zbývá (kolo 2 = poslední kolo tohoto běhu)
 
-- Přečteno (v tomto chatu cíleně): testy.md 1–4, 5.1 (jen předměty řádků), 5.9–6; komponenta-trend.md 1–3.5, 3.8, 3.10, 7.1–7.4, 10, 12.1/12.4 (jména), 13 celá, 14, 15.4, 16 (D-3, D-66–D-80), 17; data/README.md 10.
-- Zapsáno: zatím nic (další krok = 1).
+1. **Úplný recenzní průchod celým dokumentem** (dodatek 3): v kole 1 byly čteny 1–3.5, 3.8, 3.10, 7, 8, 10, 12 (jména), 13 celá, 14, 15.4, 16 (D-3, D-66–D-91), 17; **nečteny** 4–6, 9, 11, 12.2–12.3, 15.1–15.3, 15.5–15.6 a log D-4–D-65. Projít je v roli implementátora a testera a zejména ověřit, že nové sekce 13.16–13.20 s nimi souhlasí: invarianty I-9, I-10, I-13, I-14 proti 5.4–5.6, 6.1.1, 6.7 (pořadí v baru, remízy, `t_ext` vs. `t_conf`, `TL_BREAK` + `TL_REVALIDATED` v jednom baru); kontrakt 13.16.5 proti 11; `records_equal` proti 11.1; okna návrhové pravdy 13.18.3 proti 5.4 (definice potvrzení swingu) a 6.5.
+2. Zkontrolovat, že 13.2.5 tabulka scénářů a 13.18.3 formát scénáře si odpovídají (segmenty S5 `SINE`, S6 „cesta“, S7, S11 `TRI`), a doplnit do 13.18.3 chybějící druh segmentu, bude-li potřeba.
+3. Zvážit, zda 13.3 „Log odhadů“ má odkázat na schémata 13.16.6 (drobné).
+4. Po průchodu: historie kolo 8, `result.json` DONE, pokud průchod nenajde nic nového.
+
+## Co nedělat
+
+- Neotvírat znovu rozhodnutí D-81–D-91 bez nového argumentu; nepřidávat zpět orákulum ani číslování G1–G11 / S01–S21.
+- Nečíst PAT/ podklady (nejsou k dispozici; poznámka zadavatele).
