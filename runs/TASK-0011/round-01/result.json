@@ -1,0 +1,10 @@
+{
+  "task": "TASK-0011",
+  "round": 1,
+  "status": "CONTINUE",
+  "summary": "Kolo zahájeno; kontrolní průchod po D-101–D-102 probíhá.",
+  "findings": {"blocking": 0, "medium": 0, "minor": 0},
+  "changed": [],
+  "next": "Pokračovat průchodem: D-101 (5.2 × 5.4 × 10.5 × 13.2.7 × 13.2.8), D-102, 13.18–13.20, 15, zbytek.",
+  "requests": []
+}
