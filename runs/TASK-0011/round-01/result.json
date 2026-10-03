@@ -2,9 +2,9 @@
   "task": "TASK-0011",
   "round": 1,
   "status": "CONTINUE",
-  "summary": "Kolo zahájeno; kontrolní průchod po D-101–D-102 probíhá.",
-  "findings": {"blocking": 0, "medium": 0, "minor": 0},
-  "changed": [],
-  "next": "Pokračovat průchodem: D-101 (5.2 × 5.4 × 10.5 × 13.2.7 × 13.2.8), D-102, 13.18–13.20, 15, zbytek.",
+  "summary": "Průchod probíhá: 1 střední (intrabar_order SINGLE vs UNKNOWN v režimu close při heuristice, 5.3 × 3.4 × 13.17.1 × 13.17.3; D-103), 1 drobný (5.4 pseudokód cand_*_lvl/fine); D-101–D-102 ověřeny.",
+  "findings": {"blocking": 0, "medium": 1, "minor": 1},
+  "changed": ["zadani/komponenta-trend.md"],
+  "next": "Pokračovat: 13.18–13.20 a 15 celé, pak zbytek dokumentu; log D-103/D-104, hlavička, historie.",
   "requests": []
 }
