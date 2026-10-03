@@ -3,7 +3,7 @@
 - Úkol: TASK-0006 — review 4: trend — sloučení SR a testů do jednoho zadání, smazání komponenta-sr.md a testy.md
 - Režim: spec
 - Kolo: 1 (strop tohoto běhu: kolo 2)
-- Datum: 2026-10-03T13:33:18+02:00
+- Datum: 2026-10-03T13:45:38+02:00
 - Pracovní složka: kořen repozitáře; všechny cesty jsou relativní k ní.
 
 ## Cíl
@@ -40,7 +40,7 @@ Vždy smíš zapisovat do `runs/TASK-0006/` (stav úkolu a soubory tohoto kola).
 
 ## Stav a minulé kolo
 
-- Stav úkolu: `runs/TASK-0006/state.md` (zatím neexistuje, jde o první kolo; vytvoř ho)
+- Stav úkolu: `runs/TASK-0006/state.md` 
 - Výsledek minulého kola: (žádný, první kolo)
 - Diff minulého kola: (žádný)
 
