@@ -217,7 +217,7 @@ Kontroly (výsledek v `verification`, `passed = true` jen když projdou všechny
 
 ## 10. Použití v komponentách
 
-Komponenty (`zadani/komponenta-trend.md`, `zadani/komponenta-sr.md`, `zadani/testy.md`) čtou data jen přes datovou vrstvu, která:
+Komponenta a její testy (`zadani/komponenta-trend.md`: detektory, modul SR 3.10, testovací harness 13.16–13.20) čtou data jen přes datovou vrstvu, která:
 
 1. načte CSV a lokalizuje čas (`Europe/Prague`, 5),
 2. přiřadí obchodní den a session podle burzy (6) a vynechá bary mimo obchodní hodiny burzy (README symbolu),

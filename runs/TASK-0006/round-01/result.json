@@ -2,15 +2,18 @@
   "task": "TASK-0006",
   "round": 1,
   "status": "CONTINUE",
-  "summary": "Zapsány 13.8 zlatý vzorek, 13.14.4 provedení SR, 13.16–13.20 (harness, referenční výpočet a brány, data, report, provedení 13.15); zbývají opravy odkazů, log, historie, smazání souborů a recenzní průchod.",
+  "summary": "Sloučení hotovo: komponenta-sr.md a testy.md smazány, 13.16–13.20 a 13.14.4 zapsány, odkazy, log D-81–D-90 a historie opraveny; zbývá recenzní průchod.",
   "findings": {
     "blocking": 0,
     "medium": 0,
     "minor": 0
   },
   "changed": [
-    "zadani/komponenta-trend.md"
+    "zadani/komponenta-trend.md",
+    "zadani/komponenta-sr.md",
+    "zadani/testy.md",
+    "data/README.md"
   ],
-  "next": "Opravit odkazy (hlavička, 1.2, 1.4, 3.8, 3.10.2, 10.1, 13 úvod, 13.10, 13.14.1, 13.15.1, 14, 15.4, D-3), log D-81+, historie 7, data/README.md 10, smazat komponenta-sr.md a testy.md, recenzní průchod.",
+  "next": "Recenzní průchod nového textu (AI implementátor / AI tester) a sloučených míst; nálezy zapracovat; DONE/CONTINUE.",
   "requests": []
 }
