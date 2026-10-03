@@ -1,16 +1,10 @@
 {
   "task": "TASK-0012",
   "round": 1,
-  "status": "CONTINUE",
-  "summary": "Kontrolní průchod po D-103–D-104: 0 blokujících, 1 střední (zaokrouhlení ,5 nedefinováno: 13.11 perturbace, 12.2, 12.3 → konvence půl nahoru v 4.5, D-105), 5 drobných (D-106); zapracováno, log, historie řádek 14, hlavička kolo 14; dočítá se zbytek.",
-  "findings": {
-    "blocking": 0,
-    "medium": 1,
-    "minor": 5
-  },
-  "changed": [
-    "zadani/komponenta-trend.md"
-  ],
-  "next": "Dočíst 13.2–13.3, 1–2, 3.5–3.9; pak DONE.",
+  "status": "DONE",
+  "summary": "Kontrolní průchod po D-103–D-104: 0 blokujících, 1 střední (zaokrouhlení hodnoty přesně ,5 na celé číslo nedefinováno v 13.11 perturbacích, 12.2 bodu 1 a 12.3 → konvence půl nahoru v 4.5, D-105), 6 drobných (D-106: bin denní doby 13.6 × 13.14.2 × 15.4, 13.5 simulace i ≥ 1 a c_i > H, 13.8 výběr vzorku bez semínka × 13.20, 13.14.2 atr_ref(t_pub), 10.1 a 13.3 sloupce logu × 13.16.6, 14 duplicitní body); vše zapracováno, hlavička kolo 14, historie řádek 14, odkazy D/I/sekce bez nálezu.",
+  "findings": {"blocking": 0, "medium": 1, "minor": 6},
+  "changed": ["zadani/komponenta-trend.md"],
+  "next": "Žádné další kolo (max_rounds 1, DONE). Případné další kontrolní kolo: průchod nad novým textem D-105 (4.5 konvence × 12.2 × 12.3 × 13.11) a D-106 (13.5, 13.6, 13.8, 13.14.2, 13.20); sekce 2, 3.5–3.10, 6–9, 10.3–10.5, 13.17–13.20 a 15 v tomto kole nečteny (celé čteny v TASK-0010/0011 bez nálezu); D-81–D-106 neotvírat bez nového argumentu.",
   "requests": []
 }

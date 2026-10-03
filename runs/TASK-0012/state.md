@@ -1,17 +1,14 @@
-# TASK-0012 — stav kola 1 (2026-10-03)
+# TASK-0012 — stav po kole 1 (2026-10-03)
 
-## Hotovo
-- D-103/I-17 text ověřen: 3.4 × 5.3 bod 1 × 5.4 Časy × 10.3 (tabulka + odstavec D-93) × 13.17.1 bod 4 × 13.17.4 I-17 × log D-103 — bez rozporu. D-104 (5.4 komentář) bez nálezu.
-- Přečteno celé: 10.1–10.2, 11, 12, 13.1, 13.4–13.15, 4.
-- Nálezy ZAPRACOVÁNY (4.5 konvence, 10.1, 12.2, 12.3, 13.5, 13.6, 13.8, 13.11, 13.14.2, 13.19.1, 13.20, 14, 15.4; log D-105, D-106; historie řádek 14; hlavička kolo 14; kontrola odkazů D/I/sekce bez nálezu):
-  1. (střední) zaokrouhlení poloviny na celé číslo není definováno: 13.11 perturbace ±25 % (atr_n 30 → 22,5/37,5; pw3_max 30; sr_max_levels 6 → 4,5/7,5), 12.2 bod 1 `round((i+0,5)×n/8)` (n ≡ 8 mod 16 dává přesně ,5; 0/1-based pořadí), 12.3 `pw3_max` ∈ {W/4, …} (W = 45, 75 → ,5); Python `round` = půl k sudému → dva implementátoři jinak → globální konvence půl nahoru `⌊x + 0,5⌋` do 4.5.
-  2. (drobný) denní doba: 13.6 a 13.14.2 „po 30 min“ vs. 15.4 „zaokrouhlené na 30 min“ → definovat bin `⌊m / 30⌋ × 30` jednou (13.6), odkázat.
-  3. (drobný) 13.5 simulace: OBNOVENÍ `c_i ≥ H` vs. 13.4 `ext_high > H` (ostré); krok `i` od 1 → sjednotit (`c_i > H`, i ≥ 1).
-  4. (drobný) 13.8 „náhodný vzorek … semínko v reportu“ bez pravidla → systematický výběr v časovém pořadí (jako 13.5 bod 2 / 12.2 bod 1), bez semínka.
-  5. (drobný) 13.14.2 `atr_ref(valid_from)` → `atr_ref` prvního baru rozsahu s `ts_open ≥ valid_from`.
+## Hotovo (kolo 1)
+- D-103/I-17 ověřeno první: 3.4 × 5.3 bod 1 × 5.4 Časy × 10.3 (tabulka + odstavec D-93) × 13.17.1 bod 4 × 13.17.3 × I-17 × log D-103 — bez rozporu. D-104 (5.4 komentář) bez nálezu.
+- Přečteno celé: 1, 4, 10.1–10.2, 11, 12, 13.1, 13.2 brány 1–10, 13.3, 13.4–13.15, 13.16.1–13.16.2, 13.16.4–13.16.6, 14.
+- Střední (1, D-105): zaokrouhlení hodnoty přesně ,5 na celé číslo nebylo určeno (13.11 perturbace ±25 %: `atr_n` 30 → 22,5/37,5, `pw3_max` 30, `sr_max_levels` 6 → 4,5/7,5; 12.2 bod 1 `round((i+0,5)×n/8)` při `n ≡ 8 (mod 16)` a 0/1-based pořadí; 12.3 mřížka `pw3_max` při W = 45, 75). Zapsána globální konvence půl nahoru `⌊x + 0,5⌋` do 4.5 (včetně pravidla ceny na tick: přesně uprostřed → nižší tick) a odkazy v 12.2, 12.3, 13.11.
+- Drobné (6, D-106): bin denní doby `30 × ⌊m/30⌋` definován v 13.6, odkazy 13.14.2 a 15.4; 13.5 simulace kroky `i ≥ 1`, OBNOVENÍ `c_i > H` ostře (jako 13.4); 13.8 vzorek auditu systematicky v časovém pořadí bez semínka (13.20 sladěno, `audit/sample.json` nese pravidlo a N); 13.14.2 `atr_ref(t_pub)` (první bar s `ts_open ≥ valid_from`); 10.1 prefixy `stat_`, `news_`, `extra_<name>_` a 13.3 sloupce baru podle 13.16.6; 14 sloučeny duplicitní body o vstupních zónách.
+- Hlavička kolo 14; log D-105, D-106; historie řádek 14; poslední řádek KONEC DOKUMENTU; kontrola odkazů D-1–D-106, I-1–I-17 a číslovaných sekcí skriptem bez nálezu. `result.json` DONE.
 
-## Rozpracováno
-- Přečteno celé i 13.16.1–13.16.2, 13.16.4–13.16.6, 14. Dočítá se 13.2–13.3, 1–2, 3.5–3.9.
+## Nečteno v tomto kole (celé čteno v TASK-0010/0011 bez nálezu)
+- 2, 3.5–3.10, 5, 6–9, 10.3–10.5, 13.2 syntetika, 13.16.3, 13.17–13.20, 15, log D-1–D-102 (jen grep).
 
 ## Zbývá
-- Dočíst zbytek, nastavit DONE (max_rounds 1).
+- Nic v tomto úkolu (max_rounds 1, DONE). Doporučení pro další kontrolní kolo: průchod nad novým textem D-105/D-106 a sekcemi výše; D-81–D-106 neotvírat bez nového argumentu.
