@@ -2,13 +2,15 @@
   "task": "TASK-0008",
   "round": 1,
   "status": "CONTINUE",
-  "summary": "Kolo 1 zahájeno: kontrolní průchod zadani/komponenta-trend.md po TASK-0007 r01.",
+  "summary": "Průchod oblastí z TASK-0007: blokující 13.2.7 (snapshoty bez maskování ts_ext_fine se nikdy neshodnou) a střední (konec okna rozdílu včetně t_e) zapracovány (D-97); průchod pokračuje.",
   "findings": {
-    "blocking": 0,
-    "medium": 0,
+    "blocking": 1,
+    "medium": 1,
     "minor": 0
   },
-  "changed": [],
+  "changed": [
+    "zadani/komponenta-trend.md"
+  ],
   "next": "Dokončit průchod dokumentem (začít oblastmi změněnými v TASK-0007 r01).",
   "requests": []
 }
